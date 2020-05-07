@@ -38,15 +38,15 @@ https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-ma
 
 ...% ls
 
-...% rm *.*
+...% rm '*.*'
 
-...% cd ..
+...% cd '..'
 
 ...% cd Cask
 
 ...% ls
 
-...% rm *.*
+...% rm '*.*'
 
 ...% cd
 
