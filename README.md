@@ -6,50 +6,50 @@ Diplomatura Business Intelligence (BI) - Universidad Tecnlógica Nacional Buenos
 
 0) Instalar Homebrew:
 
-...% /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
+...% <code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"</code>
 
-1) ...% brew tap sethrfore/homebrew-r-srf
+1) ...% <code>brew tap sethrfore/homebrew-r-srf</code>
 
-2) ...% brew info sethrfore/r-srf/r
+2) ...%<code> brew info sethrfore/r-srf/r</code>
 
-3) ...% brew install <all dependencies and options>
+3) ...% <code>brew install _all dependencies and options_ </code>
 
-4) ...% brew info sethrfore/r-srf/r (to confirm it's all there)
+4) ...% <code>brew info sethrfore/r-srf/r (to confirm it's all there) </code>
 
-5) ...% brew install -s sethrfore/r-srf/r --with-cairo --with-icu4c --with-java --with-libtiff --with-openblas --with-texinfo
+5) ...% <code>brew install -s sethrfore/r-srf/r --with-cairo --with-icu4c --with-java --with-libtiff --with-openblas --with-texinfo </code>
 
-6) ...% Install RStudio from its web site with the installer.
+6) Install RStudio from its web site with the installer.
 
-7) ...% Update Compilers required by R 4.y.z by following (MacOs Catalina 10.15+):
+7) Update Compilers required by R 4.y.z by following (MacOs Catalina 10.15+):
 
-https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-macos/
+Fuente: https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-macos/
 
 8) Start up RStudio and run:
 
-> capabilities()
+> <code>capabilities()</code>
 
 9) Back in Terminal, clean up Brew downloads cache
 
-...% cd ~/Library/Caches/Homebrew
+...% <code>cd ~/Library/Caches/Homebrew</code>
 
-...% ls
+...% <code>ls</code>
 
-...% cd downloads
+...% <code>cd downloads</code>
 
-...% ls
+...% <code>ls</code>
 
 ...% <code>rm ``*``.``*``</code>
 
-...% cd '..'
+...% <code>cd ``..``</code>
 
-...% cd Cask
+...% <code>cd Cask</code>
 
-...% ls
+...% <code>ls</code>
 
-...% rm '*.*'
+...% <code>rm ``*``.``*``</code>
 
-...% cd
+...% <code>cd</code>
 
-...% brew cleanup
+...% <code>brew cleanup</code>
 
-...% brew missing
+...% <code>brew missing</code>
