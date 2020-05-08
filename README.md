@@ -71,7 +71,7 @@ Copia y pega lo siguiente al final de documento uytilizando cualquier editor de 
 ~ % <code>brew missing</code>
 
 --------------------------------------------------------------------
-#BONUS: 
+# BONUS: 
 
 library(ctv) es súper interesante, puedes leer sobre ella brevemente en https://cran.r-project.org/web/packages/ctv/index.html 
 
