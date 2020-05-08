@@ -36,6 +36,10 @@ Es un instructivo para Windows, en Mac, el archivo Rprofile que hay que modifica
 
 <code> /usr/local/Cellar/r/4.0.0/lib/R/library/base/R/Rprofile </code> Hay que buscarlo con Finder.
 
+BONUS: library(ctv) es súper interesante, puedes leer sobre ella brevemente en https://cran.r-project.org/web/packages/ctv/index.html 
+
+Lo más interesante son los listado por vistas publicados en: https://cran.r-project.org/web/views/
+
 10) De vuelta en la Terminal, limpiar el cache de Brew downloads
 
 ~ % <code>cd ~/Library/Caches/Homebrew</code>
