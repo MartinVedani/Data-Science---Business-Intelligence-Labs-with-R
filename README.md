@@ -44,10 +44,6 @@ Copia y pega lo siguiente al final de documento uytilizando cualquier editor de 
 <code> myPaths <- c(myPaths[3], myPaths[1], myPaths[2])</code><br>
 <code> .libPaths(myPaths)</code>
 
-BONUS: library(ctv) es súper interesante, puedes leer sobre ella brevemente en https://cran.r-project.org/web/packages/ctv/index.html 
-
-Lo más interesante son los listado por vistas publicados en: https://cran.r-project.org/web/views/
-
 10) De vuelta en la Terminal, limpiar el cache de Brew downloads
 
 ~ % <code>cd ~/Library/Caches/Homebrew</code>
