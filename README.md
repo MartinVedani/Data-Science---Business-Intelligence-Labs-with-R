@@ -6,7 +6,7 @@ Diplomatura Business Intelligence (BI) - Universidad Tecnlógica Nacional Buenos
 
 0) Instalar Homebrew:
 
-...% <code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"</code>
+~ % <code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"</code>
 
 1) ...% <code>brew tap sethrfore/homebrew-r-srf</code>
 
