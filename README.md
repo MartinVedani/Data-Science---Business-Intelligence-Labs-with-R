@@ -18,17 +18,21 @@ Diplomatura Business Intelligence (BI) - Universidad Tecnlógica Nacional Buenos
 
 5) ~ % <code>brew install -s sethrfore/r-srf/r --with-cairo --with-icu4c --with-java --with-libtiff --with-openblas --with-texinfo </code>
 
-6) Install RStudio from its web site with the installer.
+6) Instalar RStudio desde su página web.
 
-7) Update Compilers required by R 4.y.z by following (MacOs Catalina 10.15+):
+7) Actualizar los compiladores requeridos por R ^4.0.0 con las instrucciones del siguiente tutorial (MacOs Catalina 10.15+):
 
 Fuente: https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-macos/
 
-8) Start up RStudio and run:
+8) Iniciar RStudio y ejecutar lo siguiente:
 
 ``>`` <code>capabilities()</code>
 
-9) Back in Terminal, clean up Brew downloads cache
+9) Sigue las intrucciones de este tutorial par acambiar la libraria donde se instalarán todos los paquetes de R. eSto ahorrará MUCHO timepo en el futuro al actualizar a nuevas versiones de R:
+
+https://www.accelebrate.com/library/how-to-articles/r-rstudio-library
+
+10) De vuelta en la Terminal, limpiar el cache de Brew downloads
 
 ~ % <code>cd ~/Library/Caches/Homebrew</code>
 
