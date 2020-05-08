@@ -34,7 +34,18 @@ https://www.accelebrate.com/library/how-to-articles/r-rstudio-library
 
 Es un instructivo para Windows, en Mac, el archivo Rprofile que hay que modificar para hacer el cambio permanente se encustra en:
 
-<code> /usr/local/Cellar/r/4.0.0/lib/R/library/base/R/Rprofile </code> Hay que buscarlo con Finder.
+<code> /usr/local/Cellar/r/4.0.0/lib/R/library/base/R/Rprofile </code> Hay que buscarlo con Finder. 
+
+Copia y pega lo siguiente al final de documento uytilizando cualquier editor de texto (crea tu propia carpeta "r-library").
+
+<code> 
+#my custom stuff
+myPaths <- .libPaths()
+myPaths <- c(myPaths, "/Users/martin/r-library")
+myPaths <- c(myPaths[3], myPaths[1], myPaths[2])
+.libPaths(myPaths)
+</code>
+
 
 BONUS: library(ctv) es súper interesante, puedes leer sobre ella brevemente en https://cran.r-project.org/web/packages/ctv/index.html 
 
