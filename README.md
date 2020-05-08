@@ -38,9 +38,7 @@ https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-ma
 
 ...% ls
 
-<code>``rm *.*</code>
-
-...% rm <*.*>
+...% rm ``*``.``*``
 
 ...% cd '..'
 
