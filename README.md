@@ -34,7 +34,7 @@ https://www.accelebrate.com/library/how-to-articles/r-rstudio-library
 
 Es un instructivo para Windows, en Mac, el archivo Rprofile que hay que modificar para hacer el cambio permanente se encustra en:
 
-<code> cd /usr/local/Cellar/r/4.0.0/lib/R/library/base/R/Rprofile </code>
+<code> /usr/local/Cellar/r/4.0.0/lib/R/library/base/R/Rprofile </code> Hay que buscarlo con Finder.
 
 10) De vuelta en la Terminal, limpiar el cache de Brew downloads
 
