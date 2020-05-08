@@ -38,10 +38,10 @@ Es un instructivo para Windows, en Mac, el archivo Rprofile que hay que modifica
 
 Copia y pega lo siguiente al final de documento uytilizando cualquier editor de texto (crea tu propia carpeta "r-library").
 
-<code> #my custom stuff</code>
-<code> myPaths <- .libPaths()</code>
-<code> myPaths <- c(myPaths, "/Users/martin/r-library")</code>
-<code> myPaths <- c(myPaths[3], myPaths[1], myPaths[2])</code>
+<code> #my custom stuff</code><br> 
+<code> myPaths <- .libPaths()</code><br>
+<code> myPaths <- c(myPaths, "/Users/martin/r-library")</code><br>
+<code> myPaths <- c(myPaths[3], myPaths[1], myPaths[2])</code><br>
 <code> .libPaths(myPaths)</code>
 
 BONUS: library(ctv) es súper interesante, puedes leer sobre ella brevemente en https://cran.r-project.org/web/packages/ctv/index.html 
