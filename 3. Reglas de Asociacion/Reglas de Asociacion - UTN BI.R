@@ -5,7 +5,7 @@
 #########################################################################################
 
 # Se recomiendo enfaticamente realizar estos ejercicios luego de leer el archivo pdf 
-# "arules" y "arulesViz" detenidamente. Estan en ingl�s por lo cual, de no leerlo, se 
+# "arules" y "arulesViz" detenidamente. Estan en inglés por lo cual, de no leerlo, se 
 # pueden seguir los pasos debajo sin problema.
 # Fuente: Intelligent Data Analysis Lab, https://lyle.smu.edu/IDA/arules/
 
@@ -21,7 +21,7 @@ library(seriation)
 #################################### Ejercicio 2.2.1 ####################################
 #########################################################################################
 # Tomar los datos contenidos en la tabla casos1 de la database reglas y encontrar todas 
-# las reglas de asociaci�n que tengan m�s de 10 casos y una confianza superior al 80%
+# las reglas de asociación que tengan más de 10 casos y una confianza superior al 80%
 #########################################################################################
 
 ### Entender los datos que hemos recibido y convertir clases importadas a tipo de clase
@@ -29,6 +29,10 @@ library(seriation)
 
 # Importar y entender Caso 1
 Caso1 <- read.csv("Caso1.csv", head = T, sep="," , as.is = T)
+
+# o
+
+Caso1 <- read.table(file.choose(), header = TRUE, sep = ",")
 str(Caso1)
 summary(Caso1)
 
@@ -55,6 +59,11 @@ summary(Caso1trans)
 
 # Importar y entender Caso 2
 Caso2 <- read.csv("Caso2.csv", head = T, sep="," , as.is = T)
+
+# o
+
+Caso2 <- read.table(file.choose(), header = TRUE, sep = ",")
+
 str(Caso2)
 summary(Caso2)
 
@@ -80,6 +89,10 @@ summary(Caso2trans)
 
 # Importar y entender Caso 3
 Caso3 <- read.csv("Caso3.csv", head = T, sep="," , as.is = T)
+
+# o
+
+Caso3 <- read.table(file.choose(), header = TRUE, sep = ",")
 str(Caso3)
 summary(Caso3)
 
@@ -105,9 +118,11 @@ summary(Caso3trans)
 
 ### Chequear frecuencia de items
 
+par(mfrow = c(3,1)) #para dividir la sección de gráficos en 3x1 ( 3 filas y 1 columna)
 itemFrequencyPlot(Caso1trans, topN=50, cex.names=.5)
 itemFrequencyPlot(Caso2trans, topN=50, cex.names=.5)
 itemFrequencyPlot(Caso3trans, topN=50, cex.names=.5)
+par(mfrow = c(1,1)) #resetear la sección de gráficos a 1 x 1 (1 fila, 1 columna)
 
 ### Crear e inspeccionar reglas
 
@@ -145,8 +160,8 @@ reglas3diez80 <- apriori(Caso3trans, parameter = list(supp = 0.001, confidence =
 #########################################################################################
 #################################### Ejercicio 2.2.2 ####################################
 #########################################################################################
-# Tomar las reglas obtenidas en el ejercicio 2.2.1 y ordenarlas desde las m�s 
-# dependientes a las m�s independientes.
+# Tomar las reglas obtenidas en el ejercicio 2.2.1 y ordenarlas desde las más 
+# dependientes a las más independientes.
 #########################################################################################
 
 # Inspeccionar reglas, en orden descendente (de mayor a menor) segun "lift" 
@@ -162,37 +177,44 @@ plot(reglas1diez80, measure=c("support", "lift"), shading="confidence")
 plot(reglas1diez80, shading="order", control=list(main = "Two-key plot"))
 
 sel <- plot(reglas1diez80, measure=c("support", "lift"), shading="confidence", 
-            interactive=TRUE)
+            engine="interactive")
+
+# Este último es un gráfico interactivo, debes presionar ESC antes de continuar.
 
 
 #########################################################################################
 #################################### Ejercicio 2.2.3 ####################################
 #########################################################################################
-# Encontrar i y l para los datos del ejercicio 2.2.1 tales que obtenga el m�ximo valor 
-# dentro de alguna matriz de inter�s.
+# Encontrar i y l para los datos del ejercicio 2.2.1 tales que obtenga el máximo valor 
+# dentro de alguna matriz de interés.
 #########################################################################################
 
-plot(reglas1diez80, method="matrix3D", measure="lift", control=list(reorder=TRUE))
+# 3D
+plot(reglas1diez80, method="matrix", engine = "3d", measure="lift", control=list(reorder="similarity"))
+# Valid reorder methods are: ‘none’, ‘measure’, ‘support/confidence’, ‘similarity’
 
+# 2D
 plot(reglas1diez80, method="matrix", measure=c("lift", "confidence"))
 plot(reglas1diez80, method="matrix", measure=c("lift", "confidence"), 
-     control=list(reorder=TRUE))
+     control=list("similarity"))
 
 plot(reglas1diez80, method="grouped")
 plot(reglas1diez80, method="grouped", control=list(k=50))
-sel2 <- plot(reglas1diez80, method="grouped", interactive=TRUE)
+sel2 <- plot(reglas1diez80, method="grouped", engine='interactive')
 
 plot(reglas1diez80, method="graph")
 plot(reglas1diez80, method="graph", control=list(type="itemsets"))
 saveAsGraph(head(sort(reglas1diez80, by="lift"),1000), file="rules.graphml")
 
 plot(reglas1diez80, method="paracoord")
+
+# El siguiente va a tardar un largo tiempo en reordenar.
 plot(reglas1diez80, method="paracoord", control=list(reorder=TRUE))
 
 #########################################################################################
 #################################### Ejercicio 2.2.4 ####################################
 #########################################################################################
-# Consulte el tutorial "reglas Weka" en c:\tutorials de su m�quina virtual para usar el
-# paquete Weka.associations.apriori para reconstruir los c�lculos realizados en el 
+# Consulte el tutorial "reglas Weka" en c:\tutorials de su máquina virtual para usar el
+# paquete Weka.associations.apriori para reconstruir los cálculos realizados en el 
 # ejercicio 2.2.1
 #########################################################################################
