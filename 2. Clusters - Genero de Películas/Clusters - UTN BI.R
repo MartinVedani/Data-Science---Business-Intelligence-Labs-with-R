@@ -36,6 +36,9 @@
 
 # En este ejercicio nos concentraremos en distancia euclídea.
 
+# El método de Manhattan no lo veremos implementado pero en la unidad de Algorítmos 
+# Genéticos, en dilema del viajante se implementa una solucion de ciudades muy interesante.
+
 getwd() # Por defecto R toma los archivos de esta carpeta
 generoPeliculas <- read.csv("generoPeliculas.csv", header = TRUE)
 
