@@ -2,13 +2,16 @@
 Diplomatura Business Intelligence (BI) - Universidad Tecnlógica Nacional Buenos Aires (UTN)
 
 # Instruccion de instalación con TERMINAL en MacOs Catalina 10.15+ (sirve para Windows con modificaciones leves del usuario):
-(Ir a la fuente para Mojave o Windows: https://github.com/sethrfore/homebrew-r-srf.git)
 
 0) Instalar Homebrew:
+Fuente: https://docs.brew.sh/Installation
 
 ~ % <code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"</code>
 
-1) ~ % <code>brew tap sethrfore/homebrew-r-srf</code>
+1) Intalar R modificado con FULL CAPABILITIES (Java, Open BLASS, Tcl-Tk, Jpeg, Png, Tiff, Cairo, etc.)
+Fuente: Fuente para Mojave o Windows: https://github.com/sethrfore/homebrew-r-srf.git)
+
+~ % <code>brew tap sethrfore/homebrew-r-srf</code>
 
 2) ~ %<code> brew info sethrfore/r-srf/r</code>
 
