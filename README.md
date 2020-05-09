@@ -1,7 +1,7 @@
 # Business Intelligence - Guía de Trabajos Prácticos con R ^4.0.0
 Diplomatura Business Intelligence (BI) - Universidad Tecnlógica Nacional Buenos Aires (UTN)
 
-# Instruccion de instalación con TERMINAL en MacOs Catalina 10.15+:
+# Instruccion de instalación con TERMINAL en MacOs Catalina 10.15+ (sire para Windows con modificaciones leves del usuario):
 (Ir a la fuente para Mojave o Windows: https://github.com/sethrfore/homebrew-r-srf.git)
 
 0) Instalar Homebrew:
