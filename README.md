@@ -23,23 +23,23 @@ Fuente: https://github.com/sethrfore/homebrew-r-srf.git)
 
 5) ~ % <code>brew install -s sethrfore/r-srf/r --with-cairo --with-icu4c --with-java --with-libtiff --with-openblas --with-texinfo </code>
 
-6) Instalar RStudio desde su página web.
-
-7) Actualizar los compiladores requeridos por R ^4.0.0 con las instrucciones del siguiente tutorial (MacOs Catalina 10.15+):
-
-Fuente: https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-macos/
-
-8) Iniciar RStudio y ejecutar lo siguiente:
-
-``>`` <code>capabilities()</code>
-
-9) Instalar los siguientes paquetes que necesitaremos para compilar algoritmos genéticos y manipular datos geoespaciales para resolver el dilema del Vendedor Ambulante (The Travelling Sales Man dilema)
+6) Instalar los siguientes paquetes que necesitaremos para compilar algoritmos genéticos y manipular datos geoespaciales para resolver el dilema del Vendedor Ambulante (The Travelling Sales Man dilema)
 
 <code> brew install gdal </code>
 
 <code> brew install udunits </code>
 
-10) Sigue las intrucciones de este tutorial para cambiar la libraria donde se instalarán todos los paquetes de R. eSto ahorrará MUCHO timepo en el futuro al actualizar a nuevas versiones de R:
+7) Instalar RStudio desde su página web.
+
+8) Actualizar los compiladores requeridos por R ^4.0.0 con las instrucciones del siguiente tutorial (MacOs Catalina 10.15+):
+
+Fuente: https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-macos/
+
+9) Iniciar RStudio y ejecutar lo siguiente:
+
+``>`` <code>capabilities()</code>
+
+10) Sigue las intrucciones de este tutorial para cambiar la libraría donde se instalarán todos los paquetes de R. Esto ahorrará MUCHO timepo en el futuro al actualizar a nuevas versiones de R:
 
 https://www.accelebrate.com/library/how-to-articles/r-rstudio-library
 
@@ -55,7 +55,11 @@ Copia y pega lo siguiente al final de documento uytilizando cualquier editor de 
 <code> myPaths <- c(myPaths[3], myPaths[1], myPaths[2])</code><br>
 <code> .libPaths(myPaths)</code>
 
-10) De vuelta en la Terminal, limpiar el cache de Brew downloads
+11) Para lops que prefieren un IDE oscuro o gris, pueden ir a:
+
+<code> Tools -> Global Options -> Appearance -> Editor Theme -> "Material" </code>
+
+12) De vuelta en la Terminal, limpiar el cache de Brew downloads
 
 ~ % <code>cd ~/Library/Caches/Homebrew</code>
 
