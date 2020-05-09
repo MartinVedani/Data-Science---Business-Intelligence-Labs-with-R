@@ -1,6 +1,6 @@
 #############################################################################################
 
-# Ejemplos pr·cticos de Redes Neuronales en R - por Martin Vedani, UTN Business Intelligence
+# Ejemplos pr√°cticos de Redes Neuronales en R - por Martin Vedani, UTN Business Intelligence
 
 ############################################################################################
 
@@ -14,18 +14,22 @@ library(NeuralNetTools)
 
 # Cargar los datos que utilizaremos
 neuralNetData <- read.csv("neuralNetData.csv", header = T)
+# o
+
+neuralNetData <- read.table(file.choose(), header = T, sep = ",") 
+
 head(neuralNetData)
 str(neuralNetData)
 
-# Tenemos 101 observaciones de datos numÈricos de los cuales, 9 variables son de entrada "E" 
-# que resultan en una respuesta "Y". En total 10 variables. 
-# Para que los n˙meros no sean tan abstractos, podemos pensarlos de esta forma: 10 variables 
-# (columnas) representa datos de 9 datos y 1 resultado para 101 personas (filas) que han 
-# pagado o no han pagado (respuesta Y) un prÈstamo, entiendo 1 = TRUE, 0 = FALSE.
-# Estos datos los hemos recolectado a lo largo del tiempo, lo que no ha dado la "experiencia"
-# (la data.frame de 101 x 10 que acabamos de subir con read.csv) y que ahora hemos de
-# de utilizar para entrenar a nuestra red neuronal (de forma muy similar a lo que hicimos con
-# arboles de decisiones).
+# Tenemos 101 observaciones de datos num√©ricos de los cuales, 9 variables son de 
+# entrada "E" que resultan en una respuesta "Y". En total 10 variables. 
+# Para que los n√∫meros no sean tan abstractos, podemos pensarlos de esta forma: 10 variables 
+# (columnas) instancias o datos de 9 atributos y 1 resultado para 101 personas (filas) que
+# han pagado o no han pagado (respuesta Y) un pr√©stamo, entendiendo 1 = TRUE, 0 = FALSE.
+# Estos datos los hemos recolectado a lo largo del tiempo, lo que nos ha dado la 
+# "experiencia" (una data.frame de 101 x 10 que acabamos de subir con read.csv) y que 
+# ahora hemos de de utilizar para entrenar a nuestra red clientes (red neuronal) 
+# de forma muy similar a lo que hicimos con arboles de predicci√≥n para toma de decisiones.
 
 # Dividir los datos en grupo de entrenamiento y otro de testeo
 
@@ -34,11 +38,11 @@ entrenamiento <- neuralNetData[1:50, ]
 testeo <- neuralNetData[51:101, ]
 
 # Ahora vamos a construir una red neuronal con 4 nodos ocultos (una red neuronal se compone
-# de una entrada, oculta y nodos de salida). Se elige el n˙mero de nodos de aquÌ sin 
-# un mÈtodo claro, sin embargo hay algunas reglas generales. La opciÛn LifeSign se refiere 
+# de una entrada, oculta y nodos de salida). Si bien se elige aqu√≠ el n√∫mero de nodos sin 
+# un m√©todo claro, hay sin embargo algunas reglas generales. La opci√≥n LifeSign se refiere 
 # al nivel de detalle. El ouput no es lineal y vamos a utilizar un valor umbral del 10%. 
-# El paquete NeuralNet utiliza backpropagation el·stico con regresiÛn por pesos como su 
-# algoritmo est·ndar.
+# El paquete NeuralNet utiliza backpropagation el√°stico con regresi√≥n por pesos como su 
+# algoritmo est√°ndar.
 
 ?neuralnet
 set.seed(1234)
@@ -54,65 +58,64 @@ olden(nuestra.red, out_var = "Y")
 
 # Testeamos
 ?subset
-sub.testeo <- subset(testeo, select = c("E1", "E2", "E3", "E4", "E5", "E6", "E7", "E8", "E9"))
+sub.testeo <- subset(testeo, select = c("E1", "E2", "E3", "E4", "E5", "E6", 
+                                        "E7", "E8", "E9"))
 head(sub.testeo)
 str(sub.testeo)
 
 # El conjunto de datos sub.testeo es un subconjunto de nuestra base de datos de testeo, 
-# contiene sÛlo las variables (columnas) de entrada, no hemos incluido la columna de 
+# contiene s√≥lo las variables (columnas) de entrada, no hemos incluido la columna de 
 # respuesta "Y". 
 # El conjunto se ve de la siguiente manera:
 
 ?compute
 computos <- compute(nuestra.red, sub.testeo)
 
-# Observemos los resultados de que tan bien aprendiÛ nuestra red neuronal
-# comparando las predicciones vs con la informaciÛn real Y que tenemos.
-
-
+# Observemos los resultados de que tan bien aprendi√≥ nuestra red neuronal
+# comparando las predicciones vs con la informaci√≥n real Y que tenemos.
 
 resultados <- data.frame(real = testeo$Y, prediccion = computos$net.result)
 head(resultados)
 
-# Podemos redondear al entero m·s prÛximo para mejorar el entendimiento:
+# Podemos redondear al entero m√°s pr√≥ximo para mejorar el entendimiento:
 
 resultados$prediccion <- round(resultados$prediccion)
 head(resultados)
 
-# Vemos que las redes neuronales son muy parecidas a los arboles de decisiÛn, se utilizan
-# para el mismo propÛsito como hemos visto en este ejercicio de hoy, y los anteriores en la
-# unidad de ·rboles. Hay muchas opiniones respecto de cu·l es mejor. A nivel muy alto, se
-# podrÌa decir:
+# Vemos que las redes neuronales son muy parecidas a los arboles de decisi√≥n, se utilizan
+# para el mismo prop√≥sito como hemos visto en este ejercicio ahora, y los anteriores en la
+# unidad de √°rboles. Hay muchas opiniones respecto de cu√°l es mejor. A nivel muy alto, se
+# podr√≠a decir:
 
-# ¡rboles De DecisiÛn
+# √Årboles De Decisi√≥n
 
-# - Pueden ser m·s r·pido una vez entrenados (aunque ambos algoritmos pueden entrenar 
+# - Pueden ser m√°s r√°pidos una vez entrenados (aunque ambos algoritmos pueden entrenar 
 #   lentamente dependiendo algoritmo exacto y la cantidad / dimensionalidad de los datos). 
-#   Esto se debe a un ·rbol de decisiÛn intrÌnsecamente "tira a la basura", cuenta con la 
-#   entrada que no lo encuentra ˙til, mientras que una red neuronal utilizar· todos ellos a 
-#   menos que hagas algo de la selecciÛn de caracterÌsticas como una etapa de 
-#   pre-procesamiento.
+#   Esto se debe a que un √°rbol de decisi√≥n intr√≠nsecamente "tira a la basura" la variable
+#   la entrada que no encuentra √∫til, mientras que una red neuronal utilizar√° todas las 
+#   variables a menos que hagas una selecci√≥n manual de caracter√≠sticas dentro de una 
+#   etapa de re-procesamiento.
 
-# - Si es importante para entender lo que el modelo est· haciendo, los ·rboles son muy 
-#   interpretable.
+# - Si es importante entender lo que el modelo est√° haciendo, los √°rboles son muy 
+#   interpretables.
 
-# - Probablemente se quiera estar seguro de podar el ·rbol para evitar el exceso de ajuste.
+# - Probablemente se quiera estar seguro de podar el √°rbol para evitar el exceso de ajuste.
 #   randomForest soluciona este problema como hemos visto.
 
 # Redes Neuronales
 
-# - M·s lento (tanto para la formaciÛn y clasificaciÛn), y menos interpretable.
+# - M√°s lentas (tanto para la formaci√≥n y clasificaci√≥n), y menos interpretables.
 
 # - Si los datos llegan por stream, se pueden hacer actualizaciones incrementales 
-#   estoc·sticos a diferencia de los ·rboles de decisiÛn que utilizan algoritmos de 
-#   aprendizaje por "batch" (por lote)
+#   estoc√°sticos a diferencia de los √°rboles de decisi√≥n que utilizan algoritmos de 
+#   aprendizaje por "batch" (por lote).
 
-# - Se pueden modelar funciones m·s arbitrarias (interacciones no lineales, etc.) y por lo 
-#   tanto podrÌan ser m·s precisos, siempre que haya suficientes datos de entrenamiento. 
-#   Pero pueden ser propensas al sobre-ajuste ajuste tambiÈn.
+# - Se pueden modelar funciones m√°s arbitrarias (interacciones no lineales, etc.) y por lo 
+#   tanto podr√≠an ser m√°s precisos, siempre que haya suficientes datos de entrenamiento. 
+#   Pero pueden ser propensas al sobre-ajuste como los √°rboles.
 
-# La recomendaciÛn es siempre entender bien el flujo de informaciÛn para las variables de
-# entrada y, en funciÛn de costo y beneficio, elegir el algoritmo m·s apropiado. Claro,
-# para poder hacer el an·lisis de costo vs. beneficio, hay que implementar ambos algoritmos
-# y compararlos en tÈrminos de calidad predictiva, soluciÛn de overfitting, y del tiempo y 
+# La recomendaci√≥n es siempre entender bien el flujo de informaci√≥n para las variables de
+# entrada y, en funci√≥n de costo y beneficio, elegir el algoritmo m√°s apropiado. Claro,
+# para poder hacer el an√°lisis de costo vs. beneficio, hay que implementar ambos algoritmos
+# y compararlos en t√©rminos de calidad predictiva, soluci√≥n de overfitting, y del tiempo y 
 # recursos necesarios para el procesamiento.
