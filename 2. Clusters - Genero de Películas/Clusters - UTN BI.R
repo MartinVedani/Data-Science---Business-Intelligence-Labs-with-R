@@ -4,48 +4,54 @@
 #################################### Ejercicio 2.1.1 ####################################
 #########################################################################################
 
-# Terminar con el agrupamiento del ejemplo de la página 2 y luego continuar el 
-# dendrograma, que es la representación gráfica del proceso de agrupamiento jerárquico 
+# Terminar con el agrupamiento del ejemplo de la pÃ¡gina 2 y luego continuar el 
+# dendrograma, que es la representaciÃ³n grÃ¡fica del proceso de agrupamiento jerÃ¡rquico 
 # y permite observar la distancia a la que se van uniendo los elementos (es fundamental 
 # al momento de definir el criterio de parada).
 
-# Agrupamiento jerárquico es útil en las primeras etapas de análisis de datos cuando se está 
-# tratando de tener una comprensión de los datos. Por ejemplo, la búsqueda de una jerarquía 
+# Agrupamiento jerÃ¡rquico es Ãºtil en las primeras etapas de anÃ¡lisis de datos cuando se estÃ¡ 
+# tratando de tener una comprensiÃ³n de los datos. Por ejemplo, la bÃºsqueda de una jerarquÃ­a 
 # entre diferentes factores o variables.
 
 # https://es.wikipedia.org/wiki/Agrupamiento_jer%C3%A1rquico
 
-# Lo primero que debemos hacer es definir distancias sobre las cuales definir jerarquías por
-# cercanía.
+# Lo primero que debemos hacer es definir distancias sobre las cuales definir jerarquÃ­as por
+# cercanÃ­a.
 
-# ¿cómo definimos cerca? Este es el paso más importante y hay varias posibilidades en función 
-# de las cuestiones que se está tratando de responder y los datos que se tienen. 
+# Â¿cÃ³mo definimos cerca? Este es el paso mÃ¡s importante y hay varias posibilidades en funciÃ³n 
+# de las cuestiones que se estÃ¡ tratando de responder y los datos que se tienen. 
 
-# Distancia o similitud suelen ser las métricas utilizadas. Hay varias maneras de medir la 
+# Distancia o similitud suelen ser las mÃ©tricas utilizadas. Hay varias maneras de medir la 
 # distancia o similitud.
 
-# Distancia euclídea es la distancia "vuelo de pájaro", la distancia más corta en línea
+# Distancia euclÃ­dea es la distancia "vuelo de pÃ¡jaro", la distancia mÃ¡s corta en lÃ­nea
 # recta. Muchas aplicaciones, sin embargo, no puede utilizar de manera realista la distancia 
-# euclídea. Coches, por ejemplo, no pueden atravesar edificios y obstáculos y deben
-# seguir las calles y caminos. Por ende, en términos realistas, y también para los argumentos
-# de funciones en R, también existe la distancia o método de "Manhattan", es 2 o más dimensiones
-# a igual que con distancia euclidiana.
+# euclÃ­dea. Coches, por ejemplo, no pueden atravesar edificios y obstÃ¡culos y deben
+# seguir las calles y caminos. Por ende, en tÃ©rminos realistas, y tambiÃ©n para los argumentos
+# de funciones en R, tambiÃ©n existe la distancia o mÃ©todo de "Manhattan", en 2 o mÃ¡s dimensiones
+# al igual que con distancia euclidiana.
 
-# Distancia euclídea y la similitud de correlación son medidas continuas, mientras que la 
+# Distancia euclÃ­dea y la similitud de correlaciÃ³n son medidas continuas, mientras que la 
 # distancia de Manhattan es una medida binaria.
 
-# En este ejercicio nos concentraremos en distancia euclídea.
+# En este ejercicio nos concentraremos en distancia euclÃ­dea.
 
 getwd() # Por defecto R toma los archivos de esta carpeta
 generoPeliculas <- read.csv("generoPeliculas.csv", header = TRUE)
+
+# o
+
+generoPeliculas <- read.table(file.choose(), header = TRUE, sep = ",")
+
 generoPeliculas
 
 # Tenemos un data frame con datos numericos, characteres. Necesitamos lograr
 # una matriz de solamente numeros para calcular distancias.
 
-Pelis <- generoPeliculas[,2:4]
-rownames(Pelis) <- generoPeliculas$Caso
+Pelis <- generoPeliculas[,2:4] #toma columnas de 2 a 4
 Pelis
+rownames(Pelis) <- generoPeliculas$Caso #cambiea el nomrbre de las filas al mismo del archivo original
+Pelis 
 
 # Ahora tenemos la matriz Pelis de 5 observaciones con 3 coordenadas cartesianas
 # x = Comed_1, y = Darama_2, z = Accion_3 (o cualquier otro orden, es indiferente)
@@ -55,8 +61,8 @@ Pelis
 distanciaPelis <- dist(Pelis, method = "euclidean")
 distanciaPelis
 
-# Con la suerte de nuestro lado, R nos proporciona una función simple que nos crea el
-# dendrograma de agrupamiento jerárquico. Se llama hclust() y toma como argumento la matriz 
+# Con la suerte de nuestro lado, R nos proporciona una funciÃ³n simple que nos crea el
+# dendrograma de agrupamiento jerÃ¡rquico. Se llama hclust() y toma como argumento la matriz 
 # triangular inferior de distancia que miramos en el paso anterior.
 
 ?hclust
@@ -69,26 +75,26 @@ plot(agruparPelis)
 plot(as.dendrogram(agruparPelis))
 par(mfrow = c(1,1))
 
-# El primer grafico nos da bastante información, pero para identificar claramente 
-# la cantidad de grupos a diferentes distancias, el segundo en más útil. 
-# Veámoslo más grande para entender por qué.
+# El primer grafico nos da bastante informaciÃ³n, pero para identificar claramente 
+# la cantidad de grupos a diferentes distancias, el segundo en mÃ¡s Ãºtil. 
+# Veamoslo mÃ¡s grande para entender por quÃ©.
 
 plot(as.dendrogram(agruparPelis))
 
-# Si quisiésemos saber, por ejemplo, cuantos grupos tenemos a una distancia de 0.5 (sin
-# unidades), ¿qué contestaríamos?
+# Si quisiÃ©semos saber, por ejemplo, cuantos grupos tenemos a una distancia de 0.5 (sin
+# unidades), Â¿quÃ© contestarÃ­amos?
 
 abline(h = 0.5, col="red")
 
-# Contestaríamos 5 grupos, la misma cantidad de observaciones con las que comenzamos.
-# Esta distancia (o calificación de película) es irrelevante.
+# ContestarÃ­amos 5 grupos, la misma cantidad de observaciones con las que comenzamos.
+# Esta distancia (o calificaciÃ³n de pelÃ­cula) es irrelevante.
 
-# Y a una distancia de 2.5, ¿cuantos grupos de observaciones similares tenemos?
+# Y a una distancia de 2.5, Â¿cuantos grupos de observaciones similares tenemos?
 
 abline(h = 2.5, col="red")
 
-# 3, porque nuestra línea corta 3 "ramas". Y los grupos similares son A+C y B+D, con E
-# por si sola quien, claramente, tiene un gusto en películas estadísticamente diferente
+# 3, porque nuestra lÃ­nea corta 3 "ramas". Y los grupos similares son A+C y B+D, con E
+# por sÃ­ sola quien, claramente, tiene un gusto en pelÃ­culas estadÃ­sticamente diferente
 # a de las otra 4 personas.
 
 #########################################################################################
@@ -96,99 +102,103 @@ abline(h = 2.5, col="red")
 #########################################################################################
 
 # Tomar el conjunto de puntos X,Y representado en la tabla "cluster1" de la base de 
-# datos Clusters y aplicarle un algoritmo bottom up basado en la distancia euclídea 
-# utilizando como representación de un conjunto el promedio entre los puntos. Detenerse 
+# datos Clusters y aplicarle un algoritmo bottom up basado en la distancia euclÃ­dea 
+# utilizando como representaciÃ³n de un conjunto el promedio entre los puntos. Detenerse 
 # al llegar a 5 conjuntos.
 
 getwd() # Por defecto R toma los archivos de esta carpeta
 cluster <- read.csv("cluster.txt", header = FALSE)
+# o
+cluster  <- read.table(file.choose(), header = FALSE, sep = ",")
 
-head(cluster) # R asignó automáticamente el nombre de las columnas (variables) V1
-#               y V2
+head(cluster) # R asignÃ³ autom?ticamente el nombre de las columnas (variables) V1 y V2
 
 # Cambiamos los nombres de las columnas para que representen exactamente lo que son
 colnames(cluster) <- (c("x","y"))
 head(cluster)
 
-# Calculamos distancias
+plot(cluster)
+
+# ParecerÃ­a que hay 5 agrupamientos, busquemos major detalle calculando distancias
+
 distanciaCluster <- dist(cluster, method = "euclidean")
 
-# Creamos la agrupación jerárquica
+# Creamos la agrupaciÃ³n jerÃ¡rquica
 agruparCluster <- hclust(distanciaCluster)
 
 # Veamos los resultados
 plot(as.dendrogram(agruparCluster))
 
 # Genial. Vemos que a partir de la distancia 1.4 aproximadamente, ya tenemos agrupaciones
-# relevantes que nos pueden ayudar a comenzar a estudiar un gran número de observaciones
-# por grupos de algún sentido común entre ellos - la investigación luego nos dirá en qué son
+# relevantes que nos pueden ayudar a comenzar a estudiar un gran nÃºmero de observaciones
+# por grupos con algÃºn sentido comÃºn entre ellos - la investigaciÃ³n luego nos dirÃ¡ en quÃ© son
 # parecidos los conjuntos compuestos por tantas observaciones.
 
 abline (h = 1.4, col = "red")
 
-# ¿Cuántas agrupaciones tenemos en la distancia 1.4? ¿Cuántas ramas corta la línea roja
-# que acabamos de dibujar sobre el gráfico?
+# Â¿CuÃ¡ntas agrupaciones tenemos en la distancia 1.4? Â¿CuÃ¡ntas ramas corta la lÃ­nea roja
+# que acabamos de dibujar sobre el grÃ¡fico?
 
 #########################################################################################
 #################################### Ejercicio 2.1.3 ####################################
 #########################################################################################
 
-# El dendrograma incluido en la teoría, grafica el proceso de agrupamiento jerárquico de 
-# provincias de argentina según variables del último censo de población 2010. Analizarlo y comentar:
+# El dendrograma incluido en la teorÃ­a, grafica el proceso de agrupamiento jerÃ¡rquico de 
+# provincias de argentina segÃºn variables del censo de poblaciÃ³n 2010. Analizarlo y comentar:
 
-# a) Según este resultado, en cuántos niveles agruparía a las provincias?
-#    La decisión de la cantidad de los grupos depende de las distancia. Por ejemplo, a 
-#    distancia 10, haríamos 5 grupos, porque esas son las cantidades de ramas que
-#    cortaríamos al dibujar un línea en distancia = 10.
+# a) SegÃºn este resultado, Â¿en cuÃ¡ntos niveles agruparÃ­a a las provincias?
+#    La decisiÃ³n de la cantidad de los grupos depende de las distancia. Por ejemplo, a 
+#    distancia 10, harÃ­amos 5 grupos, porque esas son las cantidades de ramas que
+#    cortarÃ­amos al dibujar un lÃ­nea en distancia = 10.
 
 
-# b) Si tuviera que formar 4 grupos, qué provincias incluiría en cada uno?
-#    A una distancia de 13 aproximadamente, se formaría 4 grupos. Siguiendo las ramificaciones,
-#    los grupos serían:
+# b) Si tuviera que formar 4 grupos, Â¿quÃ© provincias incluirÃ­a en cada uno?
+#    A una distancia de 13 aproximadamente, se formarÃ­an 4 grupos. Siguiendo las ramificaciones,
+#    los grupos serÃ­an:
 #              Grupo 1: Salta + Santiago del Estero + AMBA_3C + La Rioja +
 #                       Catamarca + Santa Fe + Misiones
 #              Grupo 2: Jujuy solamente
 #              Grupo 3: AMBA + La Pampa
-#              Grupo 4: Buenos Aires + Santa Cruz + Corrientes + Entre Ríos
+#              Grupo 4: Buenos Aires + Santa Cruz + Corrientes + Entre RÃ­os
 
 #########################################################################################
 #################################### Ejercicio 2.1.4 ####################################
 #########################################################################################
 
 # Tomar el conjunto de puntos x,y representado en la tabla "cluster1" de la base de datos
-# Clusters y aplicarle K-medias para llegar a 5 conjuntos tomando los datos según X 
+# Clusters y aplicarle K-medias para llegar a 5 conjuntos tomando los datos segÃºn X 
 # creciente.
 
-# Esta Técnica es más útil en las primeras etapas de análisis de datos cuando se está 
-# tratando de tener una comprensión de los datos. Por ejemplo, la búsqueda de un cierto 
-# patrón o relación entre diferentes factores o variables.
+# Esta TÃ©cnica es mÃ¡s Ãºtil en las primeras etapas de anÃ¡lisis de datos cuando se estÃ¡ 
+# tratando de tener una comprensiÃ³n de los datos. Por ejemplo, la bÃºsqueda de un cierto 
+# patrÃ³n o relaciÃ³n entre diferentes factores o variables.
 
 # Estamos de suerte otra vez, el paquete kmeans ya viene disponible en R.
 
 ?kmeans
 
-# La documentación de R nos dice que el método k-means "pretende dividir los puntos
+# La documentaciÃ³n de R nos dice que el mÃ©todo k-means "pretende dividir los puntos
 # en una cantidad de grupos K tal que se minimice la suma de las distancias cuadradas 
 # desde cada hasta el centro del grupo ("cluster") al que ha sido asignada.
 
-# Aunque tiene varios parámetros, sólo hablaremos de cuatro. Estos son x, (la matriz numérica
+# Aunque tiene varios parÃ¡metros, sÃ³lo hablaremos de cuatro. Estos son x, (la matriz numÃ©rica
 # o data frame de los datos), centers, iter.max y nstart. El segundo de estos (centers) puede 
-# ser un número de grupos o un conjunto de centroides iniciales. El tercero, iter.max, 
-# especifica el número máximo de iteraciones que pasar, y nstart es el número de arranques al 
-# azar que se desean probar si especifica centros como un número.
+# ser un nÃºmero de grupos o un conjunto de centroides iniciales. El tercero, iter.max, 
+# especifica el nÃºmero mÃ¡ximo de iteraciones permitidas, y nstart es el nÃºmero de arranques al 
+# azar que se desean probar si centros es un nÃºmero.
 
-# Paso 2: Creación de los datos:
+# Paso 2: CreaciÃ³n de los datos:
 # Luego es necesario crear un "data frame" con los datos que tenemos para elaborar 
 # los clusters
-# Para eso podemos recurrir a una función que carga directamente un archivo del tipo CSV tiene
+# Para eso podemos recurrir a una funciÃ³n que carga directamente un archivo del tipo CSV que tiene
 # solamente los datos que queremos agrupar:
 
 getwd() # Por defecto R toma los archivos de esta carpeta
 cluster <- read.csv("cluster.txt", header = FALSE) 
 
 # Alternativa para buscar archivo manualmente
-cluster <- read.csv(file.choose(), header = FALSE)
-head(cluster) # R asignó automáticamente el nombre de las columnas (variables) V1 y V2
+cluster <- read.table(file.choose(), header = FALSE)
+head(cluster) # R asign? autom?ticamente el nombre de las columnas (variables) V1 y V2
 
 # Cambiamos los nombres de las columnas para que representen exactamente lo que son
 colnames(cluster) <- (c("x","y"))
@@ -201,11 +211,12 @@ head(cluster)
 
 plot(cluster)
 
-# Paso 4: Observando el plot, k-means clustering requiere cierta distancia métrica 
-# (digamos euclidiana), un número fijo e hipotético de clusters, y una estimación inicial
-# de la ubicación de los centroides para cada dicho número hipotético de clusters.
+# Paso 4: Observando el plot, k-means clustering requiere cierta distancia mÃ©trica 
+# (digamos euclidiana), un nÃºmero fijo e (estimativo o hipotÃ©tico) de clusters, y una 
+# estimaciÃ³n inicial de la ubicaciÃ³n de los centroides para cada dicho nÃºmero estimado o hipotÃ©tico 
+# de clusters.
 
-# A primer vista se pueden identificar 5 agrupamientos, por lo que invocamos la función
+# A primer vista se pueden identificar 5 agrupamientos, por lo que invocamos la funciÃ³n
 # kmeans() y "adivinaremos" que deseamos agrupar alrededor de 5 centros, 
 
 # Fijamos set.seed() para duplicar resultados y guardamos los resultados de kmeans() en
@@ -216,112 +227,115 @@ agrupar5 <- kmeans(cluster, centers = 5)
 
 # Paso 5: visualizando los resultados.
 
-# Al finalizar, k-means clustering devuelve una posición final del centroide de cada grupo, 
-# así como la asignación de cada punto de datos u observación a un clúster.
+# Al finalizar, k-means clustering devuelve una posiciÃ³n final del centroide de cada grupo, 
+# asÃ­ como la asignaciÃ³n de cada punto de datos u observaciÃ³n a un cluster.
 
-# Invocando la variable creada con kmeans() obtenemos la información del tamaño de clusters, 
+# Invocando la variable creada con kmeans() obtenemos la informaciÃ³n del tamaÃ±o de clusters, 
 # y las coordenadas x,y de los centros de cada uno de los 5 grupos.
 
 agrupar5
 
-# K-means clustering with 5 clusters of sizes 393, 87, 208, 212, 101
+# K-means clustering with 5 clusters of sizes 420, 87, 101, 191, 202 
+# (depende tambien del sistema orperativo, set seed es para duplicar los mismo resultados en mismos
+# sistemas. Yo estoy usando mac, es probable que Windows o Linux den resultados diferentes con 
+# set.seed(123) o con versiones differentes de las fÃ³rmula kmeans().
 
 # Cluster means:
-#          x          y
-# 1 4.009575  3.4889257
+#   x          y
+# 1 2.976254 -0.9909601
 # 2 6.522571  1.0127496
-# 3 3.978965 -0.9931525
-# 4 1.992461 -0.9888090
-# 5 5.545365  0.9713600
+# 3 5.545365  0.9713600
+# 4 2.984065  3.0040805
+# 5 4.979240  3.9473686
 
 # Clustering vector:
-# [1] 1 5 5 3 4 1 1 4 1 1....
+# [1] 4 3 3 1 1 4 4 1 4 5 1....
 
 # Within cluster sum of squares by cluster:
-#  [1] 542.81868  15.00750  36.48762  33.59407  18.16448
-# (between_SS / total_SS =  89.9 %)
+#  [1] 484.39693  15.00750  18.16448  32.87873  31.78665
+# (between_SS / total_SS =  90.9 %)
 
 plot(cluster)
 points(agrupar5$centers, col="black", bg="red", pch=23, cex=2)
 
-# Interesante, son 5 centros, pero no son exactamente los 5 que habíamos 
-# "adivinado" y esperábamos, ¿verdad?
+# Interesante, son 5 centros, pero no son exactamente los 5 que habÃ­amos 
+# "adivinado" y estabamos esperando, Â¿verdad?
 
 # probemos con 6 centros
 set.seed(123)
 agrupar6 <- kmeans(cluster, 6)
-agrupar6 # total_SS =  90.0 % => Mejoramos un poco, 0.01%
+agrupar6 # total_SS =  91.0 % => Mejoramos un poco, 0.1%
 
 plot(cluster)
 points(agrupar6$centers, col="black", bg="red", pch=23, cex=2) 
-# no mejoramos lo suficiente como justificar un centro adicional que, visualmente,
-# es redundante.
+# no mejoramos lo suficiente como para justificar un centro adicional que, visualmente,
+# parece redundante.
 
 # probemos con 4 centros
 set.seed(123)
 agrupar4 <- kmeans(cluster,4)
-agrupar4 # total_SS =  89.2 %, empeoramos muy poco
+agrupar4 # total_SS =  83.4 %, empeoramos un poco
 
 plot(cluster)
 points(agrupar4$centers, col="black", bg="red", pch=23, cex=2) 
-# no empeoramos demasiado y ahora nos ahorramos un centro.
+# no solo empeoramos, sino que ahora parece que tenemos 2 centros "fuera o lejos de grupo".
 
-# Dejemos que kmean() elija la mejor combinación de 5 centros de 
+# Dejemos que kmean() elija la mejor combinaciÃ³n de 5 centros de 
 # 25 intentos completamente aleatorios
 set.seed(123)
 agruparMejor5 <- kmeans(cluster, 5, nstart=25)
-agruparMejor5 # total_SS =  96.7 % es una mejor bastante interesante
+agruparMejor5 # total_SS =  96.7 % es una mejora MUY interesante
 
 plot(cluster)
 points(agruparMejor5$centers, col="black", bg="red", pch=23, cex=2)
-#Ahora sí tenemos los 5 centros esperados que "adivinamos por aproximación 
+#Ahora sÃ­ tenemos los 5 centros esperados que "adivinamos por aproximaciÃ³n 
 # visual" al comienzo.
 
-# Otra forma interesante de graficar los grupos (con o sin centroides) sería la 
+# Otra forma interesante de graficar los grupos (con o sin centroides) serÃ­a la 
 # siguiente
 ?plot
 plot(cluster[,"x"],cluster[,"y"], col=agruparMejor5$cluster,pch=19,cex=1)
-# al argumentar colores = clusters, R automáticamente elige una cantidad de 
+# al argumentar colores = clusters, R automÃ¡ticamente elige una cantidad de 
 # colores  igual a la cantidad de agrupamientos que genero kmeans(), que son 5.
 
-#Para incluir centroides en el grafico anterior, incluir la siguiente línea de 
-# código:
+#Para incluir centroides en el grafico anterior, incluir la siguiente lÃ­nea de 
+# cÃ³digo:
 points(agruparMejor5$centers, col="black", bg="red", pch=23, cex=2)
 
-# Si con los mejores 5 de 25 intentos aleatorios nos fue tan bien, ¿nos irá mejor
+# Si con los mejores 5 de 25 intentos aleatorios nos fue tan bien, Â¿nos irÃ¡ mejor
 # con 2,500 intentos iniciales?
 set.seed(123)
 agruparMejor5de2500 <- kmeans(cluster, 5, nstart=2500)
 agruparMejor5de2500 
 
-# total_SS =  96.7 % nos significó gastar 100 veces más recursos de CPU, por un 
-# beneficio que tal vez no se note hasta la milésima, diezmilésima, etc. 
-# El despilfarro no se notó porque nuestros datos son pocos, no obstante, es una
-# consideración que todo programador debe tener en cuenta al evaluar los costos vs.
-# los beneficios de incrementar significativamente los argumentos (parámetros) en
+# total_SS =  96.7 % nos significÃ³ gastar 100 veces mÃ¡s recursos de CPU, por un 
+# beneficio que tal vez no se note hasta la milÃ©sima, diezmilÃ©sima, etc. 
+# El despilfarro no se notÃ³ porque nuestros datos son pocos, no obstante, es una
+# consideraciÃ³n que todo programador debe tener en cuenta al evaluar los costos vs.
+# los beneficios de incrementar significativamente los argumentos (parÃ¡metros) en
 # algoritmos de este o cualquier tipo.
 
 # Repasemos:
-# 1) K-means clustering requiere que se especifique un número de grupos antes de empezar.
-# 2) K-means clustering NO requiere que se especifique un número de iteraciones antes de 
+# 1) K-means clustering requiere que se especifique un nÃºmero de grupos antes de empezar.
+# 2) K-means clustering NO requiere que se especifique un nÃºmero de iteraciones antes de 
 #    empezar
-# 3) K-means clustering NO siempre se detendrá en luego de la misma cantidad de iteraciones
-# 4) Cada conjunto de datos NO tiene un número fijo de agrupamientos.
+# 3) K-means clustering NO siempre se detendrÃ¡ luego de la misma cantidad de iteraciones
+# 4) Cada conjunto de datos NO tiene un nÃºmero fijo de agrupamientos.
 # 5) Al iniciar kmeans() con un numero de centroides/agrupamientos al azar, NO se terminar
-#    siempre con la misma agrupación final.
+#    siempre con la misma agrupaciÃ³n final.
 
 # Prueba los mejores 5 centros de 50 mil y 100 mil intentos por ti mismo para ver
-# qué sucede. ¿Se ve una mejora notable? R puede tardar un poco en procesar 
-# tantos intentos, así que ten paciencia al ejecuta las ordenes.
+# quÃ© sucede. Â¿Se ve una mejora notable? R puede tardar un poco en procesar 
+# tantos intentos, asÃ­ que ten paciencia al ejecuta las ordenes.
 
 #########################################################################################
 #################################### Ejercicio 2.1.5 ####################################
 #########################################################################################
 
-# Ídem 2.1.4 pero tomando los datos según Y creciente.
+# Ãdem 2.1.4 pero tomando los datos segÃºn Y creciente.
 
-# Para ordenar una data frame en R, se utiliza la función de order(). Por defecto, la 
-# clasificación es ascendente.
+# Para ordenar una data frame en R, se utiliza la funciÃ³n de order(). Por defecto, la 
+# clasificaciÃ³n es ascendente.
 
 ?order
 
@@ -337,5 +351,20 @@ agruparYasc
 plot(cluster)
 points(agruparYasc$centers, col="black", bg="red", pch=23, cex=2)
 
-# ¿Los resultados resultan familiares? ¿El orden de los datos, influencia realmente sus 
+# Â¿Los resultados resultan familiares? Â¿El orden de los datos, influencia realmente sus 
 # coordenadas, distancias euclidianas y los agrupamientos de kmeans()?
+
+# Para extraer los componentes de  # "clusters", podemos utilizar sus referencias al pie de:
+
+agruparYasc
+
+agruparYasc[1] # "clusters"
+agruparYasc[2] # "centers"
+agruparYasc[3] # "totss"
+agruparYasc[4] # "withinss"
+agruparYasc[5] # "tot.withinss"
+agruparYasc[6] # "betweenss" 
+agruparYasc[7] # "size"
+agruparYasc[8] # "iter"
+agruparYasc[9] # "ifault"
+
