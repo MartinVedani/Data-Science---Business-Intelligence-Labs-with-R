@@ -33,7 +33,13 @@ Fuente: https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rc
 
 ``>`` <code>capabilities()</code>
 
-9) Sigue las intrucciones de este tutorial par acambiar la libraria donde se instalarán todos los paquetes de R. eSto ahorrará MUCHO timepo en el futuro al actualizar a nuevas versiones de R:
+9) Instalar los siguientes paquetes que necesitaremos para compilar algoritmos genéticos y manipular datos geoespaciales para resolver el dilema del Vendedor Ambulante (The Travelling Sales Man dilema)
+
+<code> brew install gdal </code>
+
+<code> brew install udunits </code>
+
+10) Sigue las intrucciones de este tutorial para cambiar la libraria donde se instalarán todos los paquetes de R. eSto ahorrará MUCHO timepo en el futuro al actualizar a nuevas versiones de R:
 
 https://www.accelebrate.com/library/how-to-articles/r-rstudio-library
 
