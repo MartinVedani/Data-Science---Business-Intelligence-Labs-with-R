@@ -25,9 +25,7 @@ Fuente: https://github.com/sethrfore/homebrew-r-srf.git)
 
 6) Instalar los siguientes paquetes que necesitaremos para compilar algoritmos genéticos y manipular datos geoespaciales para resolver el dilema del Vendedor Ambulante (The Travelling Sales Man dilema)
 
-<code> brew install gdal </code>
-
-<code> brew install udunits </code>
+<code> brew install gdal udunits</code>
 
 7) Instalar RStudio desde su página web.
 
