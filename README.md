@@ -6,11 +6,14 @@ Diplomatura Business Intelligence (BI) - Universidad Tecnlógica Nacional Buenos
 1) Bajar y ejecutar instalador .exe con todos las sugerencias default:
 https://cran.r-project.org/
 
-2) Instalar RStudio con todos las sugerencias default:
+2) Instalar R-Tools for Windows con todos las sugerencias default:
+https://cran.rstudio.com/bin/windows/Rtools/
+
+3) Instalar RStudio con todos las sugerencias default:
 
 https://rstudio.com/products/rstudio/download/#download
 
-3) Sigue las intrucciones de este tutorial para cambiar la libraría donde se instalarán todos los paquetes de R. Esto ahorrará MUCHO timepo en el futuro al actualizar a nuevas versiones de R:
+4) Sigue las intrucciones de este tutorial para cambiar la libraría donde se instalarán todos los paquetes de R. Esto ahorrará MUCHO timepo en el futuro al actualizar a nuevas versiones de R:
 
 https://www.accelebrate.com/library/how-to-articles/r-rstudio-library
 
@@ -26,7 +29,7 @@ Copia y pega lo siguiente al final de documento uytilizando cualquier editor de 
 <code> myPaths <- c(myPaths[3], myPaths[1], myPaths[2])</code><br>
 <code> .libPaths(myPaths)</code>
 
-4) Para lops que prefieren un IDE oscuro o gris, pueden ir a:
+5) Para lops que prefieren un IDE oscuro o gris, pueden ir a:
 
 <code> Tools -> Global Options -> Appearance -> Editor Theme -> "Material" </code>
 
