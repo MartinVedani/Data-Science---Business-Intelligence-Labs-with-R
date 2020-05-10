@@ -32,15 +32,25 @@ install.packages("doParallel", depend = TRUE)
 library("TSP")
 data("USCA50")
 library(doParallel)
-registerDoParallel()
+
+?registerDoParallel
+?makePSOCKcluster
+
+cl <- parallel::makeCluster(3, setup_timeout = 0.5)
+
+# setup_timeout values > 1 s consistently did not at the time of this publication.The issue
+# is being worked on https://github.com/rstudio/rstudio/issues/6692
+
+registerDoParallel(cl)
+
 
 ## Revisar el objeto con el que trabajaremos
 USCA50
 # object of class 'TSP' 
 # 50 cities (distance 'euclidean') 
 
-# Calculamos giras del viajante (tours) con diferentes heurísticas y almacenamos los 
-# resultados en la lista de recorridos "tours". Como ejemplo, mostramos la primera gira que 
+# Calculamos giras del viajante (viajes) con diferentes heurísticas y almacenamos los 
+# resultados en la lista de recorridos "viajes". Como ejemplo, mostramos la primera gira que 
 # muestra el método empleado, el número de ciudades y la distancia total. Todas las 
 # longitudes de camino se comparan utilizando la tabla de puntos en la figura 1.
 # Para el gráfico, agregamos un punto para la solución óptima que tiene una longitud de 
@@ -71,27 +81,27 @@ viajes$'arbitrary_insertion+two_opt' <- solve_TSP(USCA50)
 #Visualizar resultados de las distancias generadas por cada método
 dotchart(sort(c(sapply(viajes, tour_length), optimal = 14497)),
          xlab = "tour length")
-title("Figura 2 - Viajes")
+title("Figura 1 - Viajes")
 
 viajes[["nn+two_opt+rep_10"]]
 # oobject of class ‘TOUR’ 
 # result of method ‘nn+two_opt_rep_10’ for 50 cities
-# tour length: 14823
+# tour length: 14826
 
 labels(viajes[["nn+two_opt+rep_10"]])
-# [1] "Anchorage, AK"     "Bellingham, WA"    "Boise, ID"         "Carson City, NV"  
-# [5] "Berkeley, CA"      "Bakersfield, CA"   "Albuquerque, NM"   "Amarillo, TX"     
-# [9] "Abilene, TX"       "Austin, TX"        "Beaumont, TX"      "Baton Rouge, LA"  
-# [13] "Biloxi, MS"        "Birmingham, AL"    "Bowling Green, KY" "Atlanta, GA"      
-# [17] "Augusta, GA"       "Asheville, NC"     "Ashland, KY"       "Canton, OH"       
-# [21] "Akron, OH"         "Binghamtom, NY"    "Allentown, PA"     "Baltimore, MD"    
-# [25] "Atlantic City, NJ" "Central Islip, NY" "Bridgeport, CT"    "Albany, NY"       
-# [29] "Brattleboro, VT"   "Brockton, MA"      "Boston, MA"        "Cambridge, MA"    
-# [33] "Augusta, ME"       "Bangor, ME"        "Burlington, VT"    "Belleville, ON"   
-# [37] "Buffalo, NY"       "Burlington, ONT"   "Brantford, ON"     "Bay City, MI"     
-# [41] "Ann Arbor, MI"     "Battle Creek, MI"  "Bloomington, IL"   "Cedar Rapids, IA" 
-# [45] "Bismarck, ND"      "Brandon, MB"       "Billings, MT"      "Butte, MT"        
-# [49] "Calgary, AB"       "Alert, NT" 
+# [1] "Baltimore, MD"     "Allentown, PA"     "Atlantic City, NJ" "Central Islip, NY"
+# [5] "Bridgeport, CT"    "Albany, NY"        "Brattleboro, VT"   "Brockton, MA"     
+# [9] "Boston, MA"        "Cambridge, MA"     "Augusta, ME"       "Bangor, ME"       
+# [13] "Burlington, VT"    "Alert, NT"         "Anchorage, AK"     "Bellingham, WA"   
+# [17] "Calgary, AB"       "Brandon, MB"       "Bismarck, ND"      "Billings, MT"     
+# [21] "Butte, MT"         "Boise, ID"         "Carson City, NV"   "Berkeley, CA"     
+# [25] "Bakersfield, CA"   "Albuquerque, NM"   "Amarillo, TX"      "Abilene, TX"      
+# [29] "Austin, TX"        "Beaumont, TX"      "Baton Rouge, LA"   "Biloxi, MS"       
+# [33] "Birmingham, AL"    "Atlanta, GA"       "Augusta, GA"       "Asheville, NC"    
+# [37] "Ashland, KY"       "Bowling Green, KY" "Bloomington, IL"   "Cedar Rapids, IA" 
+# [41] "Battle Creek, MI"  "Bay City, MI"      "Ann Arbor, MI"     "Akron, OH"        
+# [45] "Canton, OH"        "Brantford, ON"     "Burlington, ONT"   "Buffalo, NY"      
+# [49] "Belleville, ON"    "Binghamtom, NY" 
 
 
 # El camino de Hamilton
@@ -118,7 +128,7 @@ gira$'arbitrary_insertion+two_opt' <- solve_TSP(tsp)
 
 #Visualizar resultados de las distancias generadas por cada método
 dotchart(sort(c(sapply(gira, tour_length))), xlab = "tour length")
-title("Figura 3 - Gira")
+title("Figura 2 - Gira")
 
 # Como la ciudad ficticia ("dummy") tiene distancia cero a todas las demás ciudades, 
 # la longitud del camino es igual a la longitud de la gira que nos informó R 
@@ -128,7 +138,7 @@ title("Figura 3 - Gira")
 gira[["nn+two_opt+rep_10"]]
 # object of class ‘TOUR’ 
 # result of method ‘nn+two_opt_rep_10’ for 313 cities
-# tour length: 36916
+# tour length: 36182
 
 # Utilizamos cut_tour() para crear un camino y mostramos las primeras y últimas 6 ciudades 
 # a continuación.
@@ -137,12 +147,12 @@ gira <- gira[["nn+two_opt+rep_10"]]
 camino <- cut_tour(gira, "cut")
 
 head(labels(camino))
-# [[1] "Lihue, HI"      "Honolulu, HI"   "Hilo, HI"       "Seattle, WA"    "Bellingham, WA"
-# [6] "Victoria, BC" 
+# [1] "Lihue, HI"       "Honolulu, HI"    "Hilo, HI"        "Carson City, NV" "Reno, NV"       
+# [6] "Boise, ID" 
 
 tail(labels(camino))
-# [1] "Saint Petersburg, FL" "Sarasota, FL"         "West Palm Beach, FL"  "Miami, FL"           
-# [5] "Key West, FL"         "San Juan, PR"   
+# [1] "Whitehorse, YK" "Dawson, YT"     "Fairbanks, AK"  "Anchorage, AK"  "Nome, AK"      
+# [6] "Alert, NT"   
 
 # La gira que se encuentra en este ejemplo nos da un camino desde Lihue, Hawaii 
 # a San Juan de Puerto Rico. Un camino de este tipo también se puede visualizar mediante el 
@@ -159,10 +169,13 @@ library("maptools")
 data("USCA312_GPS")
 
 # Busca todo el path en tu máquina local al archivo USCA312_map.rda provisto.
-# Solía ser parte del paquete TSP pero ya no.
+# Solía ser parte del paquete TSP pero fue actualizada a nuevo formato bajo el nombre 
+# USCA312_GPS. Puedes observar las diferencais por tú mismo ya que hemos cargado ambos 
+# formatos como variables globales y estan disponibles en RStudio.
 
 load(file = "<path to>/USCA312_map.rda")
 
+# Creamos un grafico especial que utilizaremos varias veces.
 plot_path <- function(path){
   plot(as(USCA312_coords, "Spatial"), axes = TRUE)
   plot(USCA312_basemap, add = TRUE, col = "gray")
@@ -173,9 +186,9 @@ plot_path <- function(path){
 }
 
 plot_path(camino)
-title("Figura 4")
+title("Figura 3")
 
-# A modo de ejemplo, vamos a elegir Nueva York como la ciudad de partida. Transformamos 
+# como próximo paso, vamos a elegir Nueva York como la ciudad de partida. Transformamos 
 # los datos en un objeto ATSP ("Asymetric" Travelling Sales Person) y establecemos la 
 # columna correspondiente a Nueva York como punto cero antes de resolverlo. Por lo tanto, 
 # la distancia para volver desde la última ciudad hasta Nueva York, no contribuye a la 
@@ -200,7 +213,7 @@ tour_inicial$'arbitrary_insertion+two_opt' <- solve_TSP(atsp)
 
 #Visualizar resultados de las distancias generadas por cada método
 dotchart(sort(c(sapply(tour_inicial, tour_length))), xlab = "tour length")
-title("Figura 5 - Tour Inicial NY")
+title("Figura 4 - Tour Inicial NY")
 
 # Como la ciudad ficticia ("dummy") tiene distancia cero a todas las demás ciudades, 
 # la longitud del camino es igual a la longitud de la gira que nos informó R 
@@ -229,7 +242,7 @@ tail(labels(camino2))
 # [5] "Honolulu, HI"      "Lihue, HI" 
 
 plot_path(camino2)
-title("Figura 6 - Tour Inicial NY")
+title("Figura 5 - Tour Inicial NY")
 
 # Para encontrar el camino más corto de Hamilton también podemos restringir los dos puntos
 # extremos, el de partida y el final. Este problema puede ser transformado a un TSP mediante
@@ -267,10 +280,9 @@ tour_final$'arbitrary_insertion+two_opt' <- solve_TSP(atsp)
 
 #Visualizar resultados de las distancias generadas por cada método
 dotchart(sort(c(sapply(tour_final, tour_length))), xlab = "tour length")
-title("Figura 7 - Tour de NY a LA")
+title("Figura 6 - Tour de NY a LA")
 
 tour_final[['nn+two_opt+rep_10']]
-
 # object of class 'TOUR' 
 # result of method ‘nn+two_opt_rep_10’ for 311 cities
 # tour length: 40019
@@ -287,14 +299,14 @@ tail(path_labels)
 # [5] "Pasadena, CA"      "Los Angeles, CA"  
 
 plot_path(path_ids)
-title("Figura 8 - Tour de NY a LA")
+title("Figura 7 - Tour de NY a LA")
 
-# La ruta que se muestra en la Figura 8 contiene múltiples cruces que indican que la 
+# La ruta que se muestra en la Figura 7 contiene algunos cruces que indican que la 
 # solución es sub-óptima. La solución óptima generada por reformular el problema como 
 # un TSP y el uso de Concorde sólo tiene una longitud de recorrido de 38.489 
 # aproximadamente.
 
-# Reordenamiento por agrupación
+## Reordenamiento por agrupación
 
 # La idea es que los objetos en un grupo son visitados en orden consecutivo y para pasar
 # de un grupo al siguiente más grande es necesario hacer "saltos".
@@ -306,121 +318,241 @@ title("Figura 8 - Tour de NY a LA")
 # ciudades ficticias deben separar las ciudades más distantes y por lo tanto representan 
 # los límites óptimos para clusters k.
 
+##########################################################################################
+#          PAUSA, cambiamos de datos y nos vamos a las ciencias anturales un rato        #
+##########################################################################################
+
 # Para ilustrar esta estrategia, y verla más claramente, vamos utilizar un conocido conjunto 
 # de datos de R llamado iris, dejando de lado las ciudades por un rato.
 # El conjunto de datos Iris contiene tres clases o tipos diferentes de especies de flores
-# identificadas bajo la variable "Species" y se miden las distancias/tamaños de sus hojas. 
+# identificadas bajo la variable "Species" y se miden las dimensiones/tamaños de sus hojas.
 
-# Para agrupar, usemos las 4 zonas horarias principales de USA (Este, Centro, Montaña, 
-# Pacifico). Esto simplemente se me ocurre arbitrariamente.
+data("iris")
+str(iris)
+tsp <- TSP(dist(iris[-5]), labels = iris[, "Species"])
 
-atsp_dummy <- insert_dummy(atsp, n = 4, label = "boundary")
+unique(iris$Species)
+# [1] setosa     versicolor virginica 
+# Levels: setosa versicolor virginica
+
+# Como hay 3 especies en el conjunto iris, es una buena razon para empezar con n = 3  
+# clusters. Por más que tenemos una buena razon, estadisticamente hablando, no deja de 
+# ser arbirtaria hasta que se demuestre lo contrario (no será el caso y lo veremos bien).
+
+tsp_dummy <- insert_dummy(tsp, n = 3, label = "boundary")
 set.seed(123)
-tour_horarios <- sapply(metodos, FUN = function(m) solve_TSP(atsp_dummy, method = m), 
+tour_iris <- sapply(metodos, FUN = function(m) solve_TSP(tsp_dummy, method = m), 
                      simplify = FALSE)
 
 # Agregamos algunos recorridos usando repeticiones y refinamientos de dos opciones
 
-tour_horarios$'nn+two_opt' <- solve_TSP(atsp_dummy, method="nn", two_opt=TRUE)
-tour_horarios$'nn+rep_10' <- solve_TSP(atsp_dummy, method="nn", rep=10)
-tour_horarios$'nn+two_opt+rep_10' <- solve_TSP(atsp_dummy, method="nn", two_opt=TRUE, rep=10)
-tour_horarios$'arbitrary_insertion+two_opt' <- solve_TSP(atsp_dummy)
+tour_iris$'nn+two_opt' <- solve_TSP(tsp_dummy, method="nn", two_opt=TRUE)
+tour_iris$'nn+rep_10' <- solve_TSP(tsp_dummy, method="nn", rep=10)
+tour_iris$'nn+two_opt+rep_10' <- solve_TSP(tsp_dummy, method="nn", two_opt=TRUE, rep=10)
+tour_iris$'arbitrary_insertion+two_opt' <- solve_TSP(tsp_dummy)
 
 #Visualizar resultados de las distancias generadas por cada método
-dotchart(sort(c(sapply(tour_horarios, tour_length))), xlab = "tour length")
-title("Figura 9 - Tour de NY a LA por Horario")
+dotchart(sort(c(sapply(tour_iris, tour_length))), xlab = "tour length")
+title("Figura 8 - Tour Iris")
 
-tour_horarios[['arbitrary_insertion+two_opt']]
+tour_iris[['nn+two_opt+rep_10']]
+# object of class ‘TOUR’ 
+# result of method ‘nn+two_opt_rep_10’ for 153 cities
+# tour length: 47.69911
+
+# A continuación, trazamos la matriz de distancia permutada del TSP utilizando el sombreado 
+# para representar distancias.
+
+# El resultado se muestra en la Figura 9. 
+
+# Las áreas más claras representan distancias grandes.
+# Las líneas rojas representan las posiciones de los 3 "boundaries", que, CREEMOS, deberían
+# marcan los límites de los clusters obtenidos (los lmites entre 3 especies diferentes).
+
+# Matrix de distancia
+
+tour_iris <- tour_iris[['nn+two_opt+rep_10']]
+
+image(tsp_dummy, tour_iris, xlab = "objects", ylab ="objects")
+title("Figura 9")
+
+## dibujar l?neas donde se ubican los limites de cluster "boundaries"
+
+abline(h = which(labels(tour_iris)=="boundary"), col = "red")
+abline(v = which(labels(tour_iris)=="boundary"), col = "red")
+
+# Tres líneas rojas horizontales y tres verticales separan exactamente la areas más oscuras
+# de las más claras.
+# Podemos ver lo bien que la partición obtenida se ajusta a la estructura de los datos 
+# dados por el campo de las especies en el conjunto iris. Dado que usamos a la especie
+# como etiquetas para reemplazar a las "ciudades" en el TSP, las etiquetas en la solución 
+# "tour_iris" representan la partición con las "ciudades ficticias" llamadas "boundary" 
+# (limites que separan a los diferentes clusters).
+# El resultado se puede resumir mirando la longitud obtenida bajo la etiqueta del cluster
+# para cada tour obtenido:
+
+out <- rle(labels(tour_iris))
+data.frame(Species = out$values, Lenghts = out$lengths, Pos = cumsum(out$lengths))
+
+#       Species Lenghts Pos
+# 1   virginica      27  27
+# 2    boundary       1  28  <- boundary o "ciudad ficticia" número 1
+# 3      setosa      50  78
+# 4    boundary       1  79  <- boundary o "ciudad ficticia" número 2
+# 5  versicolor      12  91
+# 6   virginica       1  92
+# 7  versicolor      23 115
+# 8   virginica       1 116
+# 9  versicolor       1 117
+# 10  virginica       5 122
+# 11 versicolor      13 135
+# 12  virginica       1 136
+# 13 versicolor       1 137
+# 14  virginica       6 143
+# 15   boundary       1 144  <- boundary o "ciudad ficticia" número 3
+# 16  virginica       9 153
+
+# Fronteras (boundaries) 1 y 2 dividen perfectamente los datos de la especies 'Virginica' y 
+# la especie "Setosa". A partir de la frontera 2, las especies "Versicolor" y "Virginica" 
+# comparten una extensa tercer sección del listado. 
+
+# La razón por la que la agrupación por reordenamiento falla para dividir los datos en tres 
+# grupos perfectos es la cercanía entre las especies Virginica y versicolor. Para 
+# inspeccionar este problema aún más, podemos proyectar los puntos de datos componentes 
+# principales del conjunto de datos y agregar el segmentos de trazado que resultaron del
+# resolver de TSP.
+
+prc <- prcomp(iris[1:4])
+plot(prc$x, pch = as.numeric(iris[,5]), col = as.numeric(iris[,5]))
+indices <- c(tour_iris, tour_iris[1])
+indices[indices > 150] <- NA
+lines(prc$x[indices,])
+title("Figura 10")
+
+# El resultado se muestra en la Figura 10. Las tres especies se identifican por diferentes 
+# marcadores y todos los puntos conectados por una sola ruta representan una agrupación o 
+# cluster encontrado. Claramente, los dos grupos a la derecha están demasiado cerca para ser 
+# separados correctamente utilizando sólo las distancias entre puntos individuales. Este 
+# problema es similar al efecto de encadenamiento conocido en la agrupación jerárquica 
+# utilizando el método de un solo vínculo.
+
+##########################################################################################
+#   HABIENDO DEMOSTRADO LO QUE HAREMOS, volvemos al dilema del vendedor viajero          #
+##########################################################################################
+
+# Para aaplicagar clustering a las ciudades, pensemos en inciar con un n = 4 clusters
+# en base a las principales zonas horarias principales de USA (Este, Centro, Montaña, 
+# Pacifico). Esto simplemente se me ocurre de forma completamente arbitraria.
+
+atsp_dummy <- insert_dummy(atsp, n = 4, label = "boundary")
+set.seed(123)
+tour_clusters <- sapply(metodos, FUN = function(m) solve_TSP(atsp_dummy, method = m), 
+                     simplify = FALSE)
+
+# Agregamos algunos recorridos usando repeticiones y refinamientos de dos opciones
+
+tour_clusters$'nn+two_opt' <- solve_TSP(atsp_dummy, method="nn", two_opt=TRUE)
+tour_clusters$'nn+rep_10' <- solve_TSP(atsp_dummy, method="nn", rep=10)
+tour_clusters$'nn+two_opt+rep_10' <- solve_TSP(atsp_dummy, method="nn", two_opt=TRUE, rep=10)
+tour_clusters$'arbitrary_insertion+two_opt' <- solve_TSP(atsp_dummy)
+
+#Visualizar resultados de las distancias generadas por cada método
+dotchart(sort(c(sapply(tour_clusters, tour_length))), xlab = "tour length")
+title("Figura 11 - Tour de NY a LA por Cluster")
+
+tour_clusters[['arbitrary_insertion+two_opt']]
 # object of class ‘TOUR’ 
 # result of method ‘arbitrary_insertion+two_opt’ for 317 cities
 # tour length: 32416 
 
 # A continuación, trazamos la matriz de distancia permutada del TSP utilizando el sombreado 
 # para representar distancias.
-# El resultado se muestra en la Figura 10. Las áreas más claras representan distancias 
+# El resultado se muestra en la Figura 9. Las áreas más claras representan distancias 
 # grandes. Las líneas rojas representan las posiciones de las ciudades ficticias en la 
 # gira, que marcan los límites de los clusters obtenidos.
 
 # Matrix de distancia
 
-tour_horarios <- tour_horarios[['arbitrary_insertion+two_opt']]
+tour_clusters <- tour_clusters[['arbitrary_insertion+two_opt']]
 
-image(atsp_dummy, tour_horarios, xlab = "objects", ylab ="objects")
-title("Figura 10")
+image(atsp_dummy, tour_clusters, xlab = "objects", ylab ="objects")
+title("Figura 12")
 
-# Parecería haber 7 divisiones claramente marcadas. Resaltemos los "boundaries"
 # creados con líneas rojas que es donde se ubican las ciudades ficticias
 
-abline(h = which(labels(tour_horarios)=="boundary"), col = "red")
-abline(v = which(labels(tour_horarios)=="boundary"), col = "red")
+abline(h = which(labels(tour_clusters)=="boundary"), col = "red")
+abline(v = which(labels(tour_clusters)=="boundary"), col = "red")
 
-# Parecen quedar 3 líneas claramente sin resaltar en rojo, usemos 7 boundaries entonces.
+# Parecen quedar 3 líneas verticales y horizontales claramente sin resaltar en rojo, 
+# sumemoslas a n = 4 + 3 y usemos 7 boundaries entonces.
 
 atsp_dummy <- insert_dummy(atsp, n = 7, label = "boundary")
 set.seed(123)
-tour_horarios <- sapply(metodos, FUN = function(m) solve_TSP(atsp_dummy, method = m), 
+tour_clusters <- sapply(metodos, FUN = function(m) solve_TSP(atsp_dummy, method = m), 
                         simplify = FALSE)
 
 # Agregamos algunos recorridos usando repeticiones y refinamientos de dos opciones
 
-tour_horarios$'nn+two_opt' <- solve_TSP(atsp_dummy, method="nn", two_opt=TRUE)
-tour_horarios$'nn+rep_10' <- solve_TSP(atsp_dummy, method="nn", rep=10)
-tour_horarios$'nn+two_opt+rep_10' <- solve_TSP(atsp_dummy, method="nn", two_opt=TRUE, rep=10)
-tour_horarios$'arbitrary_insertion+two_opt' <- solve_TSP(atsp_dummy)
+tour_clusters$'nn+two_opt' <- solve_TSP(atsp_dummy, method="nn", two_opt=TRUE)
+tour_clusters$'nn+rep_10' <- solve_TSP(atsp_dummy, method="nn", rep=10)
+tour_clusters$'nn+two_opt+rep_10' <- solve_TSP(atsp_dummy, method="nn", two_opt=TRUE, rep=10)
+tour_clusters$'arbitrary_insertion+two_opt' <- solve_TSP(atsp_dummy)
 
 #Visualizar resultados de las distancias generadas por cada método
-dotchart(sort(c(sapply(tour_horarios, tour_length))), xlab = "tour length")
-title("Figura 11 - Tour de NY a LA por Horario 2")
+dotchart(sort(c(sapply(tour_clusters, tour_length))), xlab = "tour length")
+title("Figura 13 - Tour de NY a LA por Clusters 2")
 
-tour_horarios[['arbitrary_insertion+two_opt']]
+tour_clusters[['arbitrary_insertion+two_opt']]
 # object of class ‘TOUR’ 
 # result of method ‘arbitrary_insertion+two_opt’ for 318 cities
 # tour length: 28238 
 
-tour_horarios <- tour_horarios[['arbitrary_insertion+two_opt']]
+tour_clusters <- tour_clusters[['arbitrary_insertion+two_opt']]
 
-image(atsp_dummy, tour_horarios, xlab = "objects", ylab ="objects")
-title("Figura 12")
+image(atsp_dummy, tour_clusters, xlab = "objects", ylab ="objects")
+title("Figura 14")
 
-abline(h = which(labels(tour_horarios)=="boundary"), col = "red")
-abline(v = which(labels(tour_horarios)=="boundary"), col = "red")
+abline(h = which(labels(tour_clusters)=="boundary"), col = "red")
+abline(v = which(labels(tour_clusters)=="boundary"), col = "red")
 
 # Aun podemos ver 1 linea horizontal y otra vertical claramente sin resaltar en rojo.
-# Hagamos un ultimo intento con 8 boundaries.
+# Hagamos un ultimo intento con n = 8 boundaries.
 
 atsp_dummy <- insert_dummy(atsp, n = 8, label = "boundary")
 set.seed(123)
-tour_horarios <- sapply(metodos, FUN = function(m) solve_TSP(atsp_dummy, method = m), 
+tour_clusters <- sapply(metodos, FUN = function(m) solve_TSP(atsp_dummy, method = m), 
                         simplify = FALSE)
 
-tour_horarios$'nn+two_opt' <- solve_TSP(atsp_dummy, method="nn", two_opt=TRUE)
-tour_horarios$'nn+rep_10' <- solve_TSP(atsp_dummy, method="nn", rep=10)
-tour_horarios$'nn+two_opt+rep_10' <- solve_TSP(atsp_dummy, method="nn", two_opt=TRUE, rep=10)
-tour_horarios$'arbitrary_insertion+two_opt' <- solve_TSP(atsp_dummy)
+tour_clusters$'nn+two_opt' <- solve_TSP(atsp_dummy, method="nn", two_opt=TRUE)
+tour_clusters$'nn+rep_10' <- solve_TSP(atsp_dummy, method="nn", rep=10)
+tour_clusters$'nn+two_opt+rep_10' <- solve_TSP(atsp_dummy, method="nn", two_opt=TRUE, rep=10)
+tour_clusters$'arbitrary_insertion+two_opt' <- solve_TSP(atsp_dummy)
 
 #Visualizar resultados de las distancias generadas por cada método
-dotchart(sort(c(sapply(tour_horarios, tour_length))), xlab = "tour length")
-title("Figura 13 - Tour de NY a LA por Horario 3")
+dotchart(sort(c(sapply(tour_clusters, tour_length))), xlab = "tour length")
+title("Figura 15 - Tour de NY a LA por Cluster 3")
 
-tour_horarios[['farthest_insertion']]
+tour_clusters[['farthest_insertion']]
 # object of class ‘TOUR’ 
 # result of method ‘arbitrary_insertion+two_opt’ for 318 cities
 # tour length: 28132 
 
 # La mejora de 28238 a 28132 ya es bastnate poca, estamos cerca del mejor resultado posible.
 
-tour_horarios <- tour_horarios[['farthest_insertion']]
+tour_clusters <- tour_clusters[['farthest_insertion']]
 
-image(atsp_dummy, tour_horarios, xlab = "objects", ylab ="objects")
-title("Figura 14")
+image(atsp_dummy, tour_clusters, xlab = "objects", ylab ="objects")
+title("Figura 16")
 
-abline(h = which(labels(tour_horarios)=="boundary"), col = "red")
-abline(v = which(labels(tour_horarios)=="boundary"), col = "red")
+abline(h = which(labels(tour_clusters)=="boundary"), col = "red")
+abline(v = which(labels(tour_clusters)=="boundary"), col = "red")
 
-# Listo, no queda ninguna linea clara qeu no este resaltada en rojo. Esto significa que
-# que hemos alcanzado el numero óptimo de cluster K (8 límites o boundaries).
+# Listo, no queda ninguna línea clara que no este resaltada en rojo. Esto significa
+# que hemos alcanzado el número óptimo de clusters en 8 límites o boundaries. 
+# Cada cluster podría jsutificar 1 vendedor viajero para cada uno ... pero es ya será una 
+# decisión de negocio.
 
-path_labels <- c("New York, NY", labels(cut_tour(tour_horarios, la_ny)), "Los Angeles, CA")
+path_labels <- c("New York, NY", labels(cut_tour(tour_clusters, la_ny)), "Los Angeles, CA")
 path_ids <- match(path_labels, labels(USCA312))
 head(path_labels)
 # [1] "New York, NY"  "boundary"      "Flagstaff, AZ" "Phoenix, AZ"   "Tucson, AZ"   
@@ -430,12 +562,14 @@ tail(path_labels)
 # [1] "Las Vegas, NV"      "San Bernardino, CA" "Pasadena, CA"       "San Diego, CA"     
 # [5] "Yuma, AZ"           "Los Angeles, CA"  
 
+# El recorrido completo es el siguiente:
+
 path_labels
 # [1] "New York, NY"         "boundary"             "Flagstaff, AZ"       
 # [4] "Phoenix, AZ"          "Tucson, AZ"           "El Paso, TX"         
 # [7] "Albuquerque, NM"      "Gallup, NM"  etc etc etc etc etc
 
-# Removemos los boundaries para poder ilustrar la ruta
+# Removemos los boundaries para poder ilustrar la ruta sobre el mapa
 
 x <- path_labels
 x <- x[x != "boundary"]
@@ -443,9 +577,23 @@ x <- x[x != "boundary"]
 path_ids_no_NA <- match(x, labels(USCA312))
 
 plot_path(path_ids_no_NA)
-title("Figura 15 - Tour de NY a LA en 8 clusters")
+title("Figura 17 - Tour de NY a LA en 8 Clusters")
+
+# Al terminar, es buena práctica parar los clusters de procesos paralelos. Estos deberían
+# de todas formas frenar automáticamente cuando la sesión de R se cierra.
+
+stopCluster(cl)
+
+
+#                                           Conclusión
+
+# En este trabajo los autores del paquete TSP presentan el paquete de extensión TSP R que 
+# implementa una infraestructura para manejar y resolver el problema del viajero.
+# El paquete introduce clases de descripciones de los problemas simétricos y asimétricos
+# (TSP y ATSP respectivamente) y de solución (TOUR o GIRA).
+
+
+#                                           DESAFÍO
 
 # Los desafío a realizar una ruta aplicando al estrategia de cluster a USCA312 sin 
 # ninguna restricción de donde comenzar ni dónde terminar el recorrido de Hamilton.
-
-
