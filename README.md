@@ -1,7 +1,37 @@
 # Business Intelligence - Guía de Trabajos Prácticos con R ^4.0.0
 Diplomatura Business Intelligence (BI) - Universidad Tecnlógica Nacional Buenos Aires (UTN)
 
-# Instruccion de instalación con TERMINAL en MacOs Catalina 10.15+ (sirve para Windows con modificaciones leves del usuario):
+# Instruccion de instalación para Windows 10:
+
+1) Bajar y ejecutar instalador .exe con todos las sugerencias default:
+https://cran.r-project.org/
+
+2) Instalar RStudio con todos las sugerencias default:
+
+https://rstudio.com/products/rstudio/download/#download
+
+3) Sigue las intrucciones de este tutorial para cambiar la libraría donde se instalarán todos los paquetes de R. Esto ahorrará MUCHO timepo en el futuro al actualizar a nuevas versiones de R:
+
+https://www.accelebrate.com/library/how-to-articles/r-rstudio-library
+
+Es un instructivo para Windows, en Mac, el archivo Rprofile que hay que modificar para hacer el cambio permanente se encustra en:
+
+<code> C:\Program Files\R\R-4.0.0\library\base\R </code>
+
+Copia y pega lo siguiente al final de documento uytilizando cualquier editor de texto (crea tu propia carpeta "r-library").
+
+<code> #my custom stuff</code><br> 
+<code> myPaths <- .libPaths()</code><br>
+<code> myPaths <- c(myPaths, "C:/Users/marti/r-library"))</code><br>
+<code> myPaths <- c(myPaths[3], myPaths[1], myPaths[2])</code><br>
+<code> .libPaths(myPaths)</code>
+
+4) Para lops que prefieren un IDE oscuro o gris, pueden ir a:
+
+<code> Tools -> Global Options -> Appearance -> Editor Theme -> "Material" </code>
+
+
+# Instruccion de instalación con TERMINAL en MacOs Catalina 10.15+:
 
 0) Instalar Homebrew:
 
@@ -28,6 +58,8 @@ Fuente: https://github.com/sethrfore/homebrew-r-srf.git)
 <code> brew install gdal udunits</code>
 
 7) Instalar RStudio desde su página web.
+
+https://rstudio.com/products/rstudio/download/#download
 
 8) Actualizar los compiladores requeridos por R ^4.0.0 con las instrucciones del siguiente tutorial (MacOs Catalina 10.15+):
 
