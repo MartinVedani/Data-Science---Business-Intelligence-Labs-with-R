@@ -14,7 +14,7 @@ https://rstudio.com/products/rstudio/download/#download
 
 https://www.accelebrate.com/library/how-to-articles/r-rstudio-library
 
-Es un instructivo para Windows, en Mac, el archivo Rprofile que hay que modificar para hacer el cambio permanente se encustra en:
+Es un instructivo para Windows, el archivo Rprofile que hay que modificar para hacer el cambio permanente se encustra en:
 
 <code> C:\Program Files\R\R-4.0.0\library\base\R </code>
 
