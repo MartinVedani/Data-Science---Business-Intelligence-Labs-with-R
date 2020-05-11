@@ -1,6 +1,6 @@
 #############################################################################################
 
-# Ejemplos pr·cticos de Series Temporales en R
+# Ejemplos pr√°cticos de Series Temporales en R
 # - por Martin Vedani, UTN Business Intelligence
 
 ############################################################################################
@@ -9,62 +9,69 @@
 if(! "forecast" %in% installed.packages()) install.packages("forecast", depend = TRUE)
 if(! "zoo" %in% installed.packages()) install.packages("zoo", depend = TRUE)
 if(! "timeDate" %in% installed.packages()) install.packages("timeDate", depend = TRUE)
+if(! "ggplot2" %in% installed.packages()) install.packages("ggplot2", depend = TRUE)
 
-## Cargar los paquetes y los datos a utilizar en la sesiÛn actual de R
+## Cargar los paquetes y los datos a utilizar en la sesi√≥n actual de R
 
 library(forecast)
+library(zoo)
+library(ggplot2)
 
-# Series de tiempo y pronÛsticos
+# Series de tiempo y pron√≥sticos
 
-# R cuenta con amplias capacidades para el an·lisis de datos de series de tiempo. En esta
-# secciÛn veremos brevemente  la creaciÛn de una serie de tiempo, su descomposiciÛn estacional,
-# modelado con modelos exponencial y ARIMA, y pronÛsticos con el paquete forecast.
+# R cuenta con amplias capacidades para el an√°lisis de datos de series de tiempo. En esta
+# secci√≥n veremos brevemente la creaci√≥n de una serie de tiempo, su descomposici√≥n 
+# estacional, modelado con modelos exponencial y ARIMA, y pron√≥sticos con el paquete 
+# forecast.
 
 # Cargar datos de los objetos a utilizar
 gripes <- read.csv("datosBaseGripes.csv", header = T)
+
+# o
+
+gripes  <- read.csv(file.choose(), header = TRUE, sep = ",") 
 
 # Inspeccionar los datos
 head(gripes)
 tail(gripes)
 str(gripes)
 
-# Bien. Tenemos una data.frame con 2803 observaciones numÈricas realizadas durante 2803 dÌas.
+# Bien. Tenemos una data.frame con 2803 observaciones num√©ricas realizadas durante 2803 d√≠as.
 
 # Necesitamos convertir nuestro objeto "gripes" en un objeto que R
-# reconozca como Serie Temporal.  Cubriremos dos formatos de varios formatos,
+# reconozca como Serie Temporal.  Cubriremos dos de todos los posibles formatos,
 #  zoo y ts.
 
-# "zoo" ("Zeileis' ordered observations" por sus siglas en inglÈs) es una clase de series de 
-# tiempo muy flexible  creado por Achim Zeileis y Gabor Grothendieck y disponible en el 
-# paquete zoo que se cargÛ en nuestra sesiÛn de R cuando cargamos el paquete forecast al
-# comienzo.
+# "zoo" ("Zeileis' ordered observations" por sus siglas en ingl√©s) es una clase de series de 
+# tiempo muy flexible creada por Achim Zeileis y Gabor Grothendieck y disponible en el 
+# paquete zoo que se carg√≥ en nuestra sesi√≥n de R al comienzo.
 
-# La clase zoo fue diseÒada para manejar datos de series de tiempo ordenadas por 
-# Ìndices de tiempo arbitrarios. 
-# Decimos arbitrario porque un Ìndice de ordenamiento por tiempo puede ser regular, donde el 
+# La clase zoo fue dise√±ada para manejar datos de series de tiempo ordenadas por 
+# √≠ndices de tiempo arbitrarios. 
+# Decimos arbitrario porque un √∫ndice de ordenamiento por tiempo puede ser regular, donde el 
 # espacio entre observaciones es el mismo (observaciones diarias, semanales, etc.), o las 
-# observaciones pueden tener separaciones de irregulares (1 dÌa entre observaciones 1 y 2,
-# tres dÌas entre observaciones 2 y 3, seis dÌas entre la observaciones 3 y 4, etc.).
+# observaciones pueden tener separaciones irregulares (un d√≠a entre observaciones 1 y 2,
+# cuatro d√≠as entre observaciones 2 y 3, seis d√≠as entre la observaciones 3 y 4, etc.).
 
-# Esencialmente, un objeto zoo atribuye informaciÛn de fecha almacenado en un vector con la
-# a la informaciÛn de datos de cada observaciÛn almacenados en una matriz.
+# Esencialmente, un objeto zoo atribuye la informaci√≥n de fecha almacenado en un vector 
+# junto al resto de los datos de cada observaci√≥n almacenados en una matriz.
 
-# Para crear un objeto zoolÛgico se necesita datos ordenados por un Ìndice de tiempo.
-# Obviamente, el Ìndice de tiempo debe tener el mismo n˙mero de filas como el objeto de datos
-# y este Ìndice de tiempo puede ser cualquier vector que contiene observaciones ordenadas. 
-# TÌpicamente, el Ìndice de tiempo es un objeto de la clase "Date", "POSIXct", "yearmon",
+# Para crear un objeto zoo se necesitan datos ordenados por un √≠ndice de tiempo.
+# El √≠ndice de tiempo debe tener el mismo n√∫mero de filas como el objeto de datos
+# y este √≠ndice de tiempo puede ser cualquier vector que contiene observaciones ordenadas. 
+# Generalmente, el √≠ndice de tiempo es un objeto de la clase "Date", "POSIXct", "yearmon",
 # "yearqtr" o "TimeDate".
 
-# Ya que tenemos los datos ordenados por aÒo, mes y dÌa, lo primero que necesitamos hacer 
-# entonces es unir las 3 variables (o columnas) "AÒo", "Mes" y "DÌa", en 
+# Ya que tenemos los datos ordenados por a√±o, mes y d√≠a, lo primero que necesitamos hacer 
+# entonces es unir las 3 variables (o columnas) "Year", "Month" y "Day", en 
 # un objeto de formato "Date", "POSIXct", "yearmon", "yearqtr" o "TimeDate"
 
-# Para lograrlo, utilizaremos la funciÛn ISOdate(). Si tuviÈramos horas del dÌa,
-# podrÌamos usar ISOdatetime, pero no las tenemos asÌ que no ser· necesario.
+# Para lograrlo, utilizaremos la funci√≥n ISOdate(). Si tuvi√©ramos horas del d√≠a,
+# podr√≠amos usar ISOdatetime, pero no las tenemos as√≠ que no ser√° necesario.
 
 ?ISOdate
 ?with
-fechas <- with(gripes, ISOdate(AÒo, Mes, DÌa))
+fechas <- with(gripes, ISOdate(Year, Month, Day))
 
 # Inspeccionamos "fechas" para confirmar que tenemos un objeto en alguno de los formatos
 # requerido por zoo.
@@ -72,11 +79,11 @@ str(fechas)
 length(fechas)
 
 # Y efectivamente confirmamos que ahora tenemos un vector de 2803 observaciones de formato
-# POSIXct, que es uno de los formato que requiere zoo. Pero tenemos, para cada dÌa, el dato de
-# horario ("12:00:00") que es el mismo para todas las observaciones y como no estaban 
-# originalmente, ahora tampoco nos sirven, no agregan ning˙n valor asÌ que podemos eliminar los
-# horarios convirtiendo del formato "POSIXct" a formato "Fecha", el cual tambiÈn es aceptado 
-# por zoo.
+# POSIXct, que es uno de los formato que requiere zoo. Tambi√©n tenemos, para cada d√≠a, el 
+# dato de horario ("12:00:00") que es el mismo para todas las observaciones y como no 
+# estaban originalmente, ahora tampoco nos sirven, no agregan ning√∫n valor as√≠ que podemos
+# eliminar los horarios cambiando del formato "POSIXct" al formato "Date", el cual 
+# tambi√©n es aceptado por zoo.
 
 fechas <- as.Date(fechas)
 
@@ -88,26 +95,26 @@ length(fechas)
 # Excelente, tenemos ahora los datos para crear nuestro objeto zoo sin adicionales que no
 # suman valor.
 
-gripes.z <- zoo(x = gripes$Cantidad, order.by = fechas)
+gripes.z <- zoo(x = gripes$Amount, order.by = fechas)
 
 # Y chequeamos la nuevo objeto zoo
 
-# Primero confirmamos los formatos necesarios para c·lculos de tiempo estÈn presentes
+# Primero confirmamos los formatos necesarios para c√°lculos de tiempo est√°n presentes
 str(gripes.z)
 
-# Y luego que los datos estÈn ordenados de igual manera que nuestra base de datos (data.frame)
-# original
+# Y luego que los datos est√°n ordenados de igual manera que nuestra base de datos 
+# (data.frame) original
 
-head(gripes.z, 15); head(gripes,15)
-tail(gripes.z, 15); tail(gripes,15)
+head(gripes.z, 10); head(gripes,10)
+tail(gripes.z, 10); tail(gripes,10)
 
-# Excelente. Veamos el grafico de la cantidad de gripes observadas en funciÛn de las fechas
+# Excelente. Veamos el grafico de la cantidad de gripes observadas en funci√≥n de las fechas
 # en que estas fueron observadas
 
 plot(gripes.z)
 
-# Belleza! A primera vista vemos que el ciclo estacional aparenta ser de 1 aÒo, con las
-# cantidades de casos de gripe aumentando durante el invierno en norte amÈrica.
+# Bien, a primera vista vemos que el ciclo estacional aparenta ser de 1 a√±o, con las
+# cantidades de casos de gripe aumentando dos veces (dos picos por a√±o).
 
 # Una serie de tiempo se puede descomponer en tres componentes:
 
@@ -116,27 +123,27 @@ plot(gripes.z)
 # 3) su propia regularidad o irregularidad pura (la gripe libre de tendencia y efectos 
 #    estacionales). 
 
-# Esta descomposiciÛn (separaciÛn) de se logra mediante la funciÛn stl(). 
+# Esta descomposici√≥n (separaci√≥n) se logra mediante la funci√≥n stl(). 
 
-# Como stl necesita entender la frecuencia de nuestros datos.
-# Convirtamos entonces nuestra data.frame original en un serie de tiempo ts con periodicidad 
-# de 365 dÌas por aÒo ya que cada observaciÛn corresponde a un dÌa durante aproximadamente
-# unos  8 aÒos (1999-2007). La frecuencia siempre debe ser un entero.
+# Como stl() necesita entender la frecuencia de nuestros datos, debemos entonces
+# convertir entonces nuestra data.frame original en un serie de tiempo ts con periodicidad 
+# de 365 d√≠as por a√±o ya que cada observaci√≥n corresponde a un d√≠a durante aproximadamente
+# unos  8 a√±os (1999-2007). La frecuencia siempre debe ser un entero.
 
-unique(gripes$AÒo)
+unique(gripes$Year)
+# [1] 1999 2000 2001 2002 2003 2004 2005 2006 2007
 
-gripes.ts <- ts(gripes$Cantidad, start=1999, frequency = 365)
+gripes.ts <- ts(gripes$Amount, start=1999, frequency = 365)
 
 modelo <- stl(gripes.ts, s.window = "periodic")
 
 plot(modelo)
 summary(modelo)
 
-
 # Modelos exponenciales
 
-# Tenemos la funciÛn de los HoltWinters() en la instalaciÛn base de R y se puede utilizar 
-# para ajustar modelos exponenciales.
+# Tenemos la funci√≥n de filtros HoltWinters() en la instalaci√≥n base de R y se puede 
+# utilizar para ajustar modelos exponenciales.
 
 ?HoltWinters
 
@@ -153,8 +160,7 @@ modelo.doble
 modelo.completo <- HoltWinters(gripes.ts)
 summary(modelo.completo)
 
-
-# Predicciones de los prÛximos 365 dÌas (para el aÒo 2007-2008)
+# Predicciones de los pr√≥ximos 365 d√≠as (para el a√±o 2007-2008)
 
 prediccion <- predict(modelo.completo, n.ahead=365)
 
@@ -164,23 +170,24 @@ prediccion2 <- forecast(modelo.completo, h=365, level = .95)
 prediccion
 prediccion2
 
-# Las prÛximas Ûrdenes se pueden utilizar para graficar nuestras predicciones
+# Las pr√≥ximas √≥rdenes se pueden utilizar para graficar nuestras predicciones
 
-# Utilizando la funciÛn de predicciÛn y gr·ficos del paquete base de R
+# Utilizando la funci√≥n de predicci√≥n y gr√°ficos del paquete base de R
 
 plot(gripes.ts, xlim=c(1999,2008))
 lines(prediccion, col="red")
 
-# Y utilizando la funciÛn de predicciÛn y gr·ficos del paquete forecast.
-plot.forecast(prediccion2)
-plot.splineforecast(prediccion2)
+# Y utilizando la funci√≥n de predicci√≥n y gr√°ficos del paquete "forecast" y comparamos los
+# dos gr√°ficos resultantes
+plot(prediccion2)
+autoplot(prediccion2)
 
-# Predicciones autom·ticas utilizando modelos exponenciales
+# Predicciones autom√°ticas utilizando modelos exponenciales
 
 ?ets
 modelo.ets <- ets(gripes.ts)
 # no puede utilizar frecuencias superiores a 24 y, por ende, ignora el componente estacional.
-# En nuestro caso es muy importante asÌ que probamos con otra sugerencia.
+# En nuestro caso es muy importante as√≠ que probamos con otra sugerencia.
 
 ?stlf
 modelo.stlf <- stlf(gripes.ts)
@@ -189,11 +196,11 @@ summary(modelo.stlf)
 
 prediccion3 <- forecast(modelo.stlf)
 
-plot.forecast(prediccion3)
-plot.splineforecast(prediccion3)
+plot(prediccion3)
+autoplot(prediccion3)
 
-# Excelente, nos da intervalos de confianza. Si miramos el resumen del pronÛstico3, podremos
-# ver a quÈ intervalos se refiere cada color y explicarlo al presentar el grafico.
+# Excelente, nos da intervalos de confianza. Si miramos el resumen del pron√≥stico3, 
+# podremos ver a qu√© intervalos se refiere cada color y explicarlo al presentar el grafico.
 
 summary(prediccion3)
 # Forecasts:
@@ -201,28 +208,34 @@ summary(prediccion3)
 
 # Vemos que los intervalos son 80% y 95%
 
-# Adicionalmente, en este caso particular donde no puede haver una cantidad de personas 
-# negativas con
-# gripe, claramente no necesitamos las predicciones negativas, asÌ que podemos modificar
-# un poco el grafico
+# Adicionalmente, en este caso particular donde no puede haber una cantidad de personas 
+# negativas con gripe, claramente no necesitamos las predicciones negativas, as√≠ que 
+# podemos modificar un poco el grafico
 
-plot.forecast(prediccion3, ylim = c(0,1500), fcol = "red", 
+plot(prediccion3, ylim = c(0,1500), fcol = "red", 
               shadecols = c("grey", "lightblue"))
 legend("topleft", c("Prediccion", "Int. Conf. 80%", "Int. Conf. 95%"), pch = 19,
        col = c("red","lightblue", "grey"))
 
-# PredicciÛn autom·tica usando modelo ARIMA.
+# Predicci√≥n autom√°tica usando modelo ARIMA.
 
+#Paciencia que tarda un poquito.
 modelo.arima <- auto.arima(gripes.ts)
 
 class(modelo.arima)
 summary(modelo.arima)
 
-prediccion.arima <- forecast.Arima(modelo.arima)
+prediccion.arima <- forecast(modelo.arima)
 
-plot.forecast(prediccion.arima)
+plot(prediccion.arima)
 legend("topleft", c("Prediccion", "Int. Conf. 80%", "Int. Conf. 95%"), pch = 19,
        col = c("red","darkgrey", "lightgrey"))
 
-# Dada la fuerte tendencia a la baja luego del pico m·ximo en 2004, estas proyecciones
-# ARIMA parecen tener m·s sentido que las anteriores.
+autoplot(prediccion.arima)
+
+# Dada la fuerte tendencia a la baja luego del pico m√°ximo en 2004, estas proyecciones
+# ARIMA parecen tener m√°s sentido que las anteriores.
+
+# Hay MUCHO que se puede hacer con series de tiempo. Voy a subir una an√°lisis t√©cnico sobre
+# acciones de la bolsa de Wall Street para jugar en mucha m√°s profundidad y detalle
+# con una base de datos hist√≥ricos mucho m√°s amplia.
