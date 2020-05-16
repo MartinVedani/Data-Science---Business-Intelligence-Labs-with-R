@@ -1,4 +1,5 @@
-## Análsis de Mercado Financieros utiliizando herrmaientas de Series de Tiempo por Martín Vedani ##
+## Análsis de Mercado Financieros utilizando herrmaientas de Series de Tiempo y Simulaciones 
+## de Montecarlos - por Martín Vedani ##
 
 ## Unicializar los paquetes en el siguiente orden
 library(knitr)
