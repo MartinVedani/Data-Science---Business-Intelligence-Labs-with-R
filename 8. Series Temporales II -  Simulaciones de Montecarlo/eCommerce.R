@@ -17,23 +17,23 @@ library(quadprog)
 # scripts de GitHub
 
 #Source garchAuto para adaptarse a la volatilidad en quantmodity in quantmod
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI - Big Data/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/garchAuto.R')
+source('~/Series Temporales II -  Simulaciones de Montecarlo/scripts/garchAuto.R')
 #Source addGuppy para análisis técnico en quantmod
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI - Big Data/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/addGuppy.R')
+source('~/Series Temporales II -  Simulaciones de Montecarlo/scripts/addGuppy.R')
 # Source change2nysebizday para cambiar yearmon (Mmm YYY) a NYSE bizday date (YYYY-mm-dd)
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI - Big Data/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarloscripts/change2nysebizday.R')
+source('~/Series Temporales II -  Simulaciones de Montecarlo/scripts/change2nysebizday.R')
 # Source cor.mtest para combinar corrplot con Test de Significancia
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI - Big Data/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/cor.mtest.R')
+source('~/Series Temporales II -  Simulaciones de Montecarlo/scripts/scripts/cor.mtest.R')
 # Source funciones de efficient portfolio
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI - Big Data/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/my.eff.frontier.R')
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI - Big Data/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/plotEfficientFrontier.R')
+source('~/Series Temporales II -  Simulaciones de Montecarlo/scripts/my.eff.frontier.R')
+source('~/Series Temporales II -  Simulaciones de Montecarlo/scripts/plotEfficientFrontier.R')
 #Source función funggcast para graficar forecast in ggplot
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI - Big Data/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/funggcast.R')
+source('~/Series Temporales II -  Simulaciones de Montecarlo/scripts/funggcast.R')
 # Source función SDAFE2.R del libro :Statistics and Data Analysis for Financial Engineering, 2nd Edition
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI - Big Data/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/SDAFE2_copy.R')
+source('~/Series Temporales II -  Simulaciones de Montecarlo/scripts/SDAFE2_copy.R')
 # Source funciones para el análisis de portfolios
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI - Big Data/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/util_fns.R')
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI - Big Data/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/portfolio_copy.R')
+source('~/Series Temporales II -  Simulaciones de Montecarlo/scripts/util_fns.R')
+source('~/Series Temporales II -  Simulaciones de Montecarlo/scripts/portfolio_copy.R')
 # --fin de la inicialización--
 
 
@@ -420,79 +420,3 @@ autoplot(arima.forecast.meli)
 # MAKES SENSE !!!
 
 ####***************************************
-# FUNDAMENTALS
-load("merged.meli.fundamentals.2015Q2.RData")
-
-# build correlation matrix
-meli.fundamentals.corr.matrix  <- cor(merged.meli.fundamentals.2015Q2,
-                                      use="pairwise.complete.obs")
-
-res1.meli.fund <- cor.mtest(merged.meli.fundamentals.2015Q2, 0.95)
-## specialized the insignificant value according to the significant level
-par(cex = .9)
-corrplot(meli.fundamentals.corr.matrix, p.mat = res1.meli.fund[[1]], sig.level = 0.05,
-         order = "hclust", type = "lower", pch.cex = .8, tl.srt = 60)
-par(cex = 1)
-
-#*************************************************************
-library(tseries)
-
-meli.projected <- as.data.frame(projected.meli.ret.as.price)
-ebay.projected <- as.data.frame(projected.ebay.ret.as.price)
-amzn.projected <- as.data.frame(projected.amzn.ret.as.price)
-jd.projected <- as.data.frame(projected.jd.ret.as.price)
-baba.projected <- as.data.frame(projected.baba.ret.as.price)
-
-projected.prices <- cbind(meli.projected, ebay.projected, amzn.projected, jd.projected,
-                          baba.projected)
-colnames(projected.prices) <- c("MELI","EBAY","AMZN","JD","BABA")
-
-# calculate simple returns and multiple by 100 to make them as percentages
-n <- dim(projected.prices)[1]
-returns <- 100*(projected.prices[2:n,]/projected.prices[1:(n-1),] - 1)
-
-# input value of risk-free interest rate
-mu_free <- ((as.numeric(round(mean(tbill13[ytd]),4))*100)+.25)/365
-
-
-mean_vect <- apply(returns,2,mean, na.rm = T)
-cov_mat <- cov(returns, use = "pairwise.complete.obs")
-sd_vect <- sqrt(diag(cov_mat))
-
-# Allow for unlimited short sales with NULL, limit short sales with a negative value 
-# betwee 0 and -1 or do not allow short sales with 0.
-w_lower_limit <- -Inf
-
-# MEx weights of one single stock
-w_upper_limit <- 0.5
-
-?portfolio.optim
-
-result <- portfolio.optim(x = returns, pm = max(mean_vect), riskless = T, shorts = T, rf = mu_free,
-                          reslow = NULL, reshigh = c(w_upper_limit),
-                          covmat = cov_mat)
-
-
-meli.projected <- as.data.frame(projected.meli.ret.as.price)
-ebay.projected <- as.data.frame(projected.ebay.ret.as.price)
-amzn.projected <- as.data.frame(projected.amzn.ret.as.price)
-jd.projected <- as.data.frame(projected.jd.ret.as.price)
-baba.projected <- as.data.frame(projected.baba.ret.as.price)
-projected.prices <- cbind(meli.projected, ebay.projected, amzn.projected, jd.projected,
-                          baba.projected)
-colnames(projected.prices) <- c("MELI","EBAY","AMZN","JD","BABA")
-
-r <- diff(log(projected.prices))
-
-averet = matrix(colMeans(r),nrow=1)
-rcov = cov(r)
-target.return = 15/250
-
-
-
-
-
-
-
-
-
