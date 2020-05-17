@@ -7,18 +7,8 @@
 #
 #  Mercado Libre (Latam), Amazon and Ebay (USA/Europe), Alibaba & JD.com (Asia/China)
 #
-#  This work is, partly, the result of my studies at:
 #
-#  Master of Business Administration
-#  Universidad del CEMA - Buenos Aires, Argentina
-#
-#  Exchange Student, Master of Science in Global Banking and Finance
-#  European Business School London, England
-#
-#  Universidad Tecnológica Nacional,
-#  Applied Business Intelligence in R
-#
-# - por Martin Vedani
+# - por Martin Vedani, UTN Business Intellgence
 #
 ############################################################################################
 
