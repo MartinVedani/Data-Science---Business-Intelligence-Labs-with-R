@@ -444,22 +444,20 @@ dm.test(ets.forecast.meli$residuals, arima.forecast.meli$residuals, power = 1,
 
 library(rugarch)
 
-auto.arfima.meli <- autoarfima(meliLogRet, ar.max = 4, ma.max = 4, 
+auto.arfima.meli <- autoarfima(meliLogRet, ar.max = 2, ma.max = 2, 
                                criterion = "AIC", method = "partial",
-                               solver = "hybrid", distribution.model = "sged")
+                               solver = "hybrid")
 
 show(head(auto.arfima.meli$rank.matrix))
-#    AR MA Mean ARFIMA      AIC converged
-# 1  3  3    1      0 -4.153763         1
-# 2  4  4    1      0 -4.152682         1
-# 3  4  2    1      0 -4.143531         1
-# 4  2  4    1      0 -4.143384         1
-# 5  2  2    0      0 -4.122790         1
-# 6  2  2    1      0 -4.121601         1
+#   AR MA Mean ARFIMA       AIC converged
+# 1  2  2    0      0 -3.970398         1
 
-# So ARMA(3,3) model WITH a mean
+# So ARMA(2,2) model WITHOUT a mean
 
 # Parameters for ARIMA(p,d,q)
+
+# If convergence problems arise
+
 # In choosing ARMA(p,q) the theory of difference equations suggests that
 # we should choose ARMA(p+1,p), which gives rise to a solution of the difference
 # equation with p+1 terms. You can of course have some zero orders
@@ -476,19 +474,18 @@ meli.mean
 
 ?ugarchspec
 
+# No convergence problems so we will use p and q with/without mean as estimated:
+
 arma.garch.meli.spec.std <- ugarchspec(
         variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
-        mean.model = list(armaOrder=c(meli.p + 1, meli.p), include.mean = meli.mean), 
+        mean.model = list(armaOrder=c(meli.p, meli.q), include.mean = meli.mean), 
         distribution.model = "sged")
 
 arma.garch.meli.fit.std <- ugarchfit(spec=arma.garch.meli.spec.std, data=meliLogRet)
 
 
 coef(arma.garch.meli.fit.std)
-# mu           ar1           ar2           ar3           ar4           ma1           ma2 
-# 0.0017811082 -0.2300325652 -0.1548022599 -0.6713285911 -0.0174478378  0.1973552682  0.1444341433 
-# ma3         omega        alpha1         beta1          skew         shape 
-# 0.7399082032  0.0001000426  0.0832199559  0.8269806228  1.0116253232  1.0598308866 
+# see all coeficients
 
 ?ugarchsim
 
@@ -527,7 +524,7 @@ meli.projected.ret.as.price <- last.meli.price * c(1, exp(cumsum(meli.fitted.mea
 meli.target.price.66d <- as.numeric(last(meli.projected.ret.as.price))
 
 meli.target.price.66d 
-# 878.6862
+# 773.2526
 
 chart.meli <- autoplot(ets.forecast.meli)
 chart.meli + geom_hline(yintercept = meli.target.price.66d, color = "red")
@@ -552,11 +549,13 @@ summary(ets.forecast.amzn)
 
 autoplot(ets.forecast.amzn)
 
-auto.arfima.amzn <- autoarfima(amznLogRet, ar.max = 4, ma.max = 4, 
+auto.arfima.amzn <- autoarfima(amznLogRet, ar.max = 2, ma.max = 2, 
                                criterion = "AIC", method = "partial",
-                               solver = "hybrid", distribution.model = "sged")
+                               solver = "hybrid")
 
 show(head(auto.arfima.amzn$rank.matrix))
+#   AR MA Mean ARFIMA       AIC converged
+# 1  1  2    1      0 -4.926614         1
 
 amzn.p <- auto.arfima.amzn$rank.matrix[1,"AR"]
 amzn.q <- auto.arfima.amzn$rank.matrix[1,"MA"]
@@ -565,9 +564,11 @@ amzn.p
 amzn.q
 amzn.mean
 
+# No convergence problems so we will use p and q with/without mean as estimated:
+
 arma.garch.amzn.spec.std <- ugarchspec(
         variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
-        mean.model = list(armaOrder=c(amzn.p + 1, amzn.p), include.mean = amzn.mean), 
+        mean.model = list(armaOrder=c(amzn.p, amzn.q), include.mean = amzn.mean), 
         distribution.model = "sged")
 
 arma.garch.amzn.fit.std <- ugarchfit(spec=arma.garch.amzn.spec.std, data=amznLogRet)
@@ -592,7 +593,7 @@ amzn.projected.ret.as.price <- last.amzn.price * c(1, exp(cumsum(amzn.fitted.mea
 amzn.target.price.66d <- as.numeric(last(amzn.projected.ret.as.price))
 
 amzn.target.price.66d 
-# [1] 2399.691
+# [1] 2664.956
 
 chart.amzn <- autoplot(ets.forecast.amzn) 
 chart.amzn + geom_hline(yintercept = amzn.target.price.66d, color = "red")
@@ -611,11 +612,13 @@ summary(ets.forecast.ebay)
 
 autoplot(ets.forecast.ebay)
 
-auto.arfima.ebay <- autoarfima(ebayLogRet, ar.max = 4, ma.max = 4, 
+auto.arfima.ebay <- autoarfima(ebayLogRet, ar.max = 2, ma.max = 2, 
                                criterion = "AIC", method = "partial",
-                               solver = "hybrid", distribution.model = "sged")
+                               solver = "hybrid")
 
 show(head(auto.arfima.ebay$rank.matrix))
+#   AR MA Mean ARFIMA       AIC converged
+# 1  1  0    0      0 -5.041950         1
 
 ebay.p <- auto.arfima.ebay$rank.matrix[1,"AR"]
 ebay.q <- auto.arfima.ebay$rank.matrix[1,"MA"]
@@ -624,9 +627,11 @@ ebay.p
 ebay.q
 ebay.mean
 
+# No convergence problems so we will use p and q with/without mean as estimated:
+
 arma.garch.ebay.spec.std <- ugarchspec(
         variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
-        mean.model = list(armaOrder=c(ebay.p + 1, ebay.p), include.mean = ebay.mean), 
+        mean.model = list(armaOrder=c(ebay.p, ebay.q), include.mean = ebay.mean), 
         distribution.model = "sged")
 
 arma.garch.ebay.fit.std <- ugarchfit(spec=arma.garch.ebay.spec.std, data=ebayLogRet)
@@ -651,7 +656,7 @@ ebay.projected.ret.as.price <- last.ebay.price * c(1, exp(cumsum(ebay.fitted.mea
 ebay.target.price.66d <- as.numeric(last(ebay.projected.ret.as.price))
 
 ebay.target.price.66d 
-# [1] 42.1972
+# [1] 42.11713
 
 chart.ebay <- autoplot(ets.forecast.ebay) 
 chart.ebay + geom_hline(yintercept = ebay.target.price.66d, color = "red")
@@ -670,11 +675,13 @@ summary(ets.forecast.baba)
 
 autoplot(ets.forecast.baba)
 
-auto.arfima.baba <- autoarfima(babaLogRet, ar.max = 4, ma.max = 4, 
+auto.arfima.baba <- autoarfima(babaLogRet, ar.max = 2, ma.max = 2, 
                                criterion = "AIC", method = "partial",
-                               solver = "hybrid", distribution.model = "sged")
+                               solver = "hybrid")
 
 show(head(auto.arfima.baba$rank.matrix))
+#   AR MA Mean ARFIMA       AIC converged
+# 1  2  2    0      0 -4.840443         1
 
 baba.p <- auto.arfima.baba$rank.matrix[1,"AR"]
 baba.q <- auto.arfima.baba$rank.matrix[1,"MA"]
@@ -683,9 +690,11 @@ baba.p
 baba.q
 baba.mean
 
+# No convergence problems so we will use p and q with/without mean as estimated:
+
 arma.garch.baba.spec.std <- ugarchspec(
         variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
-        mean.model = list(armaOrder=c(baba.p + 1, baba.p), include.mean = baba.mean), 
+        mean.model = list(armaOrder=c(baba.p, baba.q), include.mean = baba.mean), 
         distribution.model = "sged")
 
 arma.garch.baba.fit.std <- ugarchfit(spec=arma.garch.baba.spec.std, data=babaLogRet)
@@ -710,7 +719,7 @@ baba.projected.ret.as.price <- last.baba.price * c(1, exp(cumsum(baba.fitted.mea
 baba.target.price.66d <- as.numeric(last(baba.projected.ret.as.price))
 
 baba.target.price.66d 
-# [1] 203.8717
+# [1] 203.7607
 
 chart.baba <- autoplot(ets.forecast.baba) 
 chart.baba + geom_hline(yintercept = baba.target.price.66d, color = "red")
@@ -729,11 +738,13 @@ summary(ets.forecast.jd)
 
 autoplot(ets.forecast.jd)
 
-auto.arfima.jd <- autoarfima(jdLogRet, ar.max = 4, ma.max = 4, 
+auto.arfima.jd <- autoarfima(jdLogRet, ar.max = 2, ma.max = 2, 
                              criterion = "AIC", method = "partial",
-                             solver = "hybrid", distribution.model = "sged")
+                             solver = "hybrid")
 
 show(head(auto.arfima.jd$rank.matrix))
+#   AR MA Mean ARFIMA       AIC converged
+# 1  1  1    0      0 -4.315711         1
 
 jd.p <- auto.arfima.jd$rank.matrix[1,"AR"]
 jd.q <- auto.arfima.jd$rank.matrix[1,"MA"]
@@ -742,9 +753,11 @@ jd.p
 jd.q
 jd.mean
 
+# No convergence problems so we will use p and q with/without mean as estimated:
+
 arma.garch.jd.spec.std <- ugarchspec(
         variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
-        mean.model = list(armaOrder=c(jd.p + 1, jd.p), include.mean = jd.mean), 
+        mean.model = list(armaOrder=c(jd.p, jd.q), include.mean = jd.mean), 
         distribution.model = "sged")
 
 arma.garch.jd.fit.std <- ugarchfit(spec=arma.garch.jd.spec.std, data=jdLogRet)
@@ -769,7 +782,7 @@ jd.projected.ret.as.price <- last.jd.price * c(1, exp(cumsum(jd.fitted.mean)))
 jd.target.price.66d <- as.numeric(last(jd.projected.ret.as.price))
 
 jd.target.price.66d 
-# [1] 50.72067
+# [1] 49.99154
 
 chart.jd <- autoplot(ets.forecast.jd) 
 chart.jd + geom_hline(yintercept = jd.target.price.66d, color = "red")
