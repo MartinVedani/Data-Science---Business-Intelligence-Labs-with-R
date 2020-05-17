@@ -7,7 +7,7 @@
 #
 #  Mercado Libre (Latam), Amazon and Ebay (USA/Europe), Alibaba & JD.com (Asia/China)
 #
-#  This work is, partly, the resutl of my studies at:
+#  This work is, partly, the result of my studies at:
 #
 #  Master of Business Administration
 #  Universidad del CEMA - Buenos Aires, Argentina
