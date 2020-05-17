@@ -45,7 +45,6 @@ source('~/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/util_fns
 source('~/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/portfolio_copy.R')
 # --fin de la inicialización--
 
-
 library(BatchGetSymbols)
 # Fuente: https://cran.r-project.org/web/packages/BatchGetSymbols/vignettes/BatchGetSymbols-vignette.html
 
@@ -787,3 +786,301 @@ jd.target.price.66d
 chart.jd <- autoplot(ets.forecast.jd) 
 chart.jd + geom_hline(yintercept = jd.target.price.66d, color = "red")
 # MAKES SENSE !!!
+
+#****************************************************************************************
+
+########################################################################
+# Capital Asset Pricing Model (CAPM) by company
+########################################################################
+
+#### Build table of CAPM results
+colnames.CAPM.table <- c("MELI", "AMZN", "EBAY", "BABA", "JD")
+rownames.CAPM.table <- c("Beta", "Alpha", "Over/Under Priced", "Market Risk Exposure",
+                         "Expected Excess Returns")
+CAPM.table <- matrix(nrow = length(rownames.CAPM.table), ncol = length(colnames.CAPM.table))
+colnames(CAPM.table) <- colnames.CAPM.table
+rownames(CAPM.table) <- rownames.CAPM.table
+
+#### ***************
+#### meli
+#### ***************
+# Calculate simple returns for meli and merge all in one matrix
+meli.Ret <- dailyReturn(meli, subset = "2018::", type="arithmetic")
+colnames(meli.Ret) <- c("meli.returns")
+sp500Ret.meli <- dailyReturn(sp500, subset = "2018::", type="arithmetic")
+colnames(sp500Ret.meli) <- c("sp500.returns")
+
+tbill13.meli <- ((Ad(IRX["2018::"]))/100)/252
+colnames(tbill13.meli) <- c("tbill13dailyRate(Not%)")
+
+# Merge meli and sp500 returns
+meli.sp500 <- merge.xts(meli.Ret,sp500Ret.meli)
+
+#Calculate excess returns
+for(n in 1:dim(meli.sp500)[1]){
+        for(m in 1:dim(meli.sp500)[2]){
+                meli.sp500[n,m] <- meli.sp500[n,m] - tbill13.meli[n,1]
+        }
+}
+
+# Ignore error
+
+# Do linear regression
+lm.meli <- lm(meli.returns ~ sp500.returns, meli.sp500)
+
+#Check summary coefficients
+summary(lm.meli)
+
+#Pull beta
+beta.meli <- round(as.numeric(lm.meli$coef["sp500.returns"]),2)
+
+#Pull alfa
+alpha.meli <- signif(as.numeric(lm.meli$coef["(Intercept)"]),digits = 3)
+
+#Pull market risk for meli
+# Convert summaries as lists and Pull market risk for meli (R^2)
+list.meli <- summary(lm.meli)
+marketRisk.meli <- paste(round((list.meli$r.squared)*100,2),"%",sep = "")
+
+# Calculate expected excess returns above/below expected average return of sp500
+ExpExcRet.meli <- paste(round(beta.meli * mean(meli.sp500[,"sp500.returns"])*100*252,2),
+                        "%",sep = "")
+
+
+# Fill table of CAPM results
+CAPM.table["Beta","MELI"] <- beta.meli
+CAPM.table["Alpha","MELI"] <- alpha.meli
+CAPM.table["Market Risk Exposure","MELI"] <- marketRisk.meli
+CAPM.table["Expected Excess Returns","MELI"] <- ExpExcRet.meli
+if(alpha.meli > 0.001){
+        CAPM.table["Over/Under Priced","MELI"] <- c("Under-priced")}
+if(alpha.meli < 0.00001) {
+        CAPM.table["Over/Under Priced","MELI"] <- c("Over-priced")}
+if(alpha.meli > 0.00001 & alpha.meli < 0.001){
+        CAPM.table["Over/Under Priced","MELI"] <- c("Neutral")}
+
+#### ***************
+#### amzn
+#### ***************
+# Calculate simple returns for amzn and merge all in one matrix
+amzn.Ret <- dailyReturn(amzn, subset = "2018::", type="arithmetic")
+colnames(amzn.Ret) <- c("amzn.returns")
+sp500Ret.amzn <- dailyReturn(sp500, subset = "2018::", type="arithmetic")
+colnames(sp500Ret.amzn) <- c("sp500.returns")
+
+tbill13.amzn <- ((Ad(IRX["2018::"]))/100)/252
+colnames(tbill13.amzn) <- c("tbill13dailyRate(Not%)")
+
+# Merge amzn and sp500 returns
+amzn.sp500 <- merge.xts(amzn.Ret,sp500Ret.amzn)
+
+#Calculate excess returns
+for(n in 1:dim(amzn.sp500)[1]){
+        for(m in 1:dim(amzn.sp500)[2]){
+                amzn.sp500[n,m] <- amzn.sp500[n,m] - tbill13.amzn[n,1]
+        }
+}
+
+# Do linear regression
+lm.amzn <- lm(amzn.returns ~ sp500.returns, amzn.sp500)
+
+#Check summary coefficients
+summary(lm.amzn)
+
+#Pull beta
+beta.amzn <- round(as.numeric(lm.amzn$coef["sp500.returns"]),2)
+
+#Pull alfa
+alpha.amzn <- signif(as.numeric(lm.amzn$coef["(Intercept)"]),digits = 3)
+
+#Pull market risk for amzn
+# Convert summaries as lists and Pull market risk for amzn (R^2)
+list.amzn <- summary(lm.amzn)
+marketRisk.amzn <- paste(round((list.amzn$r.squared)*100,2),"%",sep = "")
+
+# Calculate expected excess returns above/below expected average return of sp500
+ExpExcRet.amzn <- paste(round(beta.amzn * mean(amzn.sp500[,"sp500.returns"])*100*252,2),
+                        "%",sep = "")
+
+
+# Fill table of CAPM results
+CAPM.table["Beta","AMZN"] <- beta.amzn
+CAPM.table["Alpha","AMZN"] <- alpha.amzn
+CAPM.table["Market Risk Exposure","AMZN"] <- marketRisk.amzn
+CAPM.table["Expected Excess Returns","AMZN"] <- ExpExcRet.amzn
+if(alpha.amzn > 0.001){
+        CAPM.table["Over/Under Priced","AMZN"] <- c("Under-priced")}
+if(alpha.amzn < 0.00001) {
+        CAPM.table["Over/Under Priced","AMZN"] <- c("Over-priced")}
+if(alpha.amzn > 0.00001 & alpha.amzn < 0.001){
+        CAPM.table["Over/Under Priced","AMZN"] <- c("Neutral")}
+
+#### ***************
+#### ebay
+#### ***************
+# Calculate simple returns for ebay and merge all in one matrix
+ebay.Ret <- dailyReturn(ebay, subset = "2018::",type="arithmetic")
+colnames(ebay.Ret) <- c("ebay.returns")
+sp500Ret.ebay <- dailyReturn(sp500, subset = "2018::",stype="arithmetic")
+colnames(sp500Ret.ebay) <- c("sp500.returns")
+
+tbill13.ebay <- ((Ad(IRX["2018::"]))/100)/252
+colnames(tbill13.ebay) <- c("tbill13dailyRate(Not%)")
+
+# Merge ebay and sp500 returns
+ebay.sp500 <- merge.xts(ebay.Ret,sp500Ret.ebay)
+
+#Calculate excess returns
+for(n in 1:dim(ebay.sp500)[1]){
+        for(m in 1:dim(ebay.sp500)[2]){
+                ebay.sp500[n,m] <- ebay.sp500[n,m] - tbill13.ebay[n,1]
+        }
+}
+#ignore error
+
+# Do linear regression
+lm.ebay <- lm(ebay.returns ~ sp500.returns, ebay.sp500)
+
+#Check summary coefficients
+summary(lm.ebay)
+
+#Pull beta
+beta.ebay <- round(as.numeric(lm.ebay$coef["sp500.returns"]),digits = 2)
+
+#Pull alfa
+alpha.ebay <- signif(as.numeric(lm.ebay$coef["(Intercept)"]),digits = 3)
+
+#Pull market risk for ebay
+# Convert summaries as lists and Pull market risk for ebay (R^2)
+list.ebay <- summary(lm.ebay)
+marketRisk.ebay <- paste(round((list.ebay$r.squared)*100,2),"%",sep = "")
+
+# Calculate expected excess returns above/below expected average return of sp500
+ExpExcRet.ebay <- paste(round(beta.ebay * mean(ebay.sp500[,"sp500.returns"])*100*252,2),
+                        "%",sep = "")
+
+
+# Fill table of CAPM results
+CAPM.table["Beta","EBAY"] <- beta.ebay
+CAPM.table["Alpha","EBAY"] <- alpha.ebay
+CAPM.table["Market Risk Exposure","EBAY"] <- marketRisk.ebay
+CAPM.table["Expected Excess Returns","EBAY"] <- ExpExcRet.ebay
+if(alpha.ebay > 0.001){
+        CAPM.table["Over/Under Priced","EBAY"] <- c("Under-priced")}
+if(alpha.ebay < 0.00001) {
+        CAPM.table["Over/Under Priced","EBAY"] <- c("Over-priced")}
+if(alpha.ebay > 0.00001 & alpha.ebay < 0.001){
+        CAPM.table["Over/Under Priced","EBAY"] <- c("Neutral")}
+
+#### ***************
+#### baba
+#### ***************
+# Calculate simple returns for baba and merge all in one matrix
+baba.Ret <- dailyReturn(baba, subset = "2018::", type="arithmetic")
+colnames(baba.Ret) <- c("baba.returns")
+sp500Ret.baba <- dailyReturn(sp500, subset = "2018::", type="arithmetic")
+colnames(sp500Ret.baba) <- c("sp500.returns")
+
+tbill13.baba <- ((Ad(IRX["2018::"]))/100)/252
+colnames(tbill13.baba) <- c("tbill13dailyRate(Not%)")
+
+# Merge baba and sp500 returns
+baba.sp500 <- merge.xts(baba.Ret,sp500Ret.baba)
+
+#Calculate excess returns
+for(n in 1:dim(baba.sp500)[1]){
+        for(m in 1:dim(baba.sp500)[2]){
+                baba.sp500[n,m] <- baba.sp500[n,m] - tbill13.baba[n,1]
+        }
+}
+
+# Do linear regression
+lm.baba <- lm(baba.returns ~ sp500.returns, baba.sp500)
+
+#Check summary coefficients
+summary(lm.baba)
+
+#Pull beta
+beta.baba <- round(as.numeric(lm.baba$coef["sp500.returns"]),2)
+
+#Pull alfa
+alpha.baba <- signif(as.numeric(lm.baba$coef["(Intercept)"]),digits = 3)
+
+#Pull market risk for baba
+# Convert summaries as lists and Pull market risk for baba (R^2)
+list.baba <- summary(lm.baba)
+marketRisk.baba <- paste(round((list.baba$r.squared)*100,2),"%",sep = "")
+
+# Calculate expected excess returns above/below expected average return of sp500
+ExpExcRet.baba <- paste(round(beta.baba * mean(baba.sp500[,"sp500.returns"])*100*252,2),
+                        "%",sep = "")
+
+# Fill table of CAPM results
+CAPM.table["Beta","BABA"] <- beta.baba
+CAPM.table["Alpha","BABA"] <- alpha.baba
+CAPM.table["Market Risk Exposure","BABA"] <- marketRisk.baba
+CAPM.table["Expected Excess Returns","BABA"] <- ExpExcRet.baba
+if(alpha.baba > 0.001){
+        CAPM.table["Over/Under Priced","BABA"] <- c("Under-priced")}
+if(alpha.baba < 0.00001) {
+        CAPM.table["Over/Under Priced","BABA"] <- c("Over-priced")}
+if(alpha.baba > 0.00001 & alpha.baba < 0.001){
+        CAPM.table["Over/Under Priced","BABA"] <- c("Neutral")}
+
+#### ***************
+#### jd
+#### ***************
+# Calculate simple returns for jd and merge all in one matrix
+jd.Ret <- dailyReturn(jd, subset = "2018::", type="arithmetic")
+colnames(jd.Ret) <- c("jd.returns")
+sp500Ret.jd <- dailyReturn(sp500, subset = "2018::", type="arithmetic")
+colnames(sp500Ret.jd) <- c("sp500.returns")
+
+tbill13.jd <- ((Ad(IRX["2018::"]))/100)/252
+colnames(tbill13.jd) <- c("tbill13dailyRate(Not%)")
+
+# Merge jd and sp500 returns
+jd.sp500 <- merge.xts(jd.Ret,sp500Ret.jd)
+
+#Calculate excess returns
+for(n in 1:dim(jd.sp500)[1]){
+        for(m in 1:dim(jd.sp500)[2]){
+                jd.sp500[n,m] <- jd.sp500[n,m] - tbill13.jd[n,1]
+        }
+}
+
+# Do linear regression
+lm.jd <- lm(jd.returns ~ sp500.returns, jd.sp500)
+
+#Check summary coefficients
+summary(lm.jd)
+
+#Pull beta
+beta.jd <- round(as.numeric(lm.jd$coef["sp500.returns"]),2)
+
+#Pull alfa
+alpha.jd <- signif(as.numeric(lm.jd$coef["(Intercept)"]),digits = 3)
+
+#Pull market risk for jd
+# Convert summaries as lists and Pull market risk for jd (R^2)
+list.jd <- summary(lm.jd)
+marketRisk.jd <- paste(round((list.jd$r.squared)*100,2),"%",sep = "")
+
+# Calculate expected excess returns above/below expected average return of sp500
+ExpExcRet.jd <- paste(round(beta.jd * mean(jd.sp500[,"sp500.returns"])*100*252,2),
+                      "%",sep = "")
+
+
+# Fill table of CAPM results
+CAPM.table["Beta","JD"] <- beta.jd
+CAPM.table["Alpha","JD"] <- alpha.jd
+CAPM.table["Market Risk Exposure","JD"] <- marketRisk.jd
+CAPM.table["Expected Excess Returns","JD"] <- ExpExcRet.jd
+if(alpha.jd > 0.001){
+        CAPM.table["Over/Under Priced","JD"] <- c("Under-priced")}
+if(alpha.jd < 0.00001) {
+        CAPM.table["Over/Under Priced","JD"] <- c("Over-priced")}
+if(alpha.jd > 0.00001 & alpha.jd < 0.001){
+        CAPM.table["Over/Under Priced","JD"] <- c("Neutral")}
+
+#****************************************************************************************
