@@ -1,9 +1,7 @@
 #############################################################################################
-#  This is a BONUS Lab in R, where 
-#  
-#  We will apply Montecarlo Simulations on Financial Time Series and and will use
-#  Efficient Portfolio theory to determine how much of 5 Global eCommerce stocks
-#  we should allocate to our investment portfolio. Namly, we will be looking at:
+#  This is a BONUS Lab in R, where will apply Montecarlo Simulations and Efficient Portfolio 
+#  Management theory to Financial Time Series to determine how much of 5 Global eCommerce 
+#  stocks we should buy for our investment portfolio. Namly, we will be looking at:
 #
 #  Mercado Libre (Latam), Amazon and Ebay (USA/Europe), Alibaba & JD.com (Asia/China)
 #
@@ -11,9 +9,6 @@
 # - por Martin Vedani, UTN Business Intellgence
 #
 ############################################################################################
-
-## Análsis de Mercado Financieros utilizando herrmaientas de Series de Tiempo y Simulaciones 
-## de Montecarlos - por Martín Vedani ##
 
 ## Unicializar los paquetes en el siguiente orden
 library(knitr)
