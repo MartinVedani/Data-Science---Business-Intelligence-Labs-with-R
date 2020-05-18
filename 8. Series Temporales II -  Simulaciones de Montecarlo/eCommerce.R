@@ -30,20 +30,23 @@ source('~/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/garchAut
 #Source addGuppy para análisis técnico en quantmod
 source('~/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/addGuppy.R')
 # Source change2nysebizday para cambiar yearmon (Mmm YYY) a NYSE bizday date (YYYY-mm-dd)
-source('~/8. Series Temporales II -  Simulaciones de Montecarloscripts/change2nysebizday.R')
+source('~/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/change2nysebizday.R')
 # Source cor.mtest para combinar corrplot con Test de Significancia
 source('~/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/cor.mtest.R')
 # Source funciones de efficient portfolio
 source('~/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/my.eff.frontier.R')
 source('~/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/plotEfficientFrontier.R')
 #Source función funggcast para graficar forecast in ggplot
-source('~8. Series Temporales II -  Simulaciones de Montecarlo/scripts/funggcast.R')
+source('~/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/funggcast.R')
 # Source función SDAFE2.R del libro :Statistics and Data Analysis for Financial Engineering, 2nd Edition
 source('~/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/SDAFE2_copy.R')
 # Source funciones para el análisis de portfolios
 source('~/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/util_fns.R')
 source('~/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/portfolio_copy.R')
-# --fin de la inicialización--
+# Set YTD range
+ytd <- paste(as.numeric(format(Sys.Date(), '%Y')),"::", sep = "")
+# --end of start up --
+
 
 library(BatchGetSymbols)
 # Fuente: https://cran.r-project.org/web/packages/BatchGetSymbols/vignettes/BatchGetSymbols-vignette.html
@@ -68,9 +71,10 @@ print(l.out$df.control)
 p <- ggplot(l.out$df.tickers, aes(x = ref.date, y = price.close))
 p <- p + geom_line()
 p <- p + facet_wrap(~ticker, scales = 'free_y') 
-print(p)
 
 detach("package:BatchGetSymbols", unload=TRUE)
+
+print(p)
 
 ###### Otro método para conseguir datos históricos completos y manipularlos más fácil######
 
@@ -205,7 +209,10 @@ res1 <- cor.mtest(merged.master.matrix, conf.level = 0.95)
 
 ## Correlation Matrix - specialized the insignificant value according to the significant level
 corrplot(master.corr.matrix, p.mat = res1[[1]], sig.level = 0.05, order = "hclust",
-         type = "lower", pch.cex = .8, tl.srt = 60)
+         type = "upper", pch.cex = .8, tl.srt = 60)
+
+
+#****************************************************************************************
 
 # ********************************************************************************* #
 # Technical charts
@@ -221,18 +228,18 @@ addVolatility(col = "red", lwd = 2, legend = "Volatility")
 addGuppy(col=c(rep("blue",6), rep("black",6)), legend = "GMMA: Blue(short), Black(long)")
 reChart(major.ticks='months')
 
-# EBAY
-chartSeries(ebay, theme = "white", subset = ytd, type = "bar",
-            name = "(NASDAQ:EBAY)", TA="addBBands();addRSI();addVo()")
-addTA(RSI(Cl(ebay)) > 70, col="lightyellow", border=NA, on= -(1:3)) #over-bought, expect fall in price
-addVolatility(col = "red", lwd = 2, legend = paste("Volatility"))
-addGuppy(col=c(rep("blue",6), rep("black",6)), legend = "GMMA: Blue(short), Black(long)")
-
 # AMAZON
 chartSeries(amzn, theme = "white", subset = ytd, type = "bar",
             name = "(NASDAQ:AMZN)", TA="addBBands();addRSI();addVo()")
 addTA(RSI(Cl(amzn)) > 70, col="lightyellow", border=NA, on= -(1:3)) #over-bought, expect fall in price
 addVolatility(col = "red", lwd = 2, legend = "Volatility")
+addGuppy(col=c(rep("blue",6), rep("black",6)), legend = "GMMA: Blue(short), Black(long)")
+
+# EBAY
+chartSeries(ebay, theme = "white", subset = ytd, type = "bar",
+            name = "(NASDAQ:EBAY)", TA="addBBands();addRSI();addVo()")
+addTA(RSI(Cl(ebay)) > 70, col="lightyellow", border=NA, on= -(1:3)) #over-bought, expect fall in price
+addVolatility(col = "red", lwd = 2, legend = paste("Volatility"))
 addGuppy(col=c(rep("blue",6), rep("black",6)), legend = "GMMA: Blue(short), Black(long)")
 
 # Alibaba
@@ -245,12 +252,27 @@ addGuppy(col=c(rep("blue",6), rep("black",6)), legend = "GMMA: Blue(short), Blac
 # JD.com
 chartSeries(jd, theme = "white", subset = ytd, type = "bar",
             name = "(NASDAQ:JD)", TA="addBBands();addRSI();addVo()")
+addTA(RSI(Cl(baba)) > 70, col="lightyellow", border=NA, on= -(1:3)) #over-bought, expect fall in price
 addVolatility(col = "red", lwd = 2, legend = "Volatility")
 addGuppy(col=c(rep("blue",6), rep("black",6)), legend = "GMMA: Blue(short), Black(long)")
 
-# ********************************************************************************* #
+CAPM.table
 
+#****************************************************************************************
 ###### meli.model (DECOMPOSED)
+
+#### ***** VOLATILITY *******
+# # Rolling realized volatility over a 20 day window
+# # http://www.spiderfinancial.com/support/documentation/numxl/tips-and-tricks/volatility-101
+# # http://stackoverflow.com/questions/12823445/faster-way-of-calculating-rolling-realized-volatility-in-r
+
+autoplot(meliLogRet, main = "MELI's daily log returns")
+
+?runSD
+
+realized.vol.meli.20days <- runSD(meliLogRet, n=20) * sqrt(252)
+plot.xts(realized.vol.meli.20days, major.ticks = "months",
+         main = "Volatility over 20-day-rolling-window")
 
 # Decompose trend and seasonal factros with Seasonal Decomposition of Time Series by Loess
 
@@ -273,19 +295,6 @@ abline(v=c(2018.25, 2018.5, 2018.75,
            2020.25, 2020.5, 2020.75), col="salmon", lty=2)
 
 # MELI is seasonal, with a trend, and remainder data - as expected with financial data.
-
-#### ***** VOLATILITY *******
-# # Rolling realized volatility over a 20 day window
-# # http://www.spiderfinancial.com/support/documentation/numxl/tips-and-tricks/volatility-101
-# # http://stackoverflow.com/questions/12823445/faster-way-of-calculating-rolling-realized-volatility-in-r
-
-autoplot(meliLogRet, major.ticks = "years", main = "MELI's daily log returns")
-
-?runSD
-
-realized.vol.meli.20days <- runSD(meliLogRet, n=20) * sqrt(252)
-plot.xts(realized.vol.meli.20days, major.ticks = "years",
-         main = "MELI's realized volatility over 20 days")
 
 # # Forecast using STL (Seasonal Decomposition of Time Series by Loess)
 
@@ -349,7 +358,7 @@ str(arima.forecast.meli) # arima.forecast.meli$residuals
 # # Usage
 # 
 # # dm.test(e1, e2, alternative=c("two.sided","less","greater"),
-# #         h=1, power=2)
+# #         h=1, power=1)
 # 
 # # Arguments
 # 
@@ -430,7 +439,7 @@ dm.test(ets.forecast.meli$residuals, arima.forecast.meli$residuals, power = 1,
 
 # The Rugarch package is one of the more robust R libraries for financial data analysis and forecating. 
 
-# It allows to forecast more than just prices, spewcifically volatility which is very importat
+# It allows to forecast more than just prices, specifically volatility which is very importat
 # for VaR estimations at the time to decide what porfoloio allocations are on the efficient 
 # fontier and which allocations will give us less than optimal returns for a given level of
 # risk. 
@@ -787,300 +796,224 @@ chart.jd <- autoplot(ets.forecast.jd)
 chart.jd + geom_hline(yintercept = jd.target.price.66d, color = "red")
 # MAKES SENSE !!!
 
+
+#****************************************************************************************
+### eCommerce porfolio allocation with and without short selling
+
+# The optimal or efficient portfolio mixes that follow were formulated using:  
+# . Projected daily prices based on the simulations for all companies that we discussed earlier.  
+# . Computing arithmetic daily returns of said projected prices.  
+# . Limitation on the maximum portfolio participation of any single stock to not go above a ceiling of 40% long, and not below 20% short. I chose these constraints for arbitrary reasons: a rule of thumb of twice the amount of an equal weights portfolio (100% divided by 5) for long and no more than once the balanced portfolio for short positions.    
+# . Sharpe ratio calculated using stocks daily simple returns in excess of risk free rate. 
+# . 13 week US Treasury Bill Risk Free rate
+
+meli.projected <- as.data.frame(meli.projected.ret.as.price)
+amzn.projected <- as.data.frame(amzn.projected.ret.as.price)
+ebay.projected <- as.data.frame(ebay.projected.ret.as.price)
+baba.projected <- as.data.frame(baba.projected.ret.as.price)
+jd.projected <- as.data.frame(jd.projected.ret.as.price)
+
+projected.prices <- cbind(meli.projected, amzn.projected, ebay.projected, baba.projected, jd.projected)
+colnames(projected.prices) <- c("MELI", "AMZN", "EBAY", "BABA", "JD")
+
+# calculate simple returns and multiple by 100 to make them as percentages
+n <- dim(projected.prices)[1]
+returns <- as.matrix(100*(projected.prices[2:n,]/projected.prices[1:(n-1),] - 1))
+
+# input value of risk-free interest rate
+# usTbill13weeks are in percentage and annual terms, so must be divided by 252 to make daily percentage
+tbill13 <- (Ad(IRX["2018::"]))/252
+mufree <- as.numeric(round(mean(na.omit(tbill13)),4))
+
+mean_vect <- apply(returns,2,mean, na.rm = T)
+
+#####################################################
+# ***************WITH SHORT SALES********************
+#####################################################
+
+eff_Short <- my.eff.frontier(returns,  mufree = mufree, short=-0.2,
+                             risk.premium.up=max(mean_vect), risk.increment=.005)
+
+# Find the optimal portfolio
+eff.optimal.point_Short <- eff_Short[eff_Short$sharpe==max(eff_Short$sharpe),]
+
+#####################################################
+# ***************WITHOUT SHORT SALES*****************
+#####################################################
+
+eff_noShort <- my.eff.frontier(returns, mufree = mufree, short=0, max.allocation=0.4,
+                               risk.premium.up=max(mean_vect), risk.increment=.005)
+
+# Find the optimal portfolio
+eff.optimal.point_noShort <- eff_noShort[eff_noShort$sharpe==max(eff_noShort$sharpe),]
+
+# Print weights
+meli.weight.short <- round(eff.optimal.point_Short["MELI"],2)
+amzn.weight.short <-round(eff.optimal.point_Short["AMZN"],2)
+ebay.weight.short <- round(eff.optimal.point_Short["EBAY"],2)
+baba.weight.short <- round(eff.optimal.point_Short["BABA"],2)
+jd.weight.short <- round(eff.optimal.point_Short["JD"],2)
+
+
+meli.weight.no.short <- round(eff.optimal.point_noShort["MELI"],2)
+amzn.weight.no.short <-round(eff.optimal.point_noShort["AMZN"],2)
+ebay.weight.no.short <- round(eff.optimal.point_noShort["EBAY"],2)
+baba.weight.no.short <- round(eff.optimal.point_noShort["BABA"],2)
+jd.weight.no.short <- round(eff.optimal.point_noShort["JD"],2)
+
+
+weights.short <- cbind(meli.weight.short, amzn.weight.short, ebay.weight.short,
+                       baba.weight.short, jd.weight.short)
+rownames(weights.short) <- "Weights w/ Short Sales Allowed"
+
+weights.no.short <- cbind(meli.weight.no.short, amzn.weight.no.short, ebay.weight.no.short,
+                          baba.weight.no.short, jd.weight.no.short)
+rownames(weights.no.short) <- "Weights w/ Short Sales Prohibited"
+
+weights.short.no.short <- rbind(weights.short, weights.no.short)
+
+weights.short.no.short
+
+# Find the optimal portfolio again, using "eff.optimal.point" as variable name so that it 
+# works with plotEfficientFrontier()
+eff.optimal.point <- eff_Short[eff_Short$sharpe==max(eff_Short$sharpe),]
+plotEfficientFrontier(eff_Short, header = "Optimal Portfolio w/ Short Sales Allowed")
+
+# Find the optimal portfolio again, using "eff.optimal.point" as variable name so that it 
+# works with plotEfficientFrontier()
+eff.optimal.point <- eff_noShort[eff_noShort$sharpe==max(eff_noShort$sharpe),]
+plotEfficientFrontier(eff_noShort, header = "Optimal Portfolio w/ Short Sales Prohibited")
+
+#### Portfolio and Components' Value-at-Risk ([VaR](http://www.investopedia.com/terms/v/var.asp)) and 
+# Expected Shortfall ([ES](https://en.wikipedia.org/wiki/Expected_shortfall))  
+
+#### Portfolio and Components' Value-at-Risk ([VaR](http://www.investopedia.com/terms/v/var.asp)) and Expected Shortfall ([ES](https://en.wikipedia.org/wiki/Expected_shortfall))  
+
+# Key points to keep in mind:   
+#         . VaR and ES are approximation measures to the worst that could happen (max losses) on one 
+# single day out of twenty (5%).   
+# . ES looks at the entire first five percent quantile of the low end of the return distribution tail so 
+# its larger than VaR.   
+# . With positive correlation, asset prices tend to move together and this increases the volatility.  
+# . Without short sales, it is impossible to go above the expected return of the stock with the highest 
+# expected return.   
+# . When short sales are allowed, there is no upper bound on the expected return nor on the risk. And 
+# the projected fall for Alibaba, a company with a market cap above 100B, should not be for the long 
+# run. A short sale strategy should be combined with a [stop-loss 
+#                 limit order](http://www.investopedia.com/terms/s/stop-limitorder.asp).
+
+library(PerformanceAnalytics)
+
+meli.sim <- as.matrix(meli.fitted.mean)
+colnames(meli.sim) <- "MELI"
+ebay.sim <- as.matrix(ebay.fitted.mean)
+colnames(ebay.sim) <- "EBAY"
+amzn.sim <- as.matrix(amzn.fitted.mean)
+colnames(amzn.sim) <- "AMZN"
+jd.sim <- as.matrix(jd.fitted.mean)
+colnames(jd.sim) <- "JD"
+baba.sim <- as.matrix(baba.fitted.mean)
+colnames(baba.sim) <- "BABA"
+
+mergedSIM <- cbind(meli.sim, ebay.sim, amzn.sim, jd.sim,baba.sim)
+
+mergedSIM <- as.zooreg(mergedSIM)
+index(mergedSIM) <- as.yearmon(index(mergedSIM))
+
+cov_matrix <- cov(mergedSIM)
+
+VaR_Short <- VaR(mergedSIM, portfolio_method="component",
+                 weights = as.numeric(weights.short),
+                 sigma = cov_matrix, mu = mean_vect, method = "modified")
+
+VaR_noShort <- VaR(mergedSIM, portfolio_method="component",
+                   weights = as.numeric(weights.no.short),
+                   sigma = cov_matrix, mu = mean_vect, method = "modified")
+
+ES_Short <- ETL(mergedSIM, portfolio_method="component",
+                weights = as.numeric(weights.short),
+                sigma = cov_matrix, mu = mean_vect, method = "modified")
+
+ES_noShort <- ETL(mergedSIM, portfolio_method="component",
+                  weights = as.numeric(weights.no.short),
+                  sigma = cov_matrix, mu = mean_vect, method = "modified")
+
+#### Build table for VaR and ES results
+VaR_Short <- cbind(paste(round(as.numeric(VaR_Short$MVaR)*100,2),"%",sep=""),
+                   paste(round(as.numeric(VaR_Short$contribution[1])*100,2),"%",sep=""),
+                   paste(round(as.numeric(VaR_Short$contribution[2])*100,2),"%",sep=""),
+                   paste(round(as.numeric(VaR_Short$contribution[3])*100,2),"%",sep=""),
+                   paste(round(as.numeric(VaR_Short$contribution[4])*100,2),"%",sep=""),
+                   paste(round(as.numeric(VaR_Short$contribution[5])*100,2),"%",sep=""))
+colnames(VaR_Short) <- c("Total", "MELI", "EBAY", "AMZN", "JD", "BABA")
+
+VaR_noShort <- cbind(paste(round(as.numeric(VaR_noShort$MVaR)*100,2),"%",sep=""),
+                     paste(round(as.numeric(VaR_noShort$contribution[1])*100,2),"%",sep=""),
+                     paste(round(as.numeric(VaR_noShort$contribution[2])*100,2),"%",sep=""),
+                     paste(round(as.numeric(VaR_noShort$contribution[3])*100,2),"%",sep=""),
+                     paste(round(as.numeric(VaR_noShort$contribution[4])*100,2),"%",sep=""),
+                     paste(round(as.numeric(VaR_noShort$contribution[5])*100,2),"%",sep=""))
+colnames(VaR_noShort) <- c("Total", "MELI", "EBAY", "AMZN", "JD", "BABA")
+
+ES_Short <- cbind(paste(round(as.numeric(ES_Short$MES)*100,2),"%",sep=""),
+                  paste(round(as.numeric(ES_Short$contribution[1])*100,2),"%",sep=""),
+                  paste(round(as.numeric(ES_Short$contribution[2])*100,2),"%",sep=""),
+                  paste(round(as.numeric(ES_Short$contribution[3])*100,2),"%",sep=""),
+                  paste(round(as.numeric(ES_Short$contribution[4])*100,2),"%",sep=""),
+                  paste(round(as.numeric(ES_Short$contribution[5])*100,2),"%",sep=""))
+colnames(ES_Short) <- c("Total", "MELI", "EBAY", "AMZN", "JD", "BABA")
+
+ES_noShort <- cbind(paste(round(as.numeric(ES_noShort$MES)*100,2),"%",sep=""),
+                    paste(round(as.numeric(ES_noShort$contribution[1])*100,2),"%",sep=""),
+                    paste(round(as.numeric(ES_noShort$contribution[2])*100,2),"%",sep=""),
+                    paste(round(as.numeric(ES_noShort$contribution[3])*100,2),"%",sep=""),
+                    paste(round(as.numeric(ES_noShort$contribution[4])*100,2),"%",sep=""),
+                    paste(round(as.numeric(ES_noShort$contribution[5])*100,2),"%",sep=""))
+colnames(ES_noShort) <- c("Total", "MELI", "EBAY", "AMZN", "JD", "BABA")
+
+VarEs.table <- rbind(VaR_Short, VaR_noShort,ES_Short, ES_noShort)
+rownames(VarEs.table) <- c("VaR(5%) - Short Sales Allowed",
+                           "VaR(5%) - Short Sales Prohibited",
+                           "ES(5%) - Short Sales Allowed",
+                           "ES(5%) - Short Sales Prohibited")
+
+VarEs.table
+
 #****************************************************************************************
 
-########################################################################
-# Capital Asset Pricing Model (CAPM) by company
-########################################################################
-
-#### Build table of CAPM results
-colnames.CAPM.table <- c("MELI", "AMZN", "EBAY", "BABA", "JD")
-rownames.CAPM.table <- c("Beta", "Alpha", "Over/Under Priced", "Market Risk Exposure",
-                         "Expected Excess Returns")
-CAPM.table <- matrix(nrow = length(rownames.CAPM.table), ncol = length(colnames.CAPM.table))
-colnames(CAPM.table) <- colnames.CAPM.table
-rownames(CAPM.table) <- rownames.CAPM.table
-
-#### ***************
-#### meli
-#### ***************
-# Calculate simple returns for meli and merge all in one matrix
-meli.Ret <- dailyReturn(meli, subset = "2018::", type="arithmetic")
-colnames(meli.Ret) <- c("meli.returns")
-sp500Ret.meli <- dailyReturn(sp500, subset = "2018::", type="arithmetic")
-colnames(sp500Ret.meli) <- c("sp500.returns")
-
-tbill13.meli <- ((Ad(IRX["2018::"]))/100)/252
-colnames(tbill13.meli) <- c("tbill13dailyRate(Not%)")
-
-# Merge meli and sp500 returns
-meli.sp500 <- merge.xts(meli.Ret,sp500Ret.meli)
-
-#Calculate excess returns
-for(n in 1:dim(meli.sp500)[1]){
-        for(m in 1:dim(meli.sp500)[2]){
-                meli.sp500[n,m] <- meli.sp500[n,m] - tbill13.meli[n,1]
-        }
-}
-
-# Ignore error
-
-# Do linear regression
-lm.meli <- lm(meli.returns ~ sp500.returns, meli.sp500)
-
-#Check summary coefficients
-summary(lm.meli)
-
-#Pull beta
-beta.meli <- round(as.numeric(lm.meli$coef["sp500.returns"]),2)
-
-#Pull alfa
-alpha.meli <- signif(as.numeric(lm.meli$coef["(Intercept)"]),digits = 3)
-
-#Pull market risk for meli
-# Convert summaries as lists and Pull market risk for meli (R^2)
-list.meli <- summary(lm.meli)
-marketRisk.meli <- paste(round((list.meli$r.squared)*100,2),"%",sep = "")
-
-# Calculate expected excess returns above/below expected average return of sp500
-ExpExcRet.meli <- paste(round(beta.meli * mean(meli.sp500[,"sp500.returns"])*100*252,2),
-                        "%",sep = "")
-
-
-# Fill table of CAPM results
-CAPM.table["Beta","MELI"] <- beta.meli
-CAPM.table["Alpha","MELI"] <- alpha.meli
-CAPM.table["Market Risk Exposure","MELI"] <- marketRisk.meli
-CAPM.table["Expected Excess Returns","MELI"] <- ExpExcRet.meli
-if(alpha.meli > 0.001){
-        CAPM.table["Over/Under Priced","MELI"] <- c("Under-priced")}
-if(alpha.meli < 0.00001) {
-        CAPM.table["Over/Under Priced","MELI"] <- c("Over-priced")}
-if(alpha.meli > 0.00001 & alpha.meli < 0.001){
-        CAPM.table["Over/Under Priced","MELI"] <- c("Neutral")}
-
-#### ***************
-#### amzn
-#### ***************
-# Calculate simple returns for amzn and merge all in one matrix
-amzn.Ret <- dailyReturn(amzn, subset = "2018::", type="arithmetic")
-colnames(amzn.Ret) <- c("amzn.returns")
-sp500Ret.amzn <- dailyReturn(sp500, subset = "2018::", type="arithmetic")
-colnames(sp500Ret.amzn) <- c("sp500.returns")
-
-tbill13.amzn <- ((Ad(IRX["2018::"]))/100)/252
-colnames(tbill13.amzn) <- c("tbill13dailyRate(Not%)")
-
-# Merge amzn and sp500 returns
-amzn.sp500 <- merge.xts(amzn.Ret,sp500Ret.amzn)
-
-#Calculate excess returns
-for(n in 1:dim(amzn.sp500)[1]){
-        for(m in 1:dim(amzn.sp500)[2]){
-                amzn.sp500[n,m] <- amzn.sp500[n,m] - tbill13.amzn[n,1]
-        }
-}
-
-# Do linear regression
-lm.amzn <- lm(amzn.returns ~ sp500.returns, amzn.sp500)
-
-#Check summary coefficients
-summary(lm.amzn)
-
-#Pull beta
-beta.amzn <- round(as.numeric(lm.amzn$coef["sp500.returns"]),2)
-
-#Pull alfa
-alpha.amzn <- signif(as.numeric(lm.amzn$coef["(Intercept)"]),digits = 3)
-
-#Pull market risk for amzn
-# Convert summaries as lists and Pull market risk for amzn (R^2)
-list.amzn <- summary(lm.amzn)
-marketRisk.amzn <- paste(round((list.amzn$r.squared)*100,2),"%",sep = "")
-
-# Calculate expected excess returns above/below expected average return of sp500
-ExpExcRet.amzn <- paste(round(beta.amzn * mean(amzn.sp500[,"sp500.returns"])*100*252,2),
-                        "%",sep = "")
-
-
-# Fill table of CAPM results
-CAPM.table["Beta","AMZN"] <- beta.amzn
-CAPM.table["Alpha","AMZN"] <- alpha.amzn
-CAPM.table["Market Risk Exposure","AMZN"] <- marketRisk.amzn
-CAPM.table["Expected Excess Returns","AMZN"] <- ExpExcRet.amzn
-if(alpha.amzn > 0.001){
-        CAPM.table["Over/Under Priced","AMZN"] <- c("Under-priced")}
-if(alpha.amzn < 0.00001) {
-        CAPM.table["Over/Under Priced","AMZN"] <- c("Over-priced")}
-if(alpha.amzn > 0.00001 & alpha.amzn < 0.001){
-        CAPM.table["Over/Under Priced","AMZN"] <- c("Neutral")}
-
-#### ***************
-#### ebay
-#### ***************
-# Calculate simple returns for ebay and merge all in one matrix
-ebay.Ret <- dailyReturn(ebay, subset = "2018::",type="arithmetic")
-colnames(ebay.Ret) <- c("ebay.returns")
-sp500Ret.ebay <- dailyReturn(sp500, subset = "2018::",stype="arithmetic")
-colnames(sp500Ret.ebay) <- c("sp500.returns")
-
-tbill13.ebay <- ((Ad(IRX["2018::"]))/100)/252
-colnames(tbill13.ebay) <- c("tbill13dailyRate(Not%)")
-
-# Merge ebay and sp500 returns
-ebay.sp500 <- merge.xts(ebay.Ret,sp500Ret.ebay)
-
-#Calculate excess returns
-for(n in 1:dim(ebay.sp500)[1]){
-        for(m in 1:dim(ebay.sp500)[2]){
-                ebay.sp500[n,m] <- ebay.sp500[n,m] - tbill13.ebay[n,1]
-        }
-}
-#ignore error
-
-# Do linear regression
-lm.ebay <- lm(ebay.returns ~ sp500.returns, ebay.sp500)
-
-#Check summary coefficients
-summary(lm.ebay)
-
-#Pull beta
-beta.ebay <- round(as.numeric(lm.ebay$coef["sp500.returns"]),digits = 2)
-
-#Pull alfa
-alpha.ebay <- signif(as.numeric(lm.ebay$coef["(Intercept)"]),digits = 3)
-
-#Pull market risk for ebay
-# Convert summaries as lists and Pull market risk for ebay (R^2)
-list.ebay <- summary(lm.ebay)
-marketRisk.ebay <- paste(round((list.ebay$r.squared)*100,2),"%",sep = "")
-
-# Calculate expected excess returns above/below expected average return of sp500
-ExpExcRet.ebay <- paste(round(beta.ebay * mean(ebay.sp500[,"sp500.returns"])*100*252,2),
-                        "%",sep = "")
-
-
-# Fill table of CAPM results
-CAPM.table["Beta","EBAY"] <- beta.ebay
-CAPM.table["Alpha","EBAY"] <- alpha.ebay
-CAPM.table["Market Risk Exposure","EBAY"] <- marketRisk.ebay
-CAPM.table["Expected Excess Returns","EBAY"] <- ExpExcRet.ebay
-if(alpha.ebay > 0.001){
-        CAPM.table["Over/Under Priced","EBAY"] <- c("Under-priced")}
-if(alpha.ebay < 0.00001) {
-        CAPM.table["Over/Under Priced","EBAY"] <- c("Over-priced")}
-if(alpha.ebay > 0.00001 & alpha.ebay < 0.001){
-        CAPM.table["Over/Under Priced","EBAY"] <- c("Neutral")}
-
-#### ***************
-#### baba
-#### ***************
-# Calculate simple returns for baba and merge all in one matrix
-baba.Ret <- dailyReturn(baba, subset = "2018::", type="arithmetic")
-colnames(baba.Ret) <- c("baba.returns")
-sp500Ret.baba <- dailyReturn(sp500, subset = "2018::", type="arithmetic")
-colnames(sp500Ret.baba) <- c("sp500.returns")
-
-tbill13.baba <- ((Ad(IRX["2018::"]))/100)/252
-colnames(tbill13.baba) <- c("tbill13dailyRate(Not%)")
-
-# Merge baba and sp500 returns
-baba.sp500 <- merge.xts(baba.Ret,sp500Ret.baba)
-
-#Calculate excess returns
-for(n in 1:dim(baba.sp500)[1]){
-        for(m in 1:dim(baba.sp500)[2]){
-                baba.sp500[n,m] <- baba.sp500[n,m] - tbill13.baba[n,1]
-        }
-}
-
-# Do linear regression
-lm.baba <- lm(baba.returns ~ sp500.returns, baba.sp500)
-
-#Check summary coefficients
-summary(lm.baba)
-
-#Pull beta
-beta.baba <- round(as.numeric(lm.baba$coef["sp500.returns"]),2)
-
-#Pull alfa
-alpha.baba <- signif(as.numeric(lm.baba$coef["(Intercept)"]),digits = 3)
-
-#Pull market risk for baba
-# Convert summaries as lists and Pull market risk for baba (R^2)
-list.baba <- summary(lm.baba)
-marketRisk.baba <- paste(round((list.baba$r.squared)*100,2),"%",sep = "")
-
-# Calculate expected excess returns above/below expected average return of sp500
-ExpExcRet.baba <- paste(round(beta.baba * mean(baba.sp500[,"sp500.returns"])*100*252,2),
-                        "%",sep = "")
-
-# Fill table of CAPM results
-CAPM.table["Beta","BABA"] <- beta.baba
-CAPM.table["Alpha","BABA"] <- alpha.baba
-CAPM.table["Market Risk Exposure","BABA"] <- marketRisk.baba
-CAPM.table["Expected Excess Returns","BABA"] <- ExpExcRet.baba
-if(alpha.baba > 0.001){
-        CAPM.table["Over/Under Priced","BABA"] <- c("Under-priced")}
-if(alpha.baba < 0.00001) {
-        CAPM.table["Over/Under Priced","BABA"] <- c("Over-priced")}
-if(alpha.baba > 0.00001 & alpha.baba < 0.001){
-        CAPM.table["Over/Under Priced","BABA"] <- c("Neutral")}
-
-#### ***************
-#### jd
-#### ***************
-# Calculate simple returns for jd and merge all in one matrix
-jd.Ret <- dailyReturn(jd, subset = "2018::", type="arithmetic")
-colnames(jd.Ret) <- c("jd.returns")
-sp500Ret.jd <- dailyReturn(sp500, subset = "2018::", type="arithmetic")
-colnames(sp500Ret.jd) <- c("sp500.returns")
-
-tbill13.jd <- ((Ad(IRX["2018::"]))/100)/252
-colnames(tbill13.jd) <- c("tbill13dailyRate(Not%)")
-
-# Merge jd and sp500 returns
-jd.sp500 <- merge.xts(jd.Ret,sp500Ret.jd)
-
-#Calculate excess returns
-for(n in 1:dim(jd.sp500)[1]){
-        for(m in 1:dim(jd.sp500)[2]){
-                jd.sp500[n,m] <- jd.sp500[n,m] - tbill13.jd[n,1]
-        }
-}
-
-# Do linear regression
-lm.jd <- lm(jd.returns ~ sp500.returns, jd.sp500)
-
-#Check summary coefficients
-summary(lm.jd)
-
-#Pull beta
-beta.jd <- round(as.numeric(lm.jd$coef["sp500.returns"]),2)
-
-#Pull alfa
-alpha.jd <- signif(as.numeric(lm.jd$coef["(Intercept)"]),digits = 3)
-
-#Pull market risk for jd
-# Convert summaries as lists and Pull market risk for jd (R^2)
-list.jd <- summary(lm.jd)
-marketRisk.jd <- paste(round((list.jd$r.squared)*100,2),"%",sep = "")
-
-# Calculate expected excess returns above/below expected average return of sp500
-ExpExcRet.jd <- paste(round(beta.jd * mean(jd.sp500[,"sp500.returns"])*100*252,2),
-                      "%",sep = "")
-
-
-# Fill table of CAPM results
-CAPM.table["Beta","JD"] <- beta.jd
-CAPM.table["Alpha","JD"] <- alpha.jd
-CAPM.table["Market Risk Exposure","JD"] <- marketRisk.jd
-CAPM.table["Expected Excess Returns","JD"] <- ExpExcRet.jd
-if(alpha.jd > 0.001){
-        CAPM.table["Over/Under Priced","JD"] <- c("Under-priced")}
-if(alpha.jd < 0.00001) {
-        CAPM.table["Over/Under Priced","JD"] <- c("Over-priced")}
-if(alpha.jd > 0.00001 & alpha.jd < 0.001){
-        CAPM.table["Over/Under Priced","JD"] <- c("Neutral")}
-
+# References:
+#         R Core Team (2015). R: A language and environment for statistical computing. R
+# Foundation for Statistical Computing, Vienna, Austria. <URL https://www.R-project.org/>.
+# All Things R. Pull Yahoo Finance Key-Statistics Instantaneously Using XML and XPath in R. <URL: http://allthingsr.blogspot.com.ar/2012/10/pull-yahoo-finance-key-statistics.html>.
+# Raymond McTaggart and Gergely Daroczi (2015). Quandl: API Wrapper for Quandl.com. R
+# package version 2.6.0. <URL: http://CRAN.R-project.org/package=Quandl>.
+# Taiyun Wei (2013). corrplot: Visualization of a correlation matrix. R package version
+# 0.73. <URL: http://CRAN.R-project.org/package=corrplot>.
+# Jeffrey A. Ryan (2015). quantmod: Quantitative Financial Modelling Framework. R
+# package version 0.4-5. <URL: http://CRAN.R-project.org/package=quantmod>.
+# Hyndman RJ (2015). _forecast: Forecasting functions for time series and linear models_.
+# R package version 6.1, <URL: http://github.com/robjhyndman/forecast>.
+# Hyndman RJ and Khandakar Y (2008). "Automatic time series forecasting: the forecast
+# package for R." _Journal of Statistical Software_, *26*(3), pp. 1-22. <URL:
+#         http://ideas.repec.org/a/jss/jstsof/27i03.html>.
+# Alexios Ghalanos (2015). rugarch: Univariate GARCH models. R package version 1.3-6.
+# Andrew Matuszak. the Economist at Large. Efficient Frontier and plotEfficientFrontier. <URL:   http://economistatlarge.com/>.
+# David Ruppert. Statistics and Data Analysis for Financial Engineering (Springer Science+Business Media, LLC, 233 Spring Street, New York, NY 10013, USA).
+# John L. Weatherwax, PhD. A Solution Manual for: Statistics and Data Analysis for Financial Engineering by David Rupert. <URL: http://www.waxworksmath.com>.
+# S original by Berwin A. Turlach R port by Andreas Weingessel
+# <Andreas.Weingessel@ci.tuwien.ac.at> (2013). quadprog: Functions to solve Quadratic
+# Programming Problems.. R package version 1.5-5.
+# <URL: http://CRAN.R-project.org/package=quadprog>.
+# Brian G. Peterson and Peter Carl (2014). PerformanceAnalytics: Econometric tools for
+# performance and risk analysis. R package version 1.4.3541.
+# <URL: http://CRAN.R-project.org/package=PerformanceAnalytics>.
+# Yihui Xie (2015). knitr: A General-Purpose Package for Dynamic Report Generation in R.
+# R package version 1.11.
+# Yihui Xie (2015) Dynamic Documents with R and knitr. 2nd edition. Chapman and
+# Hall/CRC. ISBN 978-1498716963.
+# Yihui Xie (2014) knitr: A Comprehensive Tool for Reproducible Research in R. In
+# Victoria Stodden, Friedrich Leisch and Roger D. Peng, editors, Implementing
+# Reproducible Computational Research. Chapman and Hall/CRC. ISBN 978-1466561595.
+# JJ Allaire, Jeffrey Horner, Vicent Marti and Natacha Porte (2015). markdown:
+#         'Markdown' Rendering for R. R package version 0.7.7. <http://CRAN.R-project.org/package=markdown>.
 #****************************************************************************************
