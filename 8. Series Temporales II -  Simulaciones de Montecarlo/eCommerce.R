@@ -52,9 +52,9 @@ library(BatchGetSymbols)
 # Fuente: https://cran.r-project.org/web/packages/BatchGetSymbols/vignettes/BatchGetSymbols-vignette.html
 
 # Configurar fechas
-first.date <- as.Date("2018-01-01") # cambiar manualmente
+first.date <- as.Date("2015-01-01") # cambiar manualmente
 
-last.date <- as.Date("2020-05-16") # cambiar manualmente, d+1 for last.date may 15 2020 in this example
+last.date <- as.Date("2020-05-23") # cambiar manualmente, d+1 for last.date may 15 2020 in this example
 # last.date <- Sys.Date() # use this option to get up to the latest date available
 
 freq.data <- 'daily'
@@ -79,8 +79,8 @@ print(p)
 ###### Otro método para conseguir datos históricos completos y manipularlos más fácil######
 
 # Configurar fechas
-first.date <- as.Date("2018-01-01") # cambiar manualmente 
-last.date <- as.Date("2020-05-16") # cambiar manualmente, d+1 for last.date may 15 2020 in this example
+first.date <- as.Date("2015-01-01") # cambiar manualmente 
+last.date <- as.Date("2020-05-23") # cambiar manualmente, d+1 for last.date may 15 2020 in this example
 # last.date <- Sys.Date() # use this option to get up to the latest date available
 
 # Download full histroy of OHLC columns from Yahoo Finance
@@ -256,6 +256,353 @@ addTA(RSI(Cl(baba)) > 70, col="lightyellow", border=NA, on= -(1:3)) #over-bought
 addVolatility(col = "red", lwd = 2, legend = "Volatility")
 addGuppy(col=c(rep("blue",6), rep("black",6)), legend = "GMMA: Blue(short), Black(long)")
 
+
+#****************************************************************************************
+###### CAPITAL ASSET PRICING MODEL
+#****************************************************************************************
+# CAPM by company
+
+#### Build table of CAPM results table
+colnames.CAPM.table <- c("MELI", "AMZN", "EBAY", "BABA", "JD")
+rownames.CAPM.table <- c("Beta", "Alpha", "Over/Under Priced", "Market Risk Exposure",
+                         "Expected Excess Returns")
+CAPM.table <- matrix(nrow = length(rownames.CAPM.table), ncol = length(colnames.CAPM.table))
+colnames(CAPM.table) <- colnames.CAPM.table
+rownames(CAPM.table) <- rownames.CAPM.table
+
+CAPM.table
+
+#### ***************
+#### MELI
+#### ***************
+# For a discussion about log in time series vs arithmetic returns in the CAPM see the following
+# https://www.researchgate.net/post/Why_did_the_Fama_French_factors_calculated_using_simple_returns_instead_of_log_returns
+
+# Calculate simple returns for meli and merge all in one matrix
+meli.returns <- dailyReturn(meli, subset = "2015::", type="arithmetic")
+colnames(meli.returns) <- c("meli.returns")
+sp500Ret.meli <- dailyReturn(sp500, subset = "2015::", type="arithmetic")
+colnames(sp500Ret.meli) <- c("sp500.returns")
+
+# US treasuries are in percentage and annual terms, so must be divided by 252
+# this is an approximation good enmough for most purposes. See the following for detail discussion
+# https://quant.stackexchange.com/questions/33076/how-to-calculate-daily-risk-free-rate-using-13-week-treasury-bill
+# tbill13.meli <- ((Ad(IRX["2015::"]))/252)
+# colnames(tbill13.meli) <- c("tbill13dailyRate(Not%)")
+# tbill13.meli <- na.omit(tbill13.meli)
+
+us10yrLT.meli <- ((Ad(TNX["2015::"]))/252)
+colnames(us10yrLT.meli) <- "US.LT.above.10yrs"
+us10yrLT.meli <- na.omit(us10yrLT.meli)
+
+# Merge meli and sp500 returns
+meli.sp500.10yrLT <- merge.xts(meli.returns, sp500Ret.meli, us10yrLT.meli)
+meli.sp500.10yrLT <- na.omit(meli.sp500.10yrLT)
+
+meli.sp500 <- meli.sp500.10yrLT[,1:2]
+us10yrLT.meli <- meli.sp500.10yrLT[,3]
+
+#Calculate excess returns
+for(n in 1:dim(meli.sp500)[1]){
+        for(m in 1:dim(meli.sp500)[2]){
+                meli.sp500[n,m] <- meli.sp500[n,m] - us10yrLT.meli[n,1]
+        }
+}
+
+# Do linear regression
+lm.meli <- lm(meli.returns ~ sp500.returns, meli.sp500)
+
+#Check summary coefficients
+# summary(lm.meli)
+
+#Pull beta
+beta.meli <- round(as.numeric(lm.meli$coef["sp500.returns"]),2)
+
+#Pull alfa
+alpha.meli <- signif(as.numeric(lm.meli$coef["(Intercept)"]),digits = 3)
+
+#Pull market risk for meli
+# Convert summaries as lists and Pull market risk for meli (R^2)
+list.meli <- summary(lm.meli)
+marketRisk.meli <- paste(round((list.meli$r.squared)*100,2),"%",sep = "")
+
+# Calculate expected excess returns above/below expected average return of sp500
+ExpExcRet.meli <- paste(round(
+        mean(us10yrLT.meli) + (beta.meli * mean(meli.sp500[,"sp500.returns"]))
+        ,4)*100,"%",sep = "")
+
+
+# Fill table of CAPM results
+CAPM.table["Beta","MELI"] <- beta.meli
+CAPM.table["Alpha","MELI"] <- alpha.meli
+CAPM.table["Market Risk Exposure","MELI"] <- marketRisk.meli
+CAPM.table["Expected Excess Returns","MELI"] <- ExpExcRet.meli
+if(alpha.meli > 0.001){
+        CAPM.table["Over/Under Priced","MELI"] <- c("Under-priced")}
+if(alpha.meli < 0.00001) {
+        CAPM.table["Over/Under Priced","MELI"] <- c("Over-priced")}
+if(alpha.meli > 0.00001 & alpha.meli < 0.001){
+        CAPM.table["Over/Under Priced","MELI"] <- c("Neutral")}
+
+#### ***************
+#### AMZN
+#### ***************
+
+# Calculate simple returns for amzn and merge all in one matrix
+amzn.returns <- dailyReturn(amzn, subset = "2015::", type="arithmetic")
+colnames(amzn.returns) <- c("amzn.returns")
+sp500Ret.amzn <- dailyReturn(sp500, subset = "2015::", type="arithmetic")
+colnames(sp500Ret.amzn) <- c("sp500.returns")
+
+# US treasuries are in percentage and annual terms, so must be divided by 252
+
+us10yrLT.amzn <- ((Ad(TNX["2015::"]))/252)
+colnames(us10yrLT.amzn) <- "US.LT.above.10yrs"
+us10yrLT.amzn <- na.omit(us10yrLT.amzn)
+
+# Merge amzn and sp500 returns
+amzn.sp500.10yrLT <- merge.xts(amzn.returns, sp500Ret.amzn, us10yrLT.amzn)
+amzn.sp500.10yrLT <- na.omit(amzn.sp500.10yrLT)
+
+amzn.sp500 <- amzn.sp500.10yrLT[,1:2]
+us10yrLT.amzn <- amzn.sp500.10yrLT[,3]
+
+#Calculate excess returns
+for(n in 1:dim(amzn.sp500)[1]){
+        for(m in 1:dim(amzn.sp500)[2]){
+                amzn.sp500[n,m] <- amzn.sp500[n,m] - us10yrLT.amzn[n,1]
+        }
+}
+
+# Do linear regression
+lm.amzn <- lm(amzn.returns ~ sp500.returns, amzn.sp500)
+
+#Check summary coefficients
+# summary(lm.amzn)
+
+#Pull beta
+beta.amzn <- round(as.numeric(lm.amzn$coef["sp500.returns"]),2)
+
+#Pull alfa
+alpha.amzn <- signif(as.numeric(lm.amzn$coef["(Intercept)"]),digits = 3)
+
+#Pull market risk for amzn
+# Convert summaries as lists and Pull market risk for amzn (R^2)
+list.amzn <- summary(lm.amzn)
+marketRisk.amzn <- paste(round((list.amzn$r.squared)*100,2),"%",sep = "")
+
+# Calculate expected excess returns above/below expected average return of sp500
+ExpExcRet.amzn <- paste(round(mean(us10yrLT.amzn) + 
+                                      (beta.amzn * mean(amzn.sp500[,"sp500.returns"]))
+                              ,4)*100,"%",sep = "")
+
+
+# Fill table of CAPM results
+CAPM.table["Beta","AMZN"] <- beta.amzn
+CAPM.table["Alpha","AMZN"] <- alpha.amzn
+CAPM.table["Market Risk Exposure","AMZN"] <- marketRisk.amzn
+CAPM.table["Expected Excess Returns","AMZN"] <- ExpExcRet.amzn
+if(alpha.amzn > 0.001){
+        CAPM.table["Over/Under Priced","AMZN"] <- c("Under-priced")}
+if(alpha.amzn < 0.00001) {
+        CAPM.table["Over/Under Priced","AMZN"] <- c("Over-priced")}
+if(alpha.amzn > 0.00001 & alpha.amzn < 0.001){
+        CAPM.table["Over/Under Priced","AMZN"] <- c("Neutral")}
+
+#### ***************
+#### EBAY
+#### ***************
+
+# Calculate simple returns for ebay and merge all in one matrix
+ebay.returns <- dailyReturn(ebay, subset = "2015::", type="arithmetic")
+colnames(ebay.returns) <- c("ebay.returns")
+sp500Ret.ebay <- dailyReturn(sp500, subset = "2015::", type="arithmetic")
+colnames(sp500Ret.ebay) <- c("sp500.returns")
+
+# US treasuries are in percentage and annual terms, so must be divided by 252
+
+us10yrLT.ebay <- ((Ad(TNX["2015::"]))/252)
+colnames(us10yrLT.ebay) <- "US.LT.above.10yrs"
+us10yrLT.ebay <- na.omit(us10yrLT.ebay)
+
+# Merge ebay and sp500 returns
+ebay.sp500.10yrLT <- merge.xts(ebay.returns, sp500Ret.ebay, us10yrLT.ebay)
+ebay.sp500.10yrLT <- na.omit(ebay.sp500.10yrLT)
+
+ebay.sp500 <- ebay.sp500.10yrLT[,1:2]
+us10yrLT.ebay <- ebay.sp500.10yrLT[,3]
+
+#Calculate excess returns
+for(n in 1:dim(ebay.sp500)[1]){
+        for(m in 1:dim(ebay.sp500)[2]){
+                ebay.sp500[n,m] <- ebay.sp500[n,m] - us10yrLT.ebay[n,1]
+        }
+}
+
+# Do linear regression
+lm.ebay <- lm(ebay.returns ~ sp500.returns, ebay.sp500)
+
+#Check summary coefficients
+# summary(lm.ebay)
+
+#Pull beta
+beta.ebay <- round(as.numeric(lm.ebay$coef["sp500.returns"]),2)
+
+#Pull alfa
+alpha.ebay <- signif(as.numeric(lm.ebay$coef["(Intercept)"]),digits = 3)
+
+#Pull market risk for ebay
+# Convert summaries as lists and Pull market risk for ebay (R^2)
+list.ebay <- summary(lm.ebay)
+marketRisk.ebay <- paste(round((list.ebay$r.squared)*100,2),"%",sep = "")
+
+# Calculate expected excess returns above/below expected average return of sp500
+ExpExcRet.ebay <- paste(round(mean(us10yrLT.ebay) + 
+                                      (beta.ebay * mean(ebay.sp500[,"sp500.returns"]))
+                              ,4)*100,"%",sep = "")
+
+
+# Fill table of CAPM results
+CAPM.table["Beta","EBAY"] <- beta.ebay
+CAPM.table["Alpha","EBAY"] <- alpha.ebay
+CAPM.table["Market Risk Exposure","EBAY"] <- marketRisk.ebay
+CAPM.table["Expected Excess Returns","EBAY"] <- ExpExcRet.ebay
+if(alpha.ebay > 0.001){
+        CAPM.table["Over/Under Priced","EBAY"] <- c("Under-priced")}
+if(alpha.ebay < 0.00001) {
+        CAPM.table["Over/Under Priced","EBAY"] <- c("Over-priced")}
+if(alpha.ebay > 0.00001 & alpha.ebay < 0.001){
+        CAPM.table["Over/Under Priced","EBAY"] <- c("Neutral")}
+
+#### ***************
+#### BABA
+#### ***************
+
+# Calculate simple returns for ebay and merge all in one matrix
+baba.returns <- dailyReturn(baba, subset = "2015::", type="arithmetic")
+colnames(baba.returns) <- c("baba.returns")
+sp500Ret.baba <- dailyReturn(sp500, subset = "2015::", type="arithmetic")
+colnames(sp500Ret.baba) <- c("sp500.returns")
+
+# US treasuries are in percentage and annual terms, so must be divided by 252
+
+us10yrLT.baba <- ((Ad(TNX["2015::"]))/252)
+colnames(us10yrLT.baba) <- "US.LT.above.10yrs"
+us10yrLT.baba <- na.omit(us10yrLT.baba)
+
+# Merge baba and sp500 returns
+baba.sp500.10yrLT <- merge.xts(baba.returns, sp500Ret.baba, us10yrLT.baba)
+baba.sp500.10yrLT <- na.omit(baba.sp500.10yrLT)
+
+baba.sp500 <- baba.sp500.10yrLT[,1:2]
+us10yrLT.baba <- baba.sp500.10yrLT[,3]
+
+#Calculate excess returns
+for(n in 1:dim(baba.sp500)[1]){
+        for(m in 1:dim(baba.sp500)[2]){
+                baba.sp500[n,m] <- baba.sp500[n,m] - us10yrLT.baba[n,1]
+        }
+}
+
+# Do linear regression
+lm.baba <- lm(baba.returns ~ sp500.returns, baba.sp500)
+
+#Check summary coefficients
+# summary(lm.baba)
+
+#Pull beta
+beta.baba <- round(as.numeric(lm.baba$coef["sp500.returns"]),2)
+
+#Pull alfa
+alpha.baba <- signif(as.numeric(lm.baba$coef["(Intercept)"]),digits = 3)
+
+#Pull market risk for baba
+# Convert summaries as lists and Pull market risk for baba (R^2)
+list.baba <- summary(lm.baba)
+marketRisk.baba <- paste(round((list.baba$r.squared)*100,2),"%",sep = "")
+
+# Calculate expected excess returns above/below expected average return of sp500
+ExpExcRet.baba <- paste(round(mean(us10yrLT.baba) + 
+                                      (beta.baba * mean(baba.sp500[,"sp500.returns"]))
+                              ,4)*100,"%",sep = "")
+
+
+# Fill table of CAPM results
+CAPM.table["Beta","BABA"] <- beta.baba
+CAPM.table["Alpha","BABA"] <- alpha.baba
+CAPM.table["Market Risk Exposure","BABA"] <- marketRisk.baba
+CAPM.table["Expected Excess Returns","BABA"] <- ExpExcRet.baba
+if(alpha.baba > 0.001){
+        CAPM.table["Over/Under Priced","BABA"] <- c("Under-priced")}
+if(alpha.baba < 0.00001) {
+        CAPM.table["Over/Under Priced","BABA"] <- c("Over-priced")}
+if(alpha.baba > 0.00001 & alpha.baba < 0.001){
+        CAPM.table["Over/Under Priced","BABA"] <- c("Neutral")}
+
+#### ***************
+#### JD
+#### ***************
+
+# Calculate simple returns for ebay and merge all in one matrix
+jd.returns <- dailyReturn(jd, subset = "2015::", type="arithmetic")
+colnames(jd.returns) <- c("jd.returns")
+sp500Ret.jd <- dailyReturn(sp500, subset = "2015::", type="arithmetic")
+colnames(sp500Ret.jd) <- c("sp500.returns")
+
+# US treasuries are in percentage and annual terms, so must be divided by 252
+
+us10yrLT.jd <- ((Ad(TNX["2015::"]))/252)
+colnames(us10yrLT.jd) <- "US.LT.above.10yrs"
+us10yrLT.jd <- na.omit(us10yrLT.jd)
+
+# Merge jd and sp500 returns
+jd.sp500.10yrLT <- merge.xts(jd.returns, sp500Ret.jd, us10yrLT.jd)
+jd.sp500.10yrLT <- na.omit(jd.sp500.10yrLT)
+
+jd.sp500 <- jd.sp500.10yrLT[,1:2]
+us10yrLT.jd <- jd.sp500.10yrLT[,3]
+
+#Calculate excess returns
+for(n in 1:dim(jd.sp500)[1]){
+        for(m in 1:dim(jd.sp500)[2]){
+                jd.sp500[n,m] <- jd.sp500[n,m] - us10yrLT.jd[n,1]
+        }
+}
+
+# Do linear regression
+lm.jd <- lm(jd.returns ~ sp500.returns, jd.sp500)
+
+#Check summary coefficients
+# summary(lm.jd)
+
+#Pull beta
+beta.jd <- round(as.numeric(lm.jd$coef["sp500.returns"]),2)
+
+#Pull alfa
+alpha.jd <- signif(as.numeric(lm.jd$coef["(Intercept)"]),digits = 3)
+
+#Pull market risk for jd
+# Convert summaries as lists and Pull market risk for jd (R^2)
+list.jd <- summary(lm.jd)
+marketRisk.jd <- paste(round((list.jd$r.squared)*100,2),"%",sep = "")
+
+# Calculate expected excess returns above/below expected average return of sp500
+ExpExcRet.jd <- paste(round(mean(us10yrLT.jd) + 
+                                    (beta.jd * mean(jd.sp500[,"sp500.returns"]))
+                            ,4)*100,"%",sep = "")
+
+# Fill table of CAPM results
+CAPM.table["Beta","JD"] <- beta.jd
+CAPM.table["Alpha","JD"] <- alpha.jd
+CAPM.table["Market Risk Exposure","JD"] <- marketRisk.jd
+CAPM.table["Expected Excess Returns","JD"] <- ExpExcRet.jd
+if(alpha.jd > 0.001){
+        CAPM.table["Over/Under Priced","JD"] <- c("Under-priced")}
+if(alpha.jd < 0.00001) {
+        CAPM.table["Over/Under Priced","JD"] <- c("Over-priced")}
+if(alpha.jd > 0.00001 & alpha.jd < 0.001){
+        CAPM.table["Over/Under Priced","JD"] <- c("Neutral")}
+
 CAPM.table
 
 #****************************************************************************************
@@ -281,7 +628,7 @@ plot.xts(realized.vol.meli.20days, major.ticks = "months",
 head(meli[,6])
 # checked MELI.Adjusted closing price
 
-meli.ts <- ts(meli[,6], start = c(2018), frequency = 252)
+meli.ts <- ts(meli[,6], start = c(2015), frequency = 252)
 
 stl.meli <- stl(meli.ts[,"MELI.Adjusted"], s.window = "periodic", robust = T)
 
@@ -289,16 +636,19 @@ summary(stl.meli)
 
 plot(stl.meli, main = "MELI Factors Decomposition")
 
-abline(v=c(2018,2019,2020), col="blue", lty=2)
-abline(v=c(2018.25, 2018.5, 2018.75,
+abline(v=c(2015,2016,2017,2018,2019,2020), col="blue", lty=2)
+abline(v=c(2015.25, 2015.5, 2015.75,
+           2016.25, 2016.5, 2016.75,
+           2017.25, 2017.5, 2017.75,
+           2018.25, 2018.5, 2018.75,
            2019.25, 2019.5, 2019.75,
-           2020.25, 2020.5, 2020.75), col="salmon", lty=2)
+           2020.25, 2020.5), col="salmon", lty=2)
 
 # MELI is seasonal, with a trend, and remainder data - as expected with financial data.
 
 # # Forecast using STL (Seasonal Decomposition of Time Series by Loess)
 
-# 3 months is 90 calendar days, approcimately 66 business/trading days, so we will forecast 66 periods
+# 1 year is approximately 252 business/trading days, so we will forecast 252 periods
 # ahead
 
 # There are 3 similar methods, we will use stl.
@@ -307,7 +657,7 @@ abline(v=c(2018.25, 2018.5, 2018.75,
 ?stlf
 
 set.seed(123) # to be able to reproduce de same resutls
-stl.forecast.meli <- forecast(stl.meli, h=66)
+stl.forecast.meli <- forecast(stl.meli, h=252)
 
 summary(stl.forecast.meli)
 
@@ -323,35 +673,16 @@ head(meli[,6])
 ets.meli <- ets(meli[,6], allow.multiplicative.trend = T)
 
 set.seed(123) # to be able to reproduce de same resutls
-ets.forecast.meli <- forecast.ets(ets.meli, h=66)
+ets.forecast.meli <- forecast.ets(ets.meli, h=252)
 
 summary(ets.forecast.meli)
 
 autoplot(ets.forecast.meli)
 
-## Arima Forecasts:
-# # ***** xreg	Optionally, a vector or matrix of external regressors, which must have the 
-# # same number of rows as x.
-
-?auto.arima
-
-auto.arima.meli <- auto.arima(meli.ts[,"MELI.Adjusted"], approximation = FALSE, stepwise = FALSE, 
-                              seasonal = TRUE, lambda = "auto",
-                              allowdrift =  TRUE, allowmean = TRUE, trace = TRUE)
-
-
-set.seed(123) # to be able to reproduce de same resutls
-arima.forecast.meli <- forecast(auto.arima.meli, h=66)
-
-summary(arima.forecast.meli)
-
-autoplot(arima.forecast.meli)
-
 ## COMPARE ACCURACY with Diebold-Mariano test for predictive accuracy
 
 str(stl.forecast.meli) # stl.forecast.meli$residuals
 str(ets.forecast.meli) # ets.forecast.meli$residuals
-str(arima.forecast.meli) # arima.forecast.meli$residuals
 
 ?dm.test
 
@@ -394,45 +725,28 @@ str(arima.forecast.meli) # arima.forecast.meli$residuals
 # # STLM vs. ETS
 
 dm.test(stl.forecast.meli$residuals, ets.forecast.meli$residuals, power = 1,
-        alternative = "two.sided", h = 66)
+        alternative = "two.sided", h = 252)
 
-# p-value = 2.426e-14 is very low, H0 rejected, stl and ets have different levels of accuracy.
-
-dm.test(stl.forecast.meli$residuals, ets.forecast.meli$residuals, power = 1,
-        alternative = "greater", h = 66)
-
-# p-value = 1.213e-14 is very low, H0 rejected: ets IS MORE accurate than stl.
+# p-value is very low, H0 rejected, stl and ets have different levels of accuracy.
 
 dm.test(stl.forecast.meli$residuals, ets.forecast.meli$residuals, power = 1,
-        alternative = "less", h = 66)
+        alternative = "greater", h = 252)
 
-# p-value = 1, H0 accepted: ets IS NOT LESS accurate than stl.
+# p-value is very low, H0 rejected: ets IS MORE accurate than stl.
+
+dm.test(stl.forecast.meli$residuals, ets.forecast.meli$residuals, power = 1,
+        alternative = "less", h = 252)
+
+# p-value is close to 1, H0 accepted: ets IS NOT LESS accurate than stl.
 
 ## So ETS is more accurate than STL in this case.
 
 ##########
 
-# # ETS vs. ARIMA 
-dm.test(ets.forecast.meli$residuals, arima.forecast.meli$residuals, power = 1,
-        alternative = "two.sided", h = 66)
-
-# p-value = 1.062e-06 is very low, H0 rejected, ets and arima have different levels of accuracy.
-
-dm.test(ets.forecast.meli$residuals, arima.forecast.meli$residuals, power = 1,
-        alternative = "less", h = 66)
-
-# # p-value = 5.308e-07 is very low, H0 is rejected: arima IS LESS accurate than ets.
-
-dm.test(ets.forecast.meli$residuals, arima.forecast.meli$residuals, power = 1,
-        alternative = "greater",h = 66)
-
-# # p-value = 1, H0 accepted, arima IS NOT more accurate than ets.
-
-# # So ETS si the better predictor on "this ocassion", it may not always be case.
 
 # # ********************************************************************************* #
 
-# Lets use MONTECARLO simulations now adn run 20,000 simulations 66 trading days into the future.
+# Lets use MONTECARLO simulations now and run 20,000 simulations 252 trading days into the future.
 
 # Alternatively to auto.arima which can take very long and be very heavy on computational resources,
 # there is the option to use auto ARFIMA out of the rugarcch library.
@@ -458,9 +772,9 @@ auto.arfima.meli <- autoarfima(meliLogRet, ar.max = 2, ma.max = 2,
 
 show(head(auto.arfima.meli$rank.matrix))
 #   AR MA Mean ARFIMA       AIC converged
-# 1  2  2    0      0 -3.970398         1
+# 1  0  0    1      0 -4.325384         1
 
-# So ARMA(2,2) model WITHOUT a mean
+# So ARMA(0,0) model WITH a mean
 
 # Parameters for ARIMA(p,d,q)
 
@@ -486,8 +800,7 @@ meli.mean
 
 arma.garch.meli.spec.std <- ugarchspec(
         variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
-        mean.model = list(armaOrder=c(meli.p, meli.q), include.mean = meli.mean), 
-        distribution.model = "sged")
+        mean.model = list(armaOrder=c(meli.p, meli.q), include.mean = meli.mean))
 
 arma.garch.meli.fit.std <- ugarchfit(spec=arma.garch.meli.spec.std, data=meliLogRet)
 
@@ -497,13 +810,13 @@ coef(arma.garch.meli.fit.std)
 
 ?ugarchsim
 
-# Run 20,000 simulations, 66 trading days into the future. Set seed 123 to be able to reproduce same
+# Run 20,000 simulations, 252 trading days into the future. Set seed 123 to be able to reproduce same
 # results.
 
 T = 20000
 
 arma.garch.meli.sim <- ugarchsim(fit = arma.garch.meli.fit.std, startMethod = "sample",
-                                 n.sim = 66, m.sim = T, rseed = 123)
+                                 n.sim = 252, m.sim = T, rseed = 123)
 
 # Series Plot
 plot(arma.garch.meli.sim, which = 2)
@@ -529,13 +842,13 @@ fitted.meli <- fitted(arma.garch.meli.sim)
 meli.fitted.mean <- apply(fitted.meli, 1, mean)
 last.meli.price <- as.numeric(last(Ad(meli)))
 meli.projected.ret.as.price <- last.meli.price * c(1, exp(cumsum(meli.fitted.mean)))
-meli.target.price.66d <- as.numeric(last(meli.projected.ret.as.price))
+meli.target.price.252d <- as.numeric(last(meli.projected.ret.as.price))
 
-meli.target.price.66d 
-# 773.2526
+meli.target.price.252d 
+# 1204.261
 
 chart.meli <- autoplot(ets.forecast.meli)
-chart.meli + geom_hline(yintercept = meli.target.price.66d, color = "red")
+chart.meli + geom_hline(yintercept = meli.target.price.252d, color = "red")
 # MAKES SENSE !!!
 
 
@@ -551,7 +864,7 @@ head(amzn[,6])
 ets.amzn <- ets(amzn[,6], allow.multiplicative.trend = T)
 
 set.seed(123) # to be able to reproduce de same resutls
-ets.forecast.amzn <- forecast.ets(ets.amzn, h=66)
+ets.forecast.amzn <- forecast.ets(ets.amzn, h=252)
 
 summary(ets.forecast.amzn)
 
@@ -563,7 +876,7 @@ auto.arfima.amzn <- autoarfima(amznLogRet, ar.max = 2, ma.max = 2,
 
 show(head(auto.arfima.amzn$rank.matrix))
 #   AR MA Mean ARFIMA       AIC converged
-# 1  1  2    1      0 -4.926614         1
+# 1  0  0    1      0 -5.079345         1
 
 amzn.p <- auto.arfima.amzn$rank.matrix[1,"AR"]
 amzn.q <- auto.arfima.amzn$rank.matrix[1,"MA"]
@@ -576,17 +889,16 @@ amzn.mean
 
 arma.garch.amzn.spec.std <- ugarchspec(
         variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
-        mean.model = list(armaOrder=c(amzn.p, amzn.q), include.mean = amzn.mean), 
-        distribution.model = "sged")
+        mean.model = list(armaOrder=c(amzn.p, amzn.q), include.mean = amzn.mean))
 
 arma.garch.amzn.fit.std <- ugarchfit(spec=arma.garch.amzn.spec.std, data=amznLogRet)
 
 coef(arma.garch.amzn.fit.std)
 
-# 20,000 simulations, 66 trading days into the future. Set seed 123
+# 20,000 simulations, 252 trading days into the future. Set seed 123
 
 arma.garch.amzn.sim <- ugarchsim(fit = arma.garch.amzn.fit.std, startMethod = "sample",
-                                 n.sim = 66, m.sim = T, rseed = 123)
+                                 n.sim = 252, m.sim = T, rseed = 123)
 
 plot(arma.garch.amzn.sim, which = 2)
 plot(arma.garch.amzn.sim, which = 1)
@@ -598,14 +910,14 @@ fitted.amzn <- fitted(arma.garch.amzn.sim)
 amzn.fitted.mean <- apply(fitted.amzn, 1, mean)
 last.amzn.price <- as.numeric(last(Ad(amzn)))
 amzn.projected.ret.as.price <- last.amzn.price * c(1, exp(cumsum(amzn.fitted.mean)))
-amzn.target.price.66d <- as.numeric(last(amzn.projected.ret.as.price))
+amzn.target.price.252d <- as.numeric(last(amzn.projected.ret.as.price))
 
-amzn.target.price.66d 
-# [1] 2664.956
+amzn.target.price.252d 
+# [1] 4353.439
 
 chart.amzn <- autoplot(ets.forecast.amzn) 
-chart.amzn + geom_hline(yintercept = amzn.target.price.66d, color = "red")
-# MAKES SENSE !!!
+chart.amzn + geom_hline(yintercept = amzn.target.price.252d, color = "red")
+# LOOKS A LITTLE TOO BULLISH !!!
 
 ###### EBAY ###### 
 head(ebay[,6])
@@ -614,7 +926,7 @@ head(ebay[,6])
 ets.ebay <- ets(ebay[,6], allow.multiplicative.trend = T)
 
 set.seed(123) # to be able to reproduce de same resutls
-ets.forecast.ebay <- forecast.ets(ets.ebay, h=66)
+ets.forecast.ebay <- forecast.ets(ets.ebay, h=252)
 
 summary(ets.forecast.ebay)
 
@@ -626,7 +938,7 @@ auto.arfima.ebay <- autoarfima(ebayLogRet, ar.max = 2, ma.max = 2,
 
 show(head(auto.arfima.ebay$rank.matrix))
 #   AR MA Mean ARFIMA       AIC converged
-# 1  1  0    0      0 -5.041950         1
+# 1  1  0    1      0 -5.150052         1
 
 ebay.p <- auto.arfima.ebay$rank.matrix[1,"AR"]
 ebay.q <- auto.arfima.ebay$rank.matrix[1,"MA"]
@@ -646,10 +958,10 @@ arma.garch.ebay.fit.std <- ugarchfit(spec=arma.garch.ebay.spec.std, data=ebayLog
 
 coef(arma.garch.ebay.fit.std)
 
-# 20,000 simulations, 66 trading days into the future. Set seed 123
+# 20,000 simulations, 252 trading days into the future. Set seed 123
 
 arma.garch.ebay.sim <- ugarchsim(fit = arma.garch.ebay.fit.std, startMethod = "sample",
-                                 n.sim = 66, m.sim = T, rseed = 123)
+                                 n.sim = 252, m.sim = T, rseed = 123)
 
 plot(arma.garch.ebay.sim, which = 2)
 plot(arma.garch.ebay.sim, which = 1)
@@ -661,13 +973,13 @@ fitted.ebay <- fitted(arma.garch.ebay.sim)
 ebay.fitted.mean <- apply(fitted.ebay, 1, mean)
 last.ebay.price <- as.numeric(last(Ad(ebay)))
 ebay.projected.ret.as.price <- last.ebay.price * c(1, exp(cumsum(ebay.fitted.mean)))
-ebay.target.price.66d <- as.numeric(last(ebay.projected.ret.as.price))
+ebay.target.price.252d <- as.numeric(last(ebay.projected.ret.as.price))
 
-ebay.target.price.66d 
-# [1] 42.11713
+ebay.target.price.252d 
+# [1] 57.34784
 
 chart.ebay <- autoplot(ets.forecast.ebay) 
-chart.ebay + geom_hline(yintercept = ebay.target.price.66d, color = "red")
+chart.ebay + geom_hline(yintercept = ebay.target.price.252d, color = "red")
 # MAKES SENSE !!!
 
 ###### ALIBABA ###### 
@@ -677,7 +989,7 @@ head(baba[,6])
 ets.baba <- ets(baba[,6], allow.multiplicative.trend = T)
 
 set.seed(123) # to be able to reproduce de same resutls
-ets.forecast.baba <- forecast.ets(ets.baba, h=66)
+ets.forecast.baba <- forecast.ets(ets.baba, h=252)
 
 summary(ets.forecast.baba)
 
@@ -689,7 +1001,7 @@ auto.arfima.baba <- autoarfima(babaLogRet, ar.max = 2, ma.max = 2,
 
 show(head(auto.arfima.baba$rank.matrix))
 #   AR MA Mean ARFIMA       AIC converged
-# 1  2  2    0      0 -4.840443         1
+# 1  2  2    0      0 -4.951659         1
 
 baba.p <- auto.arfima.baba$rank.matrix[1,"AR"]
 baba.q <- auto.arfima.baba$rank.matrix[1,"MA"]
@@ -702,17 +1014,16 @@ baba.mean
 
 arma.garch.baba.spec.std <- ugarchspec(
         variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
-        mean.model = list(armaOrder=c(baba.p, baba.q), include.mean = baba.mean), 
-        distribution.model = "sged")
+        mean.model = list(armaOrder=c(baba.p, baba.q), include.mean = baba.mean))
 
 arma.garch.baba.fit.std <- ugarchfit(spec=arma.garch.baba.spec.std, data=babaLogRet)
 
 coef(arma.garch.baba.fit.std)
 
-# 20,000 simulations, 66 trading days into the future. Set seed 123
+# 20,000 simulations, 252 trading days into the future. Set seed 123
 
 arma.garch.baba.sim <- ugarchsim(fit = arma.garch.baba.fit.std, startMethod = "sample",
-                                 n.sim = 66, m.sim = T, rseed = 123)
+                                 n.sim = 252, m.sim = T, rseed = 123)
 
 plot(arma.garch.baba.sim, which = 2)
 plot(arma.garch.baba.sim, which = 1)
@@ -724,13 +1035,13 @@ fitted.baba <- fitted(arma.garch.baba.sim)
 baba.fitted.mean <- apply(fitted.baba, 1, mean)
 last.baba.price <- as.numeric(last(Ad(baba)))
 baba.projected.ret.as.price <- last.baba.price * c(1, exp(cumsum(baba.fitted.mean)))
-baba.target.price.66d <- as.numeric(last(baba.projected.ret.as.price))
+baba.target.price.252d <- as.numeric(last(baba.projected.ret.as.price))
 
-baba.target.price.66d 
-# [1] 203.7607
+baba.target.price.252d 
+# [1] 198.464
 
 chart.baba <- autoplot(ets.forecast.baba) 
-chart.baba + geom_hline(yintercept = baba.target.price.66d, color = "red")
+chart.baba + geom_hline(yintercept = baba.target.price.252d, color = "red")
 # MAKES SENSE !!!
 
 ###### JD.com ###### 
@@ -740,7 +1051,7 @@ head(jd[,6])
 ets.jd <- ets(jd[,6], allow.multiplicative.trend = T)
 
 set.seed(123) # to be able to reproduce de same resutls
-ets.forecast.jd <- forecast.ets(ets.jd, h=66)
+ets.forecast.jd <- forecast.ets(ets.jd, h=252)
 
 summary(ets.forecast.jd)
 
@@ -752,7 +1063,7 @@ auto.arfima.jd <- autoarfima(jdLogRet, ar.max = 2, ma.max = 2,
 
 show(head(auto.arfima.jd$rank.matrix))
 #   AR MA Mean ARFIMA       AIC converged
-# 1  1  1    0      0 -4.315711         1
+# 1  2  2    0      0 -4.471216         1
 
 jd.p <- auto.arfima.jd$rank.matrix[1,"AR"]
 jd.q <- auto.arfima.jd$rank.matrix[1,"MA"]
@@ -765,17 +1076,16 @@ jd.mean
 
 arma.garch.jd.spec.std <- ugarchspec(
         variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
-        mean.model = list(armaOrder=c(jd.p, jd.q), include.mean = jd.mean), 
-        distribution.model = "sged")
+        mean.model = list(armaOrder=c(jd.p, jd.q), include.mean = jd.mean))
 
 arma.garch.jd.fit.std <- ugarchfit(spec=arma.garch.jd.spec.std, data=jdLogRet)
 
 coef(arma.garch.jd.fit.std)
 
-# 20,000 simulations, 66 trading days into the future. Set seed 123
+# 20,000 simulations, 252 trading days into the future. Set seed 123
 
 arma.garch.jd.sim <- ugarchsim(fit = arma.garch.jd.fit.std, startMethod = "sample",
-                               n.sim = 66, m.sim = T, rseed = 123)
+                               n.sim = 252, m.sim = T, rseed = 123)
 
 plot(arma.garch.jd.sim, which = 2)
 plot(arma.garch.jd.sim, which = 1)
@@ -787,13 +1097,13 @@ fitted.jd <- fitted(arma.garch.jd.sim)
 jd.fitted.mean <- apply(fitted.jd, 1, mean)
 last.jd.price <- as.numeric(last(Ad(jd)))
 jd.projected.ret.as.price <- last.jd.price * c(1, exp(cumsum(jd.fitted.mean)))
-jd.target.price.66d <- as.numeric(last(jd.projected.ret.as.price))
+jd.target.price.252d <- as.numeric(last(jd.projected.ret.as.price))
 
-jd.target.price.66d 
-# [1] 49.99154
+jd.target.price.252d 
+# [1] 49.89487
 
 chart.jd <- autoplot(ets.forecast.jd) 
-chart.jd + geom_hline(yintercept = jd.target.price.66d, color = "red")
+chart.jd + geom_hline(yintercept = jd.target.price.252d, color = "red")
 # MAKES SENSE !!!
 
 
@@ -821,9 +1131,10 @@ n <- dim(projected.prices)[1]
 returns <- as.matrix(100*(projected.prices[2:n,]/projected.prices[1:(n-1),] - 1))
 
 # input value of risk-free interest rate
-# usTbill13weeks are in percentage and annual terms, so must be divided by 252 to make daily percentage
-tbill13 <- (Ad(IRX["2018::"]))/252
-mufree <- as.numeric(round(mean(na.omit(tbill13)),4))
+# US treasuries are in percentage and annual terms, so must be divided by 252
+
+us10yrLT <- na.omit(((Ad(TNX["2015::"]))/252))
+mufree <- as.numeric(round(mean(na.omit(us10yrLT)),4))
 
 mean_vect <- apply(returns,2,mean, na.rm = T)
 
@@ -831,8 +1142,8 @@ mean_vect <- apply(returns,2,mean, na.rm = T)
 # ***************WITH SHORT SALES********************
 #####################################################
 
-eff_Short <- my.eff.frontier(returns,  mufree = mufree, short=-0.2,
-                             risk.premium.up=max(mean_vect), risk.increment=.005)
+eff_Short <- my.eff.frontier(returns,  mufree = mufree, short=-0.01,
+                             risk.premium.up=max(mean_vect), risk.increment=.00001)
 
 # Find the optimal portfolio
 eff.optimal.point_Short <- eff_Short[eff_Short$sharpe==max(eff_Short$sharpe),]
@@ -841,8 +1152,8 @@ eff.optimal.point_Short <- eff_Short[eff_Short$sharpe==max(eff_Short$sharpe),]
 # ***************WITHOUT SHORT SALES*****************
 #####################################################
 
-eff_noShort <- my.eff.frontier(returns, mufree = mufree, short=0, max.allocation=0.4,
-                               risk.premium.up=max(mean_vect), risk.increment=.005)
+eff_noShort <- my.eff.frontier(returns, mufree = mufree, short=0, max.allocation=0.25,
+                               risk.premium.up=max(mean_vect), risk.increment=.00001)
 
 # Find the optimal portfolio
 eff.optimal.point_noShort <- eff_noShort[eff_noShort$sharpe==max(eff_noShort$sharpe),]
@@ -1014,6 +1325,6 @@ VarEs.table
 # Yihui Xie (2014) knitr: A Comprehensive Tool for Reproducible Research in R. In
 # Victoria Stodden, Friedrich Leisch and Roger D. Peng, editors, Implementing
 # Reproducible Computational Research. Chapman and Hall/CRC. ISBN 978-1466561595.
-# JJ Allaire, Jeffrey Horner, Vicent Marti and Natacha Porte (2015). markdown:
-#         'Markdown' Rendering for R. R package version 0.7.7. <http://CRAN.R-project.org/package=markdown>.
-#****************************************************************************************
+# JJ Allaire, Jeffrey Horner, Vicent Marti and Natacha Porte (2015). markdown:rg/package=markdown>.
+#**************************************************************************************
+#         'Markdown' Rendering for R. R package version 0.7.7. <http://CRAN.R-project.o**
