@@ -5,9 +5,9 @@ title: eCommerce - Time Series with Montecarlo Simulation (CAPM and Efficient Po
 author: "Martin Vedani - European Business School London, Msc. Global Banking and Finance"
 date: '`r format(Sys.time(), "%a %B %d, %Y. %H:%M:%S.")` Buenos Aires, Argentina.'
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
 ---
 
 ```{r echo=FALSE, message=FALSE, results='hide', warning=FALSE}
