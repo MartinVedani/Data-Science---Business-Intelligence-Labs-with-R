@@ -52,7 +52,7 @@ library(BatchGetSymbols)
 # Fuente: https://cran.r-project.org/web/packages/BatchGetSymbols/vignettes/BatchGetSymbols-vignette.html
 
 # Configurar fechas
-first.date <- as.Date("2015-01-01") # cambiar manualment
+first.date <- as.Date("2015-01-01") # cambiar manualmente
 
 last.date <- as.Date("2020-05-23") # cambiar manualmente, d+1 for last.date may 15 2020 in this example
 # last.date <- Sys.Date() # use this option to get up to the latest date available
