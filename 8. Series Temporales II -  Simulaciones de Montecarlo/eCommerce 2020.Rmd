@@ -1,7 +1,6 @@
 
 ---
-title: eCommerce - Time Series with Montecarlo Simulation (CAPM and Efficient Porfolio)
-  [.pdf]
+title: eCommerce - Time Series with Montecarlo Simulation (CAPM and Efficient Portfolio)
 author: "Martin Vedani - European Business School London, Msc. Global Banking and Finance"
 date: '`r format(Sys.time(), "%a %B %d, %Y. %H:%M:%S.")` Buenos Aires, Argentina.'
 output:
@@ -310,7 +309,7 @@ As we can see from the graph below, as expected, the mayor influences on these e
 All companies under our current coverage are traded in the US stock markets. Beyond this first introductory analysis and going forward, for our purposes of risk management and portfolio management, we will work with three key economic factors:
 
 1) The US short term 13 week T bill;
-2) the US cost of long term 10 year bonds; and
+2) the US long term 10 year bond; and
 3) The S&P 500 value.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', results="asis"}
@@ -332,7 +331,7 @@ Sources of variables: Yahoo Finance.
 
 ### Capital Asset Pricing Model per company
 
-Lets begin by looking at how our individual stock prices and performance are tied to the US market. We will use historical returns starting on January of 2018 for MELI, AMZN, EBAY, BABA and  JD.
+Lets begin by looking at how our individual stock prices and performance are tied to the US market. We will use historical returns starting on January of 2015 for MELI, AMZN, EBAY, BABA and  JD.
 
 Looking at daily arithmetic returns for each stock and the S&P500 minus the daily closing interest rate of the 10 year US treasury Bond, which we use as the risky free return, we compute each stock's and the S&P500's excess return. We then compare each of their excess returns versus the excess return of the market, represented by the S&P 500 index.
 
@@ -778,25 +777,25 @@ dm.test(e1, e2, alternative=c("two.sided","less","greater"), h=1, power=1)
 
 ####  Arguments
 
-e1 Forecast errors from method 1.
+e1 Forecast errors from method 1 - for our purposes here, STL will be method 1.
 
-e2 Forecast errors from method 2.
+e2 Forecast errors from method 2 - here, ETS will be method 2.
 
-A character string specifying the alternative hypothesis, must be one of "two.sided" (default), "greater" or "less". You can specify just the initial letter.
+The alternative input is a character string specifying the alternative hypothesis, must be one of "two.sided" (default), "greater" or "less". You can specify just the initial letter.
 
 The forecast horizon used in calculating e1 and e2 is determined with h.
 
-The power used in the loss function. Usually 1 or 2.  The choice of power is entirely due to the loss function. If we lose x dollars if the forecast error is x - then our loss function is linear and we should use the option power = 1. If we lose x^2 dollars when the forecast error is x, then we should use power = 2.
+P is the power used in the loss function. Usually 1 or 2.  The choice of power is entirely due to the loss function. If we lose x dollars if the forecast error is x - then our loss function is linear and we should use the option power = 1. If we lose x^2 dollars when the forecast error is x, then we should use power = 2.
 
 #### Details
 
 The null hypothesis is that the two methods have the same forecast accuracy. 
 
-For alternative="two.sided", the alternative hypothesis is that method 1 and method 2 have different levels of accuracy
+For alternative = "two.sided", the alternative hypothesis is that method 1 and method 2 have different levels of accuracy
 
-For alternative="less", the alternative hypothesis is that method 2 is less accurate than method 1. 
+For alternative = "less", the alternative hypothesis is that method 2 is less accurate than method 1. 
  
-For alternative="greater", the alternative hypothesis is that method 2 is more accurate than method 1. 
+For alternative = "greater", the alternative hypothesis is that method 2 is more accurate than method 1. 
 
 A smaller p-value means that there is stronger evidence in favor of the alternative hypothesis
 
@@ -807,35 +806,35 @@ dm.test(stl.forecast.meli$residuals, ets.forecast.meli$residuals, power = 1,
         alternative = "two.sided", h = 252)
 ```
 
-p-value is very low, H0 rejected, stl and ets have different levels of accuracy.
+p-value is very low, H0 rejected, STL and ETS have different levels of accuracy.
 
 ```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 dm.test(stl.forecast.meli$residuals, ets.forecast.meli$residuals, power = 1,
         alternative = "greater", h = 252)
 ```
 
-p-value = is very low, H0 rejected: ets IS MORE accurate than stl.
+p-value is very low, H0 rejected: ETS is MORE accurate than STL.
 
 ```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 dm.test(stl.forecast.meli$residuals, ets.forecast.meli$residuals, power = 1,
         alternative = "less", h = 252)
 ```
 
-p-value = 1, H0 accepted: ets IS NOT LESS accurate than stl.
+p-value = 1, H0 accepted: ETS is NOT less accurate than STL.
 
 #### So ETS is more accurate than STL in this case.
 
 ### Montecarlo Simulations for Price Projections
 
-Lets use MONTECARLO simulations now adn run 20,000 simulations 252 trading days into the future.
+Lets use MONTECARLO simulations now to run 20,000 simulations for each of 252 trading days into the future.
 
-Alternatively to auto.arima which can take very long and be very heavy on computational resources, there is the option to use auto ARFIMA out of the rugarcch library.
+Alternatively to auto.arima which can take very long and be very heavy on computational resources, there is the option to use auto ARFIMA out of the rugarch library.
 
-The Rugarch package is one of the more robust R libraries for financial data analysis and forecating. 
+The Rugarch package is one of the more robust R libraries for time series data analysis and forecasting. 
 
-It allows to forecast more than just prices, specifically volatility which is very importat for VaR estimations at the time to decide what porfoloio allocations are on the efficient fontier and which allocations will give us less than optimal returns for a given level of risk. 
+Most importantly, in addition to target values, it allows to forecast and simulate deviations or volatility, the base for VaR (Value at Risk) estimates in portfolio management. 
 
-Even more so, it can accept streaming data and build it into the models, but we will not cover that here - it is just nice to know.
+Rugarch can also accept streaming data and build it into the models, but we will not cover that here - it is just nice to know.
 
 Sources: http://www.unstarched.net/r-examples/rugarch/a-short-introduction-to-the-rugarch-package/
          https://palomar.home.ece.ust.hk/MAFS6010R_lectures/Rsession_time_series_modeling.html
@@ -868,7 +867,7 @@ meli.q <- auto.arfima.meli$rank.matrix[1,"MA"]
 meli.mean <- auto.arfima.meli$rank.matrix[1,"Mean"]
 ```
 
-No convergence problems so we will use p and q with/without mean as estimated:
+There are no convergence problems here so we will use p and q with/without mean as estimated for each of the stocks we are looking into.
 
 ```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 arma.garch.meli.spec.std <- ugarchspec(
@@ -878,7 +877,7 @@ arma.garch.meli.spec.std <- ugarchspec(
 arma.garch.meli.fit.std <- ugarchfit(spec=arma.garch.meli.spec.std, data=meliLogRet)
 ```
 
-Run 20,000 simulations, 252 trading days into the future. Set seed 123 to be able to reproduce same results.
+After running the 20,000 simulations for each of 252 trading days into the future, we get the following results:
 
 ```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 T = 20000
@@ -914,7 +913,7 @@ meli.projected.ret.as.price <- last.meli.price * c(1, exp(cumsum(meli.fitted.mea
 meli.target.price.252d <- as.numeric(last(meli.projected.ret.as.price))
 ```
 
-> 1 year (252 trading days approx.) target price for MERCADO LIBRE in USD `r round(meli.target.price.252d,2)`, (`r paste(round(((meli.target.price.252d - last.meli.price) / last.meli.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.meli.price,2)`)
+> The 1 year (252 trading days approx.) target price for MERCADO LIBRE is USD `r round(meli.target.price.252d,2)`, (a `r paste(round(((meli.target.price.252d - last.meli.price) / last.meli.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.meli.price,2)`)
 
 ```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 chart.meli <- autoplot(ets.forecast.meli)
@@ -975,7 +974,7 @@ amzn.projected.ret.as.price <- last.amzn.price * c(1, exp(cumsum(amzn.fitted.mea
 amzn.target.price.252d <- as.numeric(last(amzn.projected.ret.as.price))
 ```
 
-> 1 year (252 trading days approx.) target price for AMAZON in USD `r round(amzn.target.price.252d,2)`, (`r paste(round(((amzn.target.price.252d - last.amzn.price) / last.amzn.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.amzn.price,2)`)
+> The 1 year (252 trading days approx.) target price for AMAZON is USD `r round(amzn.target.price.252d,2)`, (a `r paste(round(((amzn.target.price.252d - last.amzn.price) / last.amzn.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.amzn.price,2)`)
 
 ```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 chart.amzn <- autoplot(ets.forecast.amzn) 
@@ -1032,13 +1031,13 @@ ebay.projected.ret.as.price <- last.ebay.price * c(1, exp(cumsum(ebay.fitted.mea
 ebay.target.price.252d <- as.numeric(last(ebay.projected.ret.as.price))
 ```
 
-> 1 year (252 trading days approx.) target price for EBAY in USD `r round(ebay.target.price.252d,2)`, (`r paste(round(((ebay.target.price.252d - last.ebay.price) / last.ebay.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.ebay.price,2)`)
+> The 1 year (252 trading days approx.) target price for EBAY is USD `r round(ebay.target.price.252d,2)`, (a `r paste(round(((ebay.target.price.252d - last.ebay.price) / last.ebay.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.ebay.price,2)`)
 
 ```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 chart.ebay <- autoplot(ets.forecast.ebay) 
 chart.ebay + geom_hline(yintercept = ebay.target.price.252d, color = "red")
 ```
-Makes sense, although the conditional sigma looks flat, we can double check that with the VaR excersise.
+Makes sense, also a little too bullish and with a conditional sigma which looks a little too flat - we can double check that with the VaR exercise.
 
 ***
 ### Projections for ALIBABA
@@ -1091,13 +1090,13 @@ baba.projected.ret.as.price <- last.baba.price * c(1, exp(cumsum(baba.fitted.mea
 baba.target.price.252d <- as.numeric(last(baba.projected.ret.as.price))
 ```
 
-> 1 year (252 trading days approx.) target price for ALIBABA in USD `r round(baba.target.price.252d,2)`, (`r paste(round(((baba.target.price.252d - last.baba.price) / last.baba.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.baba.price,2)`)
+> The 1 year (252 trading days approx.) target price for ALIBABA is USD `r round(baba.target.price.252d,2)`, (a `r paste(round(((baba.target.price.252d - last.baba.price) / last.baba.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.baba.price,2)`)
 
 ```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 chart.baba <- autoplot(ets.forecast.baba) 
 chart.baba + geom_hline(yintercept = baba.target.price.252d, color = "red")
 ```
-Makes sense!
+Makes sense, seems to have been trading sideways for quite a long time.
 
 ***
 ### Projections for JD.com
@@ -1152,23 +1151,23 @@ jd.projected.ret.as.price <- last.jd.price * c(1, exp(cumsum(jd.fitted.mean)))
 jd.target.price.252d <- as.numeric(last(jd.projected.ret.as.price))
 ```
 
-> 1 year (252 trading days approx.) target price for JD.com in USD `r round(jd.target.price.252d,2)`, (`r paste(round(((jd.target.price.252d - last.jd.price) / last.jd.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.jd.price,2)`)
+> The 1 year (252 trading days approx.) target price for JD.com is USD `r round(jd.target.price.252d,2)`, (a `r paste(round(((jd.target.price.252d - last.jd.price) / last.jd.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.jd.price,2)`)
 
 ```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 chart.jd <- autoplot(ets.forecast.jd) 
 chart.jd + geom_hline(yintercept = jd.target.price.252d, color = "red")
 ```
-Makes sense!
+Makes sense, similar to the case of Alibaba!
 
 ***
 ### eCommerce porfolio allocation with and without short selling
 
-The optimal or efficient portfolio mixes that follow were formulated using:  
+The optimal or efficient portfolios that follow were formulated using:  
 . Projected daily prices based on the simulations for all companies that we discussed earlier.  
 . Computing arithmetic daily returns of said projected prices.  
-. Limitation on the maximum portfolio participation of any single stock to not go above a ceiling of 40% long, and not below 20% short. I chose these constraints for arbitrary reasons: a rule of thumb of twice the amount of an equal weights portfolio (100% divided by 5) for long and no more than once the balanced portfolio for short positions.    
+. Limitation on the maximum portfolio participation of any single stock to not go above a ceiling of 50% when short sales are allowed, and a more conservative maximum allocation of 35% when short sales are not allowed. I chose these constraints for arbitrary reasons.    
 . Sharpe ratio calculated using stocks daily simple returns in excess of risk free rate. 
-. 13 week US Treasury Bill Risk Free rate
+. 10 year Long Term US Treasury Bond as the risk free return.
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide', }
@@ -1260,16 +1259,18 @@ plotEfficientFrontier(eff_noShort, header = "Optimal Portfolio - No Shorts, Max 
 ```
 
 ***
-### Portfolio and Components' Value-at-Risk ([VaR](http://www.investopedia.com/terms/v/var.asp)) and Expected Shortfall ([ES](https://en.wikipedia.org/wiki/Expected_shortfall))  
+### Portfolio and Components' Value-at-Risk ([VaR](http://www.investopedia.com/terms/v/var.asp)) 
 
 Key points to keep in mind:   
-. VaR and ES are approximation measures to the worst that could happen (max losses) on one single day out of twenty (5%).   
-. ES looks at the entire first five percent quantile of the low end of the return distribution tail so its larger than VaR.   
+. VaR is an approximation measure to the worst that could happen (max losses) on one single day out of twenty (5%).   
 . With positive correlation, asset prices tend to move together and this increases the volatility.  
 . Without short sales, it is impossible to go above the expected return of the stock with the highest expected return.   
-. When short sales are allowed, there is no upper bound on the expected return nor on the risk. And the projected fall for Alibaba, a company with a market cap above 100B, should not be for the long run. A short sale strategy should be combined with a [stop-loss limit order](http://www.investopedia.com/terms/s/stop-limitorder.asp).
+. When short sales are allowed, there is no upper bound on the expected return nor on the risk.
+. Although not done here, a short sale strategy (and all others for that manner) should be combined with [stop-loss limit orders](http://www.investopedia.com/terms/s/stop-limitorder.asp) which carries an additional cost.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide', }
+#and Expected Shortfall ([ES](https://en.wikipedia.org/wiki/Expected_shortfall)) 
+
 library(PerformanceAnalytics)
 
 meli.sim <- as.matrix(meli.fitted.mean)
