@@ -47,14 +47,13 @@ source('~/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/portfoli
 ytd <- paste(as.numeric(format(Sys.Date(), '%Y')),"::", sep = "")
 # --end of start up --
 
-
 library(BatchGetSymbols)
 # Fuente: https://cran.r-project.org/web/packages/BatchGetSymbols/vignettes/BatchGetSymbols-vignette.html
 
 # Configurar fechas
-first.date <- as.Date("2015-01-01") # cambiar manualmente
+first.date <- as.Date("2015-06-01") # cambiar manualmente
 
-last.date <- as.Date("2020-05-23") # cambiar manualmente, d+1 for last.date may 15 2020 in this example
+last.date <- as.Date("2020-06-07") # cambiar manualmente, d+1 for last.date may 15 2020 in this example
 # last.date <- Sys.Date() # use this option to get up to the latest date available
 
 freq.data <- 'daily'
@@ -80,7 +79,7 @@ print(p)
 
 # Configurar fechas
 first.date <- as.Date("2015-01-01") # cambiar manualmente 
-last.date <- as.Date("2020-05-23") # cambiar manualmente, d+1 for last.date may 15 2020 in this example
+last.date <- as.Date("2020-06-07") # cambiar manualmente, d+1 for last.date may 15 2020 in this example
 # last.date <- Sys.Date() # use this option to get up to the latest date available
 
 # Download full histroy of OHLC columns from Yahoo Finance
@@ -89,13 +88,13 @@ getSymbols(c("^IRX", "^TNX","^IXIC","^GSPC", "^MERV"), from = first.date , to = 
 getSymbols(c("^BVSP","^MXX", "^N225", "000001.ss"), from = first.date , to = last.date)
 # Adjust OHLC columns with both splits and dividends
 meli <- adjustOHLC(MELI)
-ebay <- adjustOHLC(EBAY)
 amzn <- adjustOHLC(AMZN)
+ebay <- adjustOHLC(EBAY)
 baba <- adjustOHLC(BABA)
 jd <- adjustOHLC(JD)
 
 ###***********
-mergedStocks <- merge.xts(Ad(meli), Ad(ebay),Ad(amzn),Ad(baba),Ad(jd))
+mergedStocks <- merge.xts(Ad(meli), Ad(amzn), Ad(ebay), Ad(baba), Ad(jd))
 ###***********
 
 # Markets / Indexes
@@ -136,70 +135,90 @@ mergedMarketIndexLogRet <- merge.xts(nasdaqLogRet, sp500LogRet, braBovespaLogRet
 tbill13 <- Ad(IRX)
 colnames(tbill13) <- "usTbill13weeks"
 
+tbill13LogRet <- dailyReturn(tbill13, type="log")
+colnames(tbill13LogRet) <- c("tbill13.log.ret")
+
 # Long Term - 10 year US Treasury Bonds
-us10yLTcomposite <- Ad(TNX)
-colnames(us10yLTcomposite) <- "US.LT.above.10yrs"
+us10yLT <- Ad(TNX)
+colnames(us10yLT) <- "US.10yrs.Bond"
+
+us10yLTLogRet <- dailyReturn(us10yLT, type="log")
+colnames(us10yLTLogRet) <- c("us10yLT.log.ret")
 
 ###**********
-mergedRiskManagement <- merge.xts(tbill13,us10yLTcomposite, Cl(sp500))
+mergedRiskManagement <- merge.xts(tbill13, tbill13LogRet, us10yLT, us10yLTLogRet, Cl(sp500))
+
+mergedRiskManagementLogRet <- merge.xts(tbill13LogRet, us10yLTLogRet)
 ###**********
 
 # Calculate simple returns and merge all in one matrix
 
 meliRet <- dailyReturn(meli)
 colnames(meliRet) <- c("meli.returns")
-ebayRet <- dailyReturn(ebay)
-colnames(ebayRet) <- c("ebay.returns")
+
 amznRet <- dailyReturn(amzn)
 colnames(amznRet) <- c("amzn.returns")
+
+ebayRet <- dailyReturn(ebay)
+colnames(ebayRet) <- c("ebay.returns")
+
 babaRet <- dailyReturn(baba)
 colnames(babaRet) <- c("baba.returns")
+
 jdRet <- dailyReturn(jd)
 colnames(jdRet) <- c("jd.returns")
 
 # ###**********
-mergedSimpleReturns <- merge.xts(meliRet, ebayRet, amznRet, babaRet, jdRet)
+mergedSimpleReturns <- merge.xts(meliRet, amznRet, ebayRet, babaRet, jdRet)
 # ###**********
 
 # Calculate Gross Cumulative returns (normalize to 1 for each company) and update 
 # column names, and merge all in one matrix
 meliGrossRet <- cumprod(meliRet + 1)
 colnames(meliGrossRet) <- c("meli.gross.ret")
-ebayGrossRet <- cumprod(ebayRet + 1)
-colnames(ebayGrossRet) <- c("ebay.gross.ret")
+
 amznGrossRet <- cumprod(amznRet + 1)
 colnames(amznGrossRet) <- c("amzn.gross.ret")
+
+ebayGrossRet <- cumprod(ebayRet + 1)
+colnames(ebayGrossRet) <- c("ebay.gross.ret")
+
 babaGrossRet <- cumprod(babaRet + 1)
 colnames(babaGrossRet) <- c("baba.gross.ret")
+
 jdGrossRet <- cumprod(jdRet + 1)
 colnames(jdGrossRet) <- c("jd.gross.ret")
 
 # ###**********
-mergedGrossRet <- merge.xts(meliGrossRet, ebayGrossRet, amznGrossRet, babaGrossRet, jdGrossRet)
+mergedGrossRet <- merge.xts(meliGrossRet, amznGrossRet, ebayGrossRet, babaGrossRet, jdGrossRet)
 # ###**********
 
 # Calculate LOGARITMIC returns and merge all in one matrix
 
 meliLogRet <- dailyReturn(meli, type="log")
 colnames(meliLogRet) <- c("meli.log.ret")
-ebayLogRet <- dailyReturn(ebay, type="log")
-colnames(ebayLogRet) <- c("ebay.log.ret")
+
 amznLogRet <- dailyReturn(amzn, type="log")
 colnames(amznLogRet) <- c("amzn.log.ret")
+
+ebayLogRet <- dailyReturn(ebay, type="log")
+colnames(ebayLogRet) <- c("ebay.log.ret")
+
 babaLogRet <- dailyReturn(baba, type="log")
 colnames(babaLogRet) <- c("baba.log.ret")
+
 jdLogRet <- dailyReturn(jd, type="log")
 colnames(jdLogRet) <- c("jd.log.ret")
 
 ###*******************
-mergedLogRet <- merge.xts(meliLogRet, ebayLogRet, amznLogRet, babaLogRet, jdLogRet)
+mergedLogRet <- merge.xts(meliLogRet, amznLogRet, ebayLogRet, babaLogRet, jdLogRet)
 ###*******************
 
 # Build MASTER correlation matrix without mergedStocks, mergedGrossRet, mergedFxRates,
 # mergedRiskFree, and mergedEconFund
 
 merged.master.matrix <- merge.xts(mergedLogRet, mergedMarketIndexLogRet,
-                                  mergedRiskManagement)
+                                  mergedRiskManagementLogRet)
 
 #Calculate correlation on masterMergedMatrix with argument: use="pairwise.complete.obs"
 master.corr.matrix  <- cor(merged.master.matrix, use="pairwise.complete.obs")
@@ -279,19 +298,16 @@ CAPM.table
 # https://www.researchgate.net/post/Why_did_the_Fama_French_factors_calculated_using_simple_returns_instead_of_log_returns
 
 # Calculate simple returns for meli and merge all in one matrix
-meli.returns <- dailyReturn(meli, subset = "2015::", type="arithmetic")
+meli.returns <- dailyReturn(meli, peridod="daily", type="arithmetic")
 colnames(meli.returns) <- c("meli.returns")
-sp500Ret.meli <- dailyReturn(sp500, subset = "2015::", type="arithmetic")
+sp500Ret.meli <- dailyReturn(sp500, peridod="daily", type="arithmetic")
 colnames(sp500Ret.meli) <- c("sp500.returns")
 
 # US treasuries are in percentage and annual terms, so must be divided by 252
 # this is an approximation good enmough for most purposes. See the following for detail discussion
 # https://quant.stackexchange.com/questions/33076/how-to-calculate-daily-risk-free-rate-using-13-week-treasury-bill
-# tbill13.meli <- ((Ad(IRX["2015::"]))/252)
-# colnames(tbill13.meli) <- c("tbill13dailyRate(Not%)")
-# tbill13.meli <- na.omit(tbill13.meli)
 
-us10yrLT.meli <- ((Ad(TNX["2015::"]))/252)
+us10yrLT.meli <- ((Ad(TNX))/252)
 colnames(us10yrLT.meli) <- "US.LT.above.10yrs"
 us10yrLT.meli <- na.omit(us10yrLT.meli)
 
@@ -349,14 +365,14 @@ if(alpha.meli > 0.00001 & alpha.meli < 0.001){
 #### ***************
 
 # Calculate simple returns for amzn and merge all in one matrix
-amzn.returns <- dailyReturn(amzn, subset = "2015::", type="arithmetic")
+amzn.returns <- dailyReturn(amzn,  peridod="daily", type="arithmetic")
 colnames(amzn.returns) <- c("amzn.returns")
-sp500Ret.amzn <- dailyReturn(sp500, subset = "2015::", type="arithmetic")
+sp500Ret.amzn <- dailyReturn(sp500,  peridod="daily", type="arithmetic")
 colnames(sp500Ret.amzn) <- c("sp500.returns")
 
 # US treasuries are in percentage and annual terms, so must be divided by 252
 
-us10yrLT.amzn <- ((Ad(TNX["2015::"]))/252)
+us10yrLT.amzn <- ((Ad(TNX))/252)
 colnames(us10yrLT.amzn) <- "US.LT.above.10yrs"
 us10yrLT.amzn <- na.omit(us10yrLT.amzn)
 
@@ -414,14 +430,14 @@ if(alpha.amzn > 0.00001 & alpha.amzn < 0.001){
 #### ***************
 
 # Calculate simple returns for ebay and merge all in one matrix
-ebay.returns <- dailyReturn(ebay, subset = "2015::", type="arithmetic")
+ebay.returns <- dailyReturn(ebay,  peridod="daily", type="arithmetic")
 colnames(ebay.returns) <- c("ebay.returns")
-sp500Ret.ebay <- dailyReturn(sp500, subset = "2015::", type="arithmetic")
+sp500Ret.ebay <- dailyReturn(sp500,  peridod="daily", type="arithmetic")
 colnames(sp500Ret.ebay) <- c("sp500.returns")
 
 # US treasuries are in percentage and annual terms, so must be divided by 252
 
-us10yrLT.ebay <- ((Ad(TNX["2015::"]))/252)
+us10yrLT.ebay <- ((Ad(TNX))/252)
 colnames(us10yrLT.ebay) <- "US.LT.above.10yrs"
 us10yrLT.ebay <- na.omit(us10yrLT.ebay)
 
@@ -479,14 +495,14 @@ if(alpha.ebay > 0.00001 & alpha.ebay < 0.001){
 #### ***************
 
 # Calculate simple returns for ebay and merge all in one matrix
-baba.returns <- dailyReturn(baba, subset = "2015::", type="arithmetic")
+baba.returns <- dailyReturn(baba,  peridod="daily", type="arithmetic")
 colnames(baba.returns) <- c("baba.returns")
-sp500Ret.baba <- dailyReturn(sp500, subset = "2015::", type="arithmetic")
+sp500Ret.baba <- dailyReturn(sp500,  peridod="daily", type="arithmetic")
 colnames(sp500Ret.baba) <- c("sp500.returns")
 
 # US treasuries are in percentage and annual terms, so must be divided by 252
 
-us10yrLT.baba <- ((Ad(TNX["2015::"]))/252)
+us10yrLT.baba <- ((Ad(TNX))/252)
 colnames(us10yrLT.baba) <- "US.LT.above.10yrs"
 us10yrLT.baba <- na.omit(us10yrLT.baba)
 
@@ -544,14 +560,14 @@ if(alpha.baba > 0.00001 & alpha.baba < 0.001){
 #### ***************
 
 # Calculate simple returns for ebay and merge all in one matrix
-jd.returns <- dailyReturn(jd, subset = "2015::", type="arithmetic")
+jd.returns <- dailyReturn(jd,  peridod="daily", type="arithmetic")
 colnames(jd.returns) <- c("jd.returns")
-sp500Ret.jd <- dailyReturn(sp500, subset = "2015::", type="arithmetic")
+sp500Ret.jd <- dailyReturn(sp500,  peridod="daily", type="arithmetic")
 colnames(sp500Ret.jd) <- c("sp500.returns")
 
 # US treasuries are in percentage and annual terms, so must be divided by 252
 
-us10yrLT.jd <- ((Ad(TNX["2015::"]))/252)
+us10yrLT.jd <- ((Ad(TNX))/252)
 colnames(us10yrLT.jd) <- "US.LT.above.10yrs"
 us10yrLT.jd <- na.omit(us10yrLT.jd)
 
@@ -628,7 +644,7 @@ plot.xts(realized.vol.meli.20days, major.ticks = "months",
 head(meli[,6])
 # checked MELI.Adjusted closing price
 
-meli.ts <- ts(meli[,6], start = c(2015), frequency = 252)
+meli.ts <- ts(meli[,6], start = c(2015, 252/2), frequency = 252)
 
 stl.meli <- stl(meli.ts[,"MELI.Adjusted"], s.window = "periodic", robust = T)
 
@@ -656,7 +672,10 @@ abline(v=c(2015.25, 2015.5, 2015.75,
 ?stlm
 ?stlf
 
-set.seed(123) # to be able to reproduce de same resutls
+#####################################################################################
+set.seed(123) # to be able to reproduce de same results for the rest of this report
+#####################################################################################
+
 stl.forecast.meli <- forecast(stl.meli, h=252)
 
 summary(stl.forecast.meli)
@@ -672,7 +691,7 @@ head(meli[,6])
 
 ets.meli <- ets(meli[,6], allow.multiplicative.trend = T)
 
-set.seed(123) # to be able to reproduce de same resutls
+#set.seed(123) # to be able to reproduce de same resutls
 ets.forecast.meli <- forecast.ets(ets.meli, h=252)
 
 summary(ets.forecast.meli)
@@ -768,11 +787,12 @@ library(rugarch)
 
 auto.arfima.meli <- autoarfima(meliLogRet, ar.max = 2, ma.max = 2, 
                                criterion = "AIC", method = "partial",
-                               solver = "hybrid")
+                               solver = "hybrid", 
+                               distribution.model = "sged")
 
 show(head(auto.arfima.meli$rank.matrix))
 #   AR MA Mean ARFIMA       AIC converged
-# 1  0  0    1      0 -4.325384         1
+# 1  0  0    1      0 -4.485027         1
 
 # So ARMA(0,0) model WITH a mean
 
@@ -799,7 +819,7 @@ meli.mean
 # No convergence problems so we will use p and q with/without mean as estimated:
 
 arma.garch.meli.spec.std <- ugarchspec(
-        variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
+        variance.model = list(model = "sGARCH", garchOrder=c(1,1)), distribution.model = "sged",
         mean.model = list(armaOrder=c(meli.p, meli.q), include.mean = meli.mean))
 
 arma.garch.meli.fit.std <- ugarchfit(spec=arma.garch.meli.spec.std, data=meliLogRet)
@@ -816,7 +836,7 @@ coef(arma.garch.meli.fit.std)
 T = 20000
 
 arma.garch.meli.sim <- ugarchsim(fit = arma.garch.meli.fit.std, startMethod = "sample",
-                                 n.sim = 252, m.sim = T, rseed = 123)
+                                 n.sim = 252, m.sim = T) #, rseed = 123)
 
 # Series Plot
 plot(arma.garch.meli.sim, which = 2)
@@ -845,7 +865,7 @@ meli.projected.ret.as.price <- last.meli.price * c(1, exp(cumsum(meli.fitted.mea
 meli.target.price.252d <- as.numeric(last(meli.projected.ret.as.price))
 
 meli.target.price.252d 
-# 1204.261
+# 1360.172
 
 chart.meli <- autoplot(ets.forecast.meli)
 chart.meli + geom_hline(yintercept = meli.target.price.252d, color = "red")
@@ -863,7 +883,7 @@ head(amzn[,6])
 
 ets.amzn <- ets(amzn[,6], allow.multiplicative.trend = T)
 
-set.seed(123) # to be able to reproduce de same resutls
+#set.seed(123) # to be able to reproduce de same resutls
 ets.forecast.amzn <- forecast.ets(ets.amzn, h=252)
 
 summary(ets.forecast.amzn)
@@ -872,11 +892,12 @@ autoplot(ets.forecast.amzn)
 
 auto.arfima.amzn <- autoarfima(amznLogRet, ar.max = 2, ma.max = 2, 
                                criterion = "AIC", method = "partial",
-                               solver = "hybrid")
+                               solver = "hybrid", 
+                               distribution.model = "sged")
 
 show(head(auto.arfima.amzn$rank.matrix))
 #   AR MA Mean ARFIMA       AIC converged
-# 1  0  0    1      0 -5.079345         1
+# 1  0  0    1      0 -5.349739         1
 
 amzn.p <- auto.arfima.amzn$rank.matrix[1,"AR"]
 amzn.q <- auto.arfima.amzn$rank.matrix[1,"MA"]
@@ -888,7 +909,7 @@ amzn.mean
 # No convergence problems so we will use p and q with/without mean as estimated:
 
 arma.garch.amzn.spec.std <- ugarchspec(
-        variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
+        variance.model = list(model = "sGARCH", garchOrder=c(1,1)), distribution.model = "sged",
         mean.model = list(armaOrder=c(amzn.p, amzn.q), include.mean = amzn.mean))
 
 arma.garch.amzn.fit.std <- ugarchfit(spec=arma.garch.amzn.spec.std, data=amznLogRet)
@@ -898,7 +919,7 @@ coef(arma.garch.amzn.fit.std)
 # 20,000 simulations, 252 trading days into the future. Set seed 123
 
 arma.garch.amzn.sim <- ugarchsim(fit = arma.garch.amzn.fit.std, startMethod = "sample",
-                                 n.sim = 252, m.sim = T, rseed = 123)
+                                 n.sim = 252, m.sim = T)#, rseed = 123)
 
 plot(arma.garch.amzn.sim, which = 2)
 plot(arma.garch.amzn.sim, which = 1)
@@ -913,7 +934,7 @@ amzn.projected.ret.as.price <- last.amzn.price * c(1, exp(cumsum(amzn.fitted.mea
 amzn.target.price.252d <- as.numeric(last(amzn.projected.ret.as.price))
 
 amzn.target.price.252d 
-# [1] 4353.439
+# [1] 3818.644
 
 chart.amzn <- autoplot(ets.forecast.amzn) 
 chart.amzn + geom_hline(yintercept = amzn.target.price.252d, color = "red")
@@ -925,7 +946,7 @@ head(ebay[,6])
 
 ets.ebay <- ets(ebay[,6], allow.multiplicative.trend = T)
 
-set.seed(123) # to be able to reproduce de same resutls
+#set.seed(123) # to be able to reproduce de same resutls
 ets.forecast.ebay <- forecast.ets(ets.ebay, h=252)
 
 summary(ets.forecast.ebay)
@@ -934,11 +955,12 @@ autoplot(ets.forecast.ebay)
 
 auto.arfima.ebay <- autoarfima(ebayLogRet, ar.max = 2, ma.max = 2, 
                                criterion = "AIC", method = "partial",
-                               solver = "hybrid")
+                               solver = "hybrid", 
+                               distribution.model = "sged")
 
 show(head(auto.arfima.ebay$rank.matrix))
 #   AR MA Mean ARFIMA       AIC converged
-# 1  1  0    1      0 -5.150052         1
+# 1  2  2    1      0 -5.442996         1
 
 ebay.p <- auto.arfima.ebay$rank.matrix[1,"AR"]
 ebay.q <- auto.arfima.ebay$rank.matrix[1,"MA"]
@@ -950,9 +972,8 @@ ebay.mean
 # No convergence problems so we will use p and q with/without mean as estimated:
 
 arma.garch.ebay.spec.std <- ugarchspec(
-        variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
-        mean.model = list(armaOrder=c(ebay.p, ebay.q), include.mean = ebay.mean), 
-        distribution.model = "sged")
+        variance.model = list(model = "sGARCH", garchOrder=c(1,1)), distribution.model = "sged",
+        mean.model = list(armaOrder=c(ebay.p, ebay.q), include.mean = ebay.mean))
 
 arma.garch.ebay.fit.std <- ugarchfit(spec=arma.garch.ebay.spec.std, data=ebayLogRet)
 
@@ -961,7 +982,7 @@ coef(arma.garch.ebay.fit.std)
 # 20,000 simulations, 252 trading days into the future. Set seed 123
 
 arma.garch.ebay.sim <- ugarchsim(fit = arma.garch.ebay.fit.std, startMethod = "sample",
-                                 n.sim = 252, m.sim = T, rseed = 123)
+                                 n.sim = 252, m.sim = T)#, rseed = 123)
 
 plot(arma.garch.ebay.sim, which = 2)
 plot(arma.garch.ebay.sim, which = 1)
@@ -976,7 +997,7 @@ ebay.projected.ret.as.price <- last.ebay.price * c(1, exp(cumsum(ebay.fitted.mea
 ebay.target.price.252d <- as.numeric(last(ebay.projected.ret.as.price))
 
 ebay.target.price.252d 
-# [1] 57.34784
+# [1] 66.88417
 
 chart.ebay <- autoplot(ets.forecast.ebay) 
 chart.ebay + geom_hline(yintercept = ebay.target.price.252d, color = "red")
@@ -988,7 +1009,7 @@ head(baba[,6])
 
 ets.baba <- ets(baba[,6], allow.multiplicative.trend = T)
 
-set.seed(123) # to be able to reproduce de same resutls
+#set.seed(123) # to be able to reproduce de same resutls
 ets.forecast.baba <- forecast.ets(ets.baba, h=252)
 
 summary(ets.forecast.baba)
@@ -997,11 +1018,12 @@ autoplot(ets.forecast.baba)
 
 auto.arfima.baba <- autoarfima(babaLogRet, ar.max = 2, ma.max = 2, 
                                criterion = "AIC", method = "partial",
-                               solver = "hybrid")
+                               solver = "hybrid", 
+                               distribution.model = "sged")
 
 show(head(auto.arfima.baba$rank.matrix))
 #   AR MA Mean ARFIMA       AIC converged
-# 1  2  2    0      0 -4.951659         1
+# 1  2  2    0      0 -4.997153         1
 
 baba.p <- auto.arfima.baba$rank.matrix[1,"AR"]
 baba.q <- auto.arfima.baba$rank.matrix[1,"MA"]
@@ -1013,7 +1035,7 @@ baba.mean
 # No convergence problems so we will use p and q with/without mean as estimated:
 
 arma.garch.baba.spec.std <- ugarchspec(
-        variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
+        variance.model = list(model = "sGARCH", garchOrder=c(1,1)), distribution.model = "sged",
         mean.model = list(armaOrder=c(baba.p, baba.q), include.mean = baba.mean))
 
 arma.garch.baba.fit.std <- ugarchfit(spec=arma.garch.baba.spec.std, data=babaLogRet)
@@ -1023,7 +1045,7 @@ coef(arma.garch.baba.fit.std)
 # 20,000 simulations, 252 trading days into the future. Set seed 123
 
 arma.garch.baba.sim <- ugarchsim(fit = arma.garch.baba.fit.std, startMethod = "sample",
-                                 n.sim = 252, m.sim = T, rseed = 123)
+                                 n.sim = 252, m.sim = T)#, rseed = 123)
 
 plot(arma.garch.baba.sim, which = 2)
 plot(arma.garch.baba.sim, which = 1)
@@ -1038,7 +1060,7 @@ baba.projected.ret.as.price <- last.baba.price * c(1, exp(cumsum(baba.fitted.mea
 baba.target.price.252d <- as.numeric(last(baba.projected.ret.as.price))
 
 baba.target.price.252d 
-# [1] 198.464
+# [1] 220.0977
 
 chart.baba <- autoplot(ets.forecast.baba) 
 chart.baba + geom_hline(yintercept = baba.target.price.252d, color = "red")
@@ -1050,7 +1072,7 @@ head(jd[,6])
 
 ets.jd <- ets(jd[,6], allow.multiplicative.trend = T)
 
-set.seed(123) # to be able to reproduce de same resutls
+#set.seed(123) # to be able to reproduce de same resutls
 ets.forecast.jd <- forecast.ets(ets.jd, h=252)
 
 summary(ets.forecast.jd)
@@ -1059,11 +1081,12 @@ autoplot(ets.forecast.jd)
 
 auto.arfima.jd <- autoarfima(jdLogRet, ar.max = 2, ma.max = 2, 
                              criterion = "AIC", method = "partial",
-                             solver = "hybrid")
+                             solver = "hybrid", 
+                             distribution.model = "sged")
 
 show(head(auto.arfima.jd$rank.matrix))
 #   AR MA Mean ARFIMA       AIC converged
-# 1  2  2    0      0 -4.471216         1
+# 1  2  2    0      0 -4.523000         1
 
 jd.p <- auto.arfima.jd$rank.matrix[1,"AR"]
 jd.q <- auto.arfima.jd$rank.matrix[1,"MA"]
@@ -1075,7 +1098,7 @@ jd.mean
 # No convergence problems so we will use p and q with/without mean as estimated:
 
 arma.garch.jd.spec.std <- ugarchspec(
-        variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
+        variance.model = list(model = "sGARCH", garchOrder=c(1,1)), distribution.model = "sged",
         mean.model = list(armaOrder=c(jd.p, jd.q), include.mean = jd.mean))
 
 arma.garch.jd.fit.std <- ugarchfit(spec=arma.garch.jd.spec.std, data=jdLogRet)
@@ -1085,7 +1108,7 @@ coef(arma.garch.jd.fit.std)
 # 20,000 simulations, 252 trading days into the future. Set seed 123
 
 arma.garch.jd.sim <- ugarchsim(fit = arma.garch.jd.fit.std, startMethod = "sample",
-                               n.sim = 252, m.sim = T, rseed = 123)
+                               n.sim = 252, m.sim = T)#, rseed = 123)
 
 plot(arma.garch.jd.sim, which = 2)
 plot(arma.garch.jd.sim, which = 1)
@@ -1100,7 +1123,7 @@ jd.projected.ret.as.price <- last.jd.price * c(1, exp(cumsum(jd.fitted.mean)))
 jd.target.price.252d <- as.numeric(last(jd.projected.ret.as.price))
 
 jd.target.price.252d 
-# [1] 49.89487
+# [1] 58.49245
 
 chart.jd <- autoplot(ets.forecast.jd) 
 chart.jd + geom_hline(yintercept = jd.target.price.252d, color = "red")
@@ -1133,7 +1156,7 @@ returns <- as.matrix(100*(projected.prices[2:n,]/projected.prices[1:(n-1),] - 1)
 # input value of risk-free interest rate
 # US treasuries are in percentage and annual terms, so must be divided by 252
 
-us10yrLT <- na.omit(((Ad(TNX["2015::"]))/252))
+us10yrLT <- na.omit(((Ad(TNX))/252))
 mufree <- as.numeric(round(mean(na.omit(us10yrLT)),4))
 
 mean_vect <- apply(returns,2,mean, na.rm = T)
@@ -1142,7 +1165,7 @@ mean_vect <- apply(returns,2,mean, na.rm = T)
 # ***************WITH SHORT SALES********************
 #####################################################
 
-eff_Short <- my.eff.frontier(returns,  mufree = mufree, short=-0.01,
+eff_Short <- my.eff.frontier(returns,  mufree = mufree, short=-Inf, max.allocation=0.50,
                              risk.premium.up=max(mean_vect), risk.increment=.00001)
 
 # Find the optimal portfolio
@@ -1152,7 +1175,7 @@ eff.optimal.point_Short <- eff_Short[eff_Short$sharpe==max(eff_Short$sharpe),]
 # ***************WITHOUT SHORT SALES*****************
 #####################################################
 
-eff_noShort <- my.eff.frontier(returns, mufree = mufree, short=0, max.allocation=0.25,
+eff_noShort <- my.eff.frontier(returns, mufree = mufree, short=0, max.allocation=0.35,
                                risk.premium.up=max(mean_vect), risk.increment=.00001)
 
 # Find the optimal portfolio
@@ -1175,11 +1198,11 @@ jd.weight.no.short <- round(eff.optimal.point_noShort["JD"],2)
 
 weights.short <- cbind(meli.weight.short, amzn.weight.short, ebay.weight.short,
                        baba.weight.short, jd.weight.short)
-rownames(weights.short) <- "Weights w/ Short Sales Allowed"
+rownames(weights.short) <- "Weights - Shorts Allowed, , Max 50% allocation"
 
 weights.no.short <- cbind(meli.weight.no.short, amzn.weight.no.short, ebay.weight.no.short,
                           baba.weight.no.short, jd.weight.no.short)
-rownames(weights.no.short) <- "Weights w/ Short Sales Prohibited"
+rownames(weights.no.short) <- "Weights - No Shorts, Max 35% allocation"
 
 weights.short.no.short <- rbind(weights.short, weights.no.short)
 
@@ -1188,12 +1211,12 @@ weights.short.no.short
 # Find the optimal portfolio again, using "eff.optimal.point" as variable name so that it 
 # works with plotEfficientFrontier()
 eff.optimal.point <- eff_Short[eff_Short$sharpe==max(eff_Short$sharpe),]
-plotEfficientFrontier(eff_Short, header = "Optimal Portfolio w/ Short Sales Allowed")
+plotEfficientFrontier(eff_Short, header = "Optimal Portfolio - Shorts Allowed, Max 50% allocation")
 
 # Find the optimal portfolio again, using "eff.optimal.point" as variable name so that it 
 # works with plotEfficientFrontier()
 eff.optimal.point <- eff_noShort[eff_noShort$sharpe==max(eff_noShort$sharpe),]
-plotEfficientFrontier(eff_noShort, header = "Optimal Portfolio w/ Short Sales Prohibited")
+plotEfficientFrontier(eff_noShort, header = "Optimal Portfolio - No Shorts, Max 35% allocation")
 
 #### Portfolio and Components' Value-at-Risk ([VaR](http://www.investopedia.com/terms/v/var.asp)) and 
 # Expected Shortfall ([ES](https://en.wikipedia.org/wiki/Expected_shortfall))  
@@ -1217,16 +1240,16 @@ library(PerformanceAnalytics)
 
 meli.sim <- as.matrix(meli.fitted.mean)
 colnames(meli.sim) <- "MELI"
-ebay.sim <- as.matrix(ebay.fitted.mean)
-colnames(ebay.sim) <- "EBAY"
 amzn.sim <- as.matrix(amzn.fitted.mean)
 colnames(amzn.sim) <- "AMZN"
-jd.sim <- as.matrix(jd.fitted.mean)
-colnames(jd.sim) <- "JD"
+ebay.sim <- as.matrix(ebay.fitted.mean)
+colnames(ebay.sim) <- "EBAY"
 baba.sim <- as.matrix(baba.fitted.mean)
 colnames(baba.sim) <- "BABA"
+jd.sim <- as.matrix(jd.fitted.mean)
+colnames(jd.sim) <- "JD"
 
-mergedSIM <- cbind(meli.sim, ebay.sim, amzn.sim, jd.sim,baba.sim)
+mergedSIM <- cbind(meli.sim, amzn.sim, ebay.sim, baba.sim, jd.sim)
 
 mergedSIM <- as.zooreg(mergedSIM)
 index(mergedSIM) <- as.yearmon(index(mergedSIM))
@@ -1256,7 +1279,7 @@ VaR_Short <- cbind(paste(round(as.numeric(VaR_Short$MVaR)*100,2),"%",sep=""),
                    paste(round(as.numeric(VaR_Short$contribution[3])*100,2),"%",sep=""),
                    paste(round(as.numeric(VaR_Short$contribution[4])*100,2),"%",sep=""),
                    paste(round(as.numeric(VaR_Short$contribution[5])*100,2),"%",sep=""))
-colnames(VaR_Short) <- c("Total", "MELI", "EBAY", "AMZN", "JD", "BABA")
+colnames(VaR_Short) <- c("Total", "MELI", "AMZN", "EBAY", "BABA", "JD")
 
 VaR_noShort <- cbind(paste(round(as.numeric(VaR_noShort$MVaR)*100,2),"%",sep=""),
                      paste(round(as.numeric(VaR_noShort$contribution[1])*100,2),"%",sep=""),
@@ -1264,29 +1287,29 @@ VaR_noShort <- cbind(paste(round(as.numeric(VaR_noShort$MVaR)*100,2),"%",sep="")
                      paste(round(as.numeric(VaR_noShort$contribution[3])*100,2),"%",sep=""),
                      paste(round(as.numeric(VaR_noShort$contribution[4])*100,2),"%",sep=""),
                      paste(round(as.numeric(VaR_noShort$contribution[5])*100,2),"%",sep=""))
-colnames(VaR_noShort) <- c("Total", "MELI", "EBAY", "AMZN", "JD", "BABA")
+colnames(VaR_noShort) <- c("Total", "MELI", "AMZN", "EBAY", "BABA", "JD")
 
-ES_Short <- cbind(paste(round(as.numeric(ES_Short$MES)*100,2),"%",sep=""),
-                  paste(round(as.numeric(ES_Short$contribution[1])*100,2),"%",sep=""),
-                  paste(round(as.numeric(ES_Short$contribution[2])*100,2),"%",sep=""),
-                  paste(round(as.numeric(ES_Short$contribution[3])*100,2),"%",sep=""),
-                  paste(round(as.numeric(ES_Short$contribution[4])*100,2),"%",sep=""),
-                  paste(round(as.numeric(ES_Short$contribution[5])*100,2),"%",sep=""))
-colnames(ES_Short) <- c("Total", "MELI", "EBAY", "AMZN", "JD", "BABA")
+# ES_Short <- cbind(paste(round(as.numeric(ES_Short$MES)*100,2),"%",sep=""),
+#                   paste(round(as.numeric(ES_Short$contribution[1])*100,2),"%",sep=""),
+#                   paste(round(as.numeric(ES_Short$contribution[2])*100,2),"%",sep=""),
+#                   paste(round(as.numeric(ES_Short$contribution[3])*100,2),"%",sep=""),
+#                   paste(round(as.numeric(ES_Short$contribution[4])*100,2),"%",sep=""),
+#                   paste(round(as.numeric(ES_Short$contribution[5])*100,2),"%",sep=""))
+# colnames(ES_Short) <- c("Total", "MELI", "AMZN", "EBAY", "BABA", "JD")
+# 
+# ES_noShort <- cbind(paste(round(as.numeric(ES_noShort$MES)*100,2),"%",sep=""),
+#                     paste(round(as.numeric(ES_noShort$contribution[1])*100,2),"%",sep=""),
+#                     paste(round(as.numeric(ES_noShort$contribution[2])*100,2),"%",sep=""),
+#                     paste(round(as.numeric(ES_noShort$contribution[3])*100,2),"%",sep=""),
+#                     paste(round(as.numeric(ES_noShort$contribution[4])*100,2),"%",sep=""),
+#                     paste(round(as.numeric(ES_noShort$contribution[5])*100,2),"%",sep=""))
+# colnames(ES_noShort) <- c("Total", "MELI", "AMZN", "EBAY", "BABA", "JD")
 
-ES_noShort <- cbind(paste(round(as.numeric(ES_noShort$MES)*100,2),"%",sep=""),
-                    paste(round(as.numeric(ES_noShort$contribution[1])*100,2),"%",sep=""),
-                    paste(round(as.numeric(ES_noShort$contribution[2])*100,2),"%",sep=""),
-                    paste(round(as.numeric(ES_noShort$contribution[3])*100,2),"%",sep=""),
-                    paste(round(as.numeric(ES_noShort$contribution[4])*100,2),"%",sep=""),
-                    paste(round(as.numeric(ES_noShort$contribution[5])*100,2),"%",sep=""))
-colnames(ES_noShort) <- c("Total", "MELI", "EBAY", "AMZN", "JD", "BABA")
-
-VarEs.table <- rbind(VaR_Short, VaR_noShort,ES_Short, ES_noShort)
+VarEs.table <- rbind(VaR_Short, VaR_noShort) #,ES_Short, ES_noShort)
 rownames(VarEs.table) <- c("VaR(5%) - Short Sales Allowed",
-                           "VaR(5%) - Short Sales Prohibited",
-                           "ES(5%) - Short Sales Allowed",
-                           "ES(5%) - Short Sales Prohibited")
+                           "VaR(5%) - Short Sales Prohibited") #,
+# "ES(5%) - Short Sales Allowed",
+# "ES(5%) - Short Sales Prohibited")
 
 VarEs.table
 
