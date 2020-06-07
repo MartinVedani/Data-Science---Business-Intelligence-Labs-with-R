@@ -91,7 +91,7 @@ Copia y pega lo siguiente al final de documento uytilizando cualquier editor de 
 <code> myPaths <- c(myPaths[3], myPaths[1], myPaths[2])</code><br>
 <code> .libPaths(myPaths)</code>
 
-12) Para lops que prefieren un IDE oscuro o gris, pueden ir a:
+12) Para los que prefieren un IDE oscuro o gris, pueden ir a:
 
 <code> Tools -> Global Options -> Appearance -> Editor Theme -> "Material" </code>
 
