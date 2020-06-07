@@ -1,6 +1,9 @@
 # Business Intelligence - Guía de Trabajos Prácticos con R ^4.0.0
 Diplomatura Business Intelligence (BI) - Universidad Tecnlógica Nacional Buenos Aires (UTN)
 
+El reporte de eCommerce con Simulaciones de Montecarlo del laboratorio 8 - Series de Tiempo II se puede ver en:
+https://martinvedani.github.io/Business-Intelligence-Labs-with-R/
+
 # Instruccion de instalación para Windows 10:
 
 1) Bajar y ejecutar instalador .exe con todos las sugerencias default:
