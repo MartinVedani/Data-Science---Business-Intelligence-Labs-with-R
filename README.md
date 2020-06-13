@@ -60,7 +60,13 @@ Fuente: https://github.com/sethrfore/homebrew-r-srf.git)
 
 5) ~ % <code>brew info sethrfore/r-srf/r (to confirm it's all there) </code>
 
-6) ~ % <code>brew install -s sethrfore/r-srf/r --with-cairo --with-icu4c --with-java --with-libtiff --with-openblas --with-texinfo </code>
+6) FIRST TIME 
+
+~ % <code>brew install -s sethrfore/r-srf/r --with-cairo --with-icu4c --with-java --with-libtiff --with-openblas --with-texinfo </code>
+
+UPDATING VERISON OF R
+
+~ % <code> brew upgrade sethrfore/r-srf/r --with-cairo --with-icu4c --with-java --with-libtiff --with-openblas --with-texinfo </code>
 
 7) Instalar los siguientes paquetes que necesitaremos para compilar algoritmos genéticos y manipular datos geoespaciales para resolver el dilema del Vendedor Ambulante (The Travelling Sales Man dilema)
 
