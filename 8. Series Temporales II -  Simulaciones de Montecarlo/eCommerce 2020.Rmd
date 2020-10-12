@@ -26,23 +26,23 @@ library(ggplot2)
 # scripts de GitHub
 
 #Source garchAuto para adaptarse a la volatilidad en quantmodity in quantmod
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/garchAuto.R')
+source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/garchAuto.R')
 #Source addGuppy para análisis técnico en quantmod
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/addGuppy.R')
+source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/addGuppy.R')
 # Source change2nysebizday para cambiar yearmon (Mmm YYY) a NYSE bizday date (YYYY-mm-dd)
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/change2nysebizday.R')
+source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/change2nysebizday.R')
 # Source cor.mtest para combinar corrplot con Test de Significancia
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/cor.mtest.R')
+source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/cor.mtest.R')
 # Source funciones de efficient portfolio
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/my.eff.frontier.R')
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/plotEfficientFrontier.R')
+source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/my.eff.frontier.R')
+source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/plotEfficientFrontier.R')
 #Source función funggcast para graficar forecast in ggplot
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/funggcast.R')
+source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/funggcast.R')
 # Source función SDAFE2.R del libro :Statistics and Data Analysis for Financial Engineering, 2nd Edition
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/SDAFE2_copy.R')
+source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/SDAFE2_copy.R')
 # Source funciones para el análisis de portfolios
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/util_fns.R')
-source('/Users/martin/OneDrive/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/portfolio_copy.R')
+source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/util_fns.R')
+source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/portfolio_copy.R')
 # Set YTD range
 ytd <- paste(as.numeric(format(Sys.Date(), '%Y')),"::", sep = "")
 # --end of start up --
