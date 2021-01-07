@@ -1,4 +1,4 @@
-# Business Intelligence - Guía de Trabajos Prácticos con R ^4.0.2
+# Business Intelligence - Guía de Trabajos Prácticos con R ^4.0.3
 Diplomatura Business Intelligence (BI) - Universidad Tecnlógica Nacional Buenos Aires (UTN)
 
 El reporte de eCommerce con Simulaciones de Montecarlo del laboratorio 8 - Series de Tiempo II se puede ver en:
@@ -48,7 +48,7 @@ Fuente: https://docs.brew.sh/Installation
 
 ~ % <code> /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" </code>
 
-2) Intalar R modificado con FULL CAPABILITIES (Java, Open BLASS, Tcl-Tk, Jpeg, Png, Tiff, Cairo, etc.)
+2) Intalar R modificado con FULL CAPABILITIES (OpenJDK, Open BLASS, Tcl-Tk, Jpeg, Png, Tiff, Cairo, etc.)
 
 Fuente: https://github.com/sethrfore/homebrew-r-srf.git)
 
@@ -62,11 +62,11 @@ Fuente: https://github.com/sethrfore/homebrew-r-srf.git)
 
 6) PRIMERA INSTALACIÓN 
 
-~ % <code> brew install -s sethrfore/r-srf/r --with-cairo-x11 --with-icu4c --with-java --with-libtiff --with-openblas --with-openjdk --with-texinfo </code>
+~ % <code> brew install -s sethrfore/r-srf/r --with-cairo-x11 --with-icu4c --with-libtiff --with-openblas --with-openjdk --with-texinfo </code>
 
 ACTUALIZACIÓN DE R CUANDO YA SE ENCUENTRA INSTALADO
 
-~ % <code> brew upgrade -s sethrfore/r-srf/r --with-cairo-x11 --with-icu4c --with-java --with-libtiff --with-openblas --with-openjdk --with-texinfo </code>
+~ % <code> brew upgrade -s sethrfore/r-srf/r --with-cairo-x11 --with-icu4c --with-libtiff --with-openblas --with-openjdk --with-texinfo </code>
 
 7) Instalar los siguientes paquetes que necesitaremos para compilar algoritmos genéticos y manipular datos geoespaciales para resolver el dilema del Vendedor Ambulante (The Travelling Sales Man dilema)
 
