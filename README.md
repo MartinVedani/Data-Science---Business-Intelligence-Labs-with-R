@@ -40,13 +40,13 @@ Copia y pega lo siguiente al final de documento uytilizando cualquier editor de 
 
 ``>`` <code> tinytex::install_tinytex() </code>
 
-# Instruccion de instalación con TERMINAL en MacOs Catalina 10.15+:
+# Instruccion de instalación con TERMINAL en MacOs Big Sur 11.1:
 
 1) Instalar Homebrew:
 
 Fuente: https://docs.brew.sh/Installation
 
-~ % <code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"</code>
+~ % <code> /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" </code>
 
 2) Intalar R modificado con FULL CAPABILITIES (Java, Open BLASS, Tcl-Tk, Jpeg, Png, Tiff, Cairo, etc.)
 
