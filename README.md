@@ -1,4 +1,4 @@
-# Business Intelligence - Guía de Trabajos Prácticos con R ^4.0.4
+# Business Intelligence - Guía de Trabajos Prácticos con R ^4.0.4_2
 Diplomatura Business Intelligence (BI) - Universidad Tecnlógica Nacional Buenos Aires (UTN)
 
 El reporte de eCommerce con Simulaciones de Montecarlo del laboratorio 8 - Series de Tiempo II se puede ver en:
@@ -22,7 +22,7 @@ https://www.accelebrate.com/library/how-to-articles/r-rstudio-library
 
 Es un instructivo para Windows, el archivo Rprofile que hay que modificar para hacer el cambio permanente se encustra en:
 
-<code> C:\Program Files\R\R-4.0.4\library\base\R </code>
+<code> C:\Program Files\R\R-4.0.4_2\library\base\R </code>
 
 Copia y pega lo siguiente al final de documento uytilizando cualquier editor de texto (crea tu propia carpeta "r-library").
 
@@ -76,7 +76,7 @@ ACTUALIZACIÓN DE R CUANDO YA SE ENCUENTRA INSTALADO
 
 https://rstudio.com/products/rstudio/download/#download
 
-9) Actualizar los compiladores requeridos por R ^4.0.4 con las instrucciones del siguiente tutorial (MacOs Catalina 10.15+):
+9) Actualizar los compiladores requeridos por R ^4.0.4_2 con las instrucciones del siguiente tutorial (MacOs Catalina 10.15+):
 
 Fuente: https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-macos/
 
@@ -90,7 +90,7 @@ https://www.accelebrate.com/library/how-to-articles/r-rstudio-library
 
 Es un instructivo para Windows, en Mac, el archivo Rprofile que hay que modificar para hacer el cambio permanente se encustra en:
 
-<code> sudo nano /usr/local/Cellar/r/4.0.4/lib/R/library/base/R/Rprofile </code> Hay que buscarlo con Finder. 
+<code> sudo nano /usr/local/Cellar/r/4.0.4_2/lib/R/library/base/R/Rprofile </code> Hay que buscarlo con Finder. 
 
 Copia y pega lo siguiente al final de documento uytilizando cualquier editor de texto (crea tu propia carpeta "r-library").
 
