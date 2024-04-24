@@ -34,7 +34,7 @@ Crea tu propia carpeta "r-library" antes de copiar y pegar lo siguiente al final
 
 5) Lanza RStudio (siempre hay que hacerlo correr como administrador).
 
-6) Para lops que prefieren un IDE oscuro o gris, pueden ir a:
+6) Para los que prefieren un IDE oscuro o gris, pueden ir a:
 
 ``>`` <code> Tools -> Global Options -> Appearance -> Editor Theme -> "Material" </code>
 
