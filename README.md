@@ -38,7 +38,7 @@ Copia y pega lo siguiente al final de documento uytilizando cualquier editor de 
 
 6) Instalar LaTex pqra poder exportar prsentacion a pdf, word or HTML con R Markrown. Para esto, en la terminal de RStudio, utilizar el siguiente comando:
 
-``>`` <code> install.packages("tinytex") </code>
+``>`` <code> install.packages("tinytex") </code><br>
 ``>`` <code> tinytex::install_tinytex() </code>
 
 # Instruccion de instalación con TERMINAL en MacOs:
@@ -119,7 +119,7 @@ b) Para los que prefieren un IDE oscuro o gris, pueden ir a:
 
 c) Instalar LaTex pqra poder exportar prsentacion a pdf, word or HTML con R Markrown. Para esto, en la terminal de RStudio, utilizar el siguiente comando:
 
-``>`` <code> install.packages("tinytex") </code>
+``>`` <code> install.packages("tinytex") </code><br>
 ``>`` <code> tinytex::install_tinytex() </code>
 
 d) De vuelta en la Terminal, limpiar el cache de Brew downloads
