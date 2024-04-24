@@ -28,7 +28,7 @@ Copia y pega lo siguiente al final de documento uytilizando cualquier editor de 
 
 <code> #my custom stuff</code><br> 
 <code> myPaths <- .libPaths()</code><br>
-<code> myPaths <- c(myPaths, "C:/Users/marti/r-library")</code><br>
+<code> myPaths <- c(myPaths, "C:/Users/admin/r-library")</code><br>
 <code> myPaths <- c(myPaths[3], myPaths[1], myPaths[2])</code><br>
 <code> .libPaths(myPaths)</code>
 
@@ -108,7 +108,7 @@ Copia y pega lo siguiente al final de documento uytilizando cualquier editor de 
 
 <code> #my custom stuff</code><br> 
 <code> myPaths <- .libPaths()</code><br>
-<code> myPaths <- c(myPaths, "/Users/martin/r-library")</code><br>
+<code> myPaths <- c(myPaths, "/Users/admin/r-library")</code><br>
 <code> myPaths <- c(myPaths[3], myPaths[1], myPaths[2])</code><br>
 <code> .libPaths(myPaths)</code>
 
