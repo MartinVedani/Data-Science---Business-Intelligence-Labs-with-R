@@ -32,11 +32,13 @@ Crea tu propia carpeta "r-library" antes de copiar y pegar lo siguiente al final
 <code> myPaths <- c(myPaths[3], myPaths[1], myPaths[2])</code><br>
 <code> .libPaths(myPaths)</code>
 
-5) Para lops que prefieren un IDE oscuro o gris, pueden ir a:
+5) Lanza RStudio (siempre hay que hacerlo correr como administrador).
+
+6) Para lops que prefieren un IDE oscuro o gris, pueden ir a:
 
 ``>`` <code> Tools -> Global Options -> Appearance -> Editor Theme -> "Material" </code>
 
-6) Instalar LaTex pqra poder exportar prsentacion a pdf, word or HTML con R Markrown. Para esto, en la terminal de RStudio, utilizar el siguiente comando:
+7) Instalar LaTex pqra poder exportar prsentacion a pdf, word or HTML con R Markrown. Para esto, en la terminal de RStudio, utilizar el siguiente comando:
 
 ``>`` <code> install.packages("tinytex") </code><br>
 ``>`` <code> tinytex::install_tinytex() </code>
