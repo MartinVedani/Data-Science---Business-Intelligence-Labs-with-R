@@ -43,6 +43,10 @@ Crea tu propia carpeta "r-library" antes de copiar y pegar lo siguiente al final
 ``>`` <code> install.packages("tinytex") </code><br>
 ``>`` <code> tinytex::install_tinytex() </code>
 
+8) Actualizar R con el paquete interno:
+
+<code>https://digitalfellows.commons.gc.cuny.edu/2022/10/25/how-to-update-r-from-r-using-the-installr-package/</code><br>
+
 # Instruccion de instalación con TERMINAL en MacOs:
 
 1) Instalar Homebrew:
