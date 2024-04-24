@@ -24,7 +24,7 @@ Es un instructivo para Windows, el archivo Rprofile que hay que modificar para h
 
 <code> C:\Program Files\R\R-4.0.4_2\library\base\R </code>
 
-Copia y pega lo siguiente al final de documento uytilizando cualquier editor de texto (crea tu propia carpeta "r-library").
+Crea tu propia carpeta "r-library" antes de copiar y pegar lo siguiente al final de documento utilizando cualquier editor de texto.
 
 <code> #my custom stuff</code><br> 
 <code> myPaths <- .libPaths()</code><br>
