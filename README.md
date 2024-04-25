@@ -1,4 +1,4 @@
-# Business Intelligence - Guía de Trabajos Prácticos con R ^4.0.4_2
+# Business Intelligence - Guía de Trabajos Prácticos con R
 Diplomatura Business Intelligence (BI) - Universidad Tecnlógica Nacional Buenos Aires (UTN)
 
 El reporte de eCommerce con Simulaciones de Montecarlo del laboratorio 8 - Series de Tiempo II se puede ver en:
@@ -16,37 +16,32 @@ https://cran.rstudio.com/bin/windows/Rtools/
 
 https://rstudio.com/products/rstudio/download/#download
 
-4) Sigue las intrucciones de este tutorial para cambiar la libraría donde se instalarán todos los paquetes de R. Esto ahorrará MUCHO timepo en el futuro al actualizar a nuevas versiones de R:
+4) Lanza RStudio (siempre hay que hacerlo correr como administrador).
 
-https://www.accelebrate.com/library/how-to-articles/r-rstudio-library
-
-Es un instructivo para Windows, el archivo Rprofile que hay que modificar para hacer el cambio permanente se encuentra en:
-
-<code> C:\Program Files\R\R-4.0.4_2\library\base\R </code>
-
-Crea tu propia carpeta "r-library" antes de copiar y pegar lo siguiente al final de documento utilizando cualquier editor de texto.
-
-<code> #my custom stuff</code><br> 
-<code> myPaths <- .libPaths()</code><br>
-<code> myPaths <- c(myPaths, "C:/Program Files/R/r-library")</code><br>
-<code> myPaths <- c(myPaths[3], myPaths[1], myPaths[2])</code><br>
-<code> .libPaths(myPaths)</code>
-
-5) Lanza RStudio (siempre hay que hacerlo correr como administrador).
-
-6) Para los que prefieren un IDE oscuro o gris, pueden ir a:
+5) Para los que prefieren un IDE oscuro o gris, pueden ir a:
 
 ``>`` <code> Tools -> Global Options -> Appearance -> Editor Theme -> "Material" </code>
 
-7) Instalar LaTex pqra poder exportar prsentacion a pdf, word or HTML con R Markrown. Para esto, en la terminal de RStudio, utilizar el siguiente comando:
+6) Instalar LaTex pqra poder exportar prsentacion a pdf, word or HTML con R Markrown. Para esto, en la terminal de RStudio, utilizar el siguiente comando:
 
 ``>`` <code> install.packages("tinytex") </code><br>
 ``>`` <code> tinytex::install_tinytex() </code>
 
-8) Actualizar R con el paquete interno:
+7) Instalar el paquete de actualizacion de R en el futuro:
 
 <code>https://digitalfellows.commons.gc.cuny.edu/2022/10/25/how-to-update-r-from-r-using-the-installr-package/</code><br>
+``>`` <code> install.packages("installr") </code><br>
+``>`` <code> installr::updateR() </code>
 
+8) Instalar paquetes de Finanzas, Econometria, Estadistica, etc.
+
+https://cran.r-project.org/web/packages/ctv/index.html 
+
+Lo más interesante son los listado por vistas publicados en: https://cran.r-project.org/web/views/
+
+``>`` <code> install.packages(‘ctv’) </code><br>
+``>`` <code> ctv::update.views(c("DifferentialEquations", "Robust", "Optimization", "OfficialStatistics", "NumericalMathematics","Finance","Econometrics", "TimeSeries"), coreOnly=TRUE) </code>
+   
 # Instruccion de instalación con TERMINAL en MacOs:
 
 1) Instalar Homebrew:
@@ -63,7 +58,7 @@ Fuente: https://docs.brew.sh/Installation
 
 https://rstudio.com/products/rstudio/download/#download
 
-5) Actualizar los compiladores requeridos por R ^4.0.4_2 con las instrucciones del siguiente tutorial (MacOs Catalina 10.15+):
+5) Actualizar los compiladores requeridos por R con las instrucciones del siguiente tutorial (MacOs Catalina 10.15+):
 
 Fuente: https://thecoatlessprofessor.com/programming/cpp/r-compiler-tools-for-rcpp-on-macos/
 
@@ -97,38 +92,7 @@ ACTUALIZACIÓN DE R CUANDO YA SE ENCUENTRA INSTALADO
   [if brew install --cask r (step 6) fails to get all capabilities()] 
 ~ % <code> brew upgrade -s sethrfore/r-srf/r --with-cairo-x11 --with-icu4c --with-libtiff --with-openblas --with-openjdk --with-tcl-tk-x11 --with-texinfo </code>
 
-6) Iniciar RStudio y ejecutar lo siguiente:
-
-``>`` <code> capabilities() </code>
-  
----- ADMINISTRACION ADICIONAL PARA USUARIOS AVANZADOS ----
-
-a) Sigue las intrucciones de este tutorial para cambiar la libraría donde se instalarán todos los paquetes de R. Esto ahorrará MUCHO timepo en el futuro al actualizar a nuevas versiones de R:
-
-https://www.accelebrate.com/library/how-to-articles/r-rstudio-library
-
-Es un instructivo para Windows, en Mac, el archivo Rprofile que hay que modificar para hacer el cambio permanente se encustra en:
-
-<code> sudo nano /usr/local/Cellar/r/4.0.4_2/lib/R/library/base/R/Rprofile </code> Hay que buscarlo con Finder. 
-
-Copia y pega lo siguiente al final de documento uytilizando cualquier editor de texto (crea tu propia carpeta "r-library").
-
-<code> #my custom stuff</code><br> 
-<code> myPaths <- .libPaths()</code><br>
-<code> myPaths <- c(myPaths, "/Users/admin/r-library")</code><br>
-<code> myPaths <- c(myPaths[3], myPaths[1], myPaths[2])</code><br>
-<code> .libPaths(myPaths)</code>
-
-b) Para los que prefieren un IDE oscuro o gris, pueden ir a:
-
-<code> Tools -> Global Options -> Appearance -> Editor Theme -> "Material" </code>
-
-c) Instalar LaTex pqra poder exportar prsentacion a pdf, word or HTML con R Markrown. Para esto, en la terminal de RStudio, utilizar el siguiente comando:
-
-``>`` <code> install.packages("tinytex") </code><br>
-``>`` <code> tinytex::install_tinytex() </code>
-
-d) De vuelta en la Terminal, limpiar el cache de Brew downloads
+6) Limpiar el cache de Brew downloads
 
 ~ % <code>cd ~/Library/Caches/Homebrew</code>
 
@@ -154,9 +118,15 @@ d) De vuelta en la Terminal, limpiar el cache de Brew downloads
 
 ~ % <code>brew missing</code>
 
---------------------------------------------------------------------
-# BONUS: 
+7) Iniciar RStudio y ejecutar lo siguiente:
 
-library(ctv) es súper interesante, puedes leer sobre ella brevemente en https://cran.r-project.org/web/packages/ctv/index.html 
+``>`` <code> capabilities() </code>
+  
+8) Para los que prefieren un IDE oscuro o gris, pueden ir a:
 
-Lo más interesante son los listado por vistas publicados en: https://cran.r-project.org/web/views/
+<code> Tools -> Global Options -> Appearance -> Editor Theme -> "Material" </code>
+
+9) Instalar LaTex pqra poder exportar prsentacion a pdf, word or HTML con R Markrown. Para esto, en la terminal de RStudio, utilizar el siguiente comando:
+
+``>`` <code> install.packages("tinytex") </code><br>
+``>`` <code> tinytex::install_tinytex() </code>
