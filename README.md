@@ -39,7 +39,7 @@ https://cran.r-project.org/web/packages/ctv/index.html
 
 Lo más interesante son los listado por vistas publicados en: https://cran.r-project.org/web/views/
 
-``>`` <code> install.packages(‘ctv’) </code><br>
+``>`` <code> install.packages("ctv") </code><br>
 ``>`` <code> ctv::update.views(c("DifferentialEquations", "Robust", "Optimization", "OfficialStatistics", "NumericalMathematics","Finance","Econometrics", "TimeSeries"), coreOnly=TRUE) </code>
    
 # Instruccion de instalación con TERMINAL en MacOs:
@@ -130,3 +130,12 @@ ACTUALIZACIÓN DE R CUANDO YA SE ENCUENTRA INSTALADO
 
 ``>`` <code> install.packages("tinytex") </code><br>
 ``>`` <code> tinytex::install_tinytex() </code>
+
+10) Instalar paquetes de Finanzas, Econometria, Estadistica, etc.
+
+https://cran.r-project.org/web/packages/ctv/index.html 
+
+Lo más interesante son los listado por vistas publicados en: https://cran.r-project.org/web/views/
+
+``>`` <code> install.packages("ctv") </code><br>
+``>`` <code> ctv::update.views(c("DifferentialEquations", "Robust", "Optimization", "OfficialStatistics", "NumericalMathematics","Finance","Econometrics", "TimeSeries"), coreOnly=TRUE) </code>
