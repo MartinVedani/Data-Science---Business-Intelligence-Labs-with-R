@@ -85,11 +85,12 @@ text(fit.arbol1)
 
 # Tratemos de graficar algo más útil.
 
-par(mfrow = c(1,2)) #para dividir la sección de gráficos en 1x2 ( 1 fila y 2 columnas)
+par(mfrow = c(1,2)) # para dividir la sección de gráficos en 1x2 ( 1 fila y 2 columnas)
 plotcp(fit.arbol1)
 plot(fit.arbol1, uniform = TRUE, main = "arbol1")
-text(fit.arbol1, use.n = T, all = T, cex = .7) #Agrega texto al grafico anterior, el grafico #2 en este caso
-par(mfrow = c(1,1)) #resetear la sección de gráficos a 1 x 1 (1 fila, 1 columna)
+text(fit.arbol1, use.n = T, all = T, cex = .7) #Agrega texto al gráfico anterior, 
+                                               # el gráfico 2 en este caso
+par(mfrow = c(1,1)) # resetear la sección de gráficos a 1 x 1 (1 fila, 1 columna)
 
 # Salió un mensaje de error que no se sabe bien que significa.
 
@@ -111,12 +112,12 @@ library(RColorBrewer) # cargar en cada sesión de R
 # La documentación nos indica que debe ser un objeto de rpart - SIN PROBLEMA!!
 
 par(mfrow = c(1,2)) #dividir sección de gráficos para comparar lado a lado
-plot(fit.arbol1, uniform = TRUE, main = "arbol1") #Feo grafico 1,
-text(fit.arbol1, use.n = T, all = T, cex = .7) # Agrega texto al feo grafico 1
-fancyRpartPlot(fit.arbol1) #Grafico 2
-par(mfrow = c(1,1)) #resetear la sección de gráficos
+plot(fit.arbol1, uniform = TRUE, main = "arbol1") #Feo gráfico 1,
+text(fit.arbol1, use.n = T, all = T, cex = .7) # Agrega texto al feo gráfico 1
+fancyRpartPlot(fit.arbol1) # Gráfico 2
+par(mfrow = c(1,1)) # resetear la sección de gráficos
 
-# Grafico 2 es mucho mas claro y útil. 
+# Gráfico 2 es mucho mas claro y útil. 
 # Gracias a:
 
 ?citation
@@ -536,12 +537,12 @@ printcp (fit.bosque.a3.train)
 
 varImpPlot(fit.bosque.a3.train)
 
-# El grafico de la izquierda nos muestra cuanto decaería la precisión o calidad
-# de prediccion del bosque en general al remover cada variable individualmente.
-# El grafico de la derecha muestra el coeficiente de Gini que nos dice la importancia 
+# El gráfico de la izquierda nos muestra cuanto decaería la precisión o calidad
+# de predicción del bosque en general al remover cada variable individualmente.
+# El gráfico de la derecha muestra el coeficiente de Gini que nos dice la importancia 
 # de cada variable dentro del modelo.
 # Dos formas diferentes de decir cosas parecidas, pero no iguales.
-# El grafico de la izquierda habla de la caída en performance del modelo en general 
+# El gráfico de la izquierda habla de la caída en performance del modelo en general 
 # según se remueva cada variable. El coeficiente de Gini nos dice el aporte
 #especifico de cada variable, independientemente del resto de las variables. 
 # En nuestro caso, el orden descendiente de importancia es el mismo en ambos gráficos,
@@ -557,7 +558,7 @@ fancyRpartPlot(fit.arbol3.train)
 
 # Exactamente lo mismo con rpart(): 1 -> 6 -> 2 -> 5
 
-# Veamos si podemos hacer una comparación grafica
+# Veamos si podemos hacer una comparación gráfica
 
 par(mfrow = c(1,2))
 fancyRpartPlot(fit.arbol3.train)
@@ -565,11 +566,11 @@ fancyRpartPlot(fit.bosque.a3.train) # Ups, error
 plot(fit.bosque.a3.train) # Ahora tenemos algo, pero no nos sirve demasiado.
 par(mfrow = c(1,1))
 
-# El segundo grafico no dice algo muy útil:
+# El segundo gráfico no dice algo muy útil:
 
 # ntrees = 1000 en randomForest() fue un buen argumento ya que la gran varianza de error
 # se aplana después del árbol numero 550 aproximadamente. Este sería el mínimo de arboles
-# necesarios para minimizar errores de prediccion.
+# necesarios para minimizar errores de predicción.
 
 # OK, la habilidad de cada jugador se ve en la cancha - lo que realmente importa son los resultados.
 
