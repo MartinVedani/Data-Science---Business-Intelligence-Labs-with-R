@@ -1,14 +1,13 @@
-# Arboles 1, 2 y 3. Por Martin Vedani.
+# Arboles 1, 2 y 3. Por Martin Vedani, originalmente como ayudante de la materia
+# en la UTN (educacion a distancia).
 
 # Este es un desarrollo para leer l?nea por l?nea e ir ejecutando orden por orden
 # manualmente, de forma interactiva.
 
 # Todo texto a la derecha del s?mbolo "#" son comentarios del autor. Es irrelevante
 # para R si lo resaltas o no con el mouse antes de hacer clic en "run",
-# ya que R simplemente ejecutara todo el texto anterior a # en cada l?nea e ignorar?
-# lo que se encuentre a la derecha de # (en cada l?nea, claro). En el editor de texto 
-# (editor de script) de mi versi?n actual de RSTUDIO, el texto que R ignora al ejecutar 
-# un comando se visualiza en verde.
+# ya que R simplemente ejecutara los comandos anteriores a # en cada l?nea e ignorar?
+# lo que se encuentre a la derecha de #.
 
 ######################################################################################
 ######################################################################################
