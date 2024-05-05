@@ -1,24 +1,25 @@
 #############################################################################################
 
-# Ejemplos pr?cticos de Algoritmos Gen?ticos en R
+# Ejemplos prácticos de Algoritmos Genéticos en R
 # El Problema de la mochila.
 # https://es.wikipedia.org/wiki/Problema_de_la_mochila
-# - por Martin Vedani, UTN Business Intelligence
+# - por Martín Vedani, UTN Business Intelligence
 
 ############################################################################################
 
 # Instalar y cargar los paquetes que utilizaremos
 if(! "genalg" %in% installed.packages()) install.packages("genalg", depend = TRUE)
 
-# El documento original se encuentra online y en ingl?s, por lo cual, de no leerlo, se pueden 
+# El documento original se encuentra online y en inglés, por lo cual, de no leerlo, se pueden 
 # seguir los pasos debajo sin problema.
 # Fuente: http://www.r-bloggers.com/genetic-algorithms-a-simple-r-example/
 
-# El problema es un clásico: tenemos una mochila, 7 objetos, y un límite de peso.
+# El problema es un clásico: tenemos una mochila, 7 objetos con un puntaje de sobrevivencia
+# y su peso respectivo, y finalmente tenemos un límite de peso.
 # Debemos asegurarnos de llevar los objetos que mejor nos ayuden a sobrevivir en caso de 
-# una emergencia sin sobrepeso.
+# una emergencia sin infringir en sobrepeso.
 
-## Cargar los paquetes y los datos a utilizar en la sesi?n actual de R
+## Cargar los paquetes y los datos a utilizar en la sesión actual de R
 library(genalg)
 
 # Cargar datos de los objetos a utilizar
@@ -54,7 +55,7 @@ objetos[cromosoma == 1, ]
 # 4        cebollas                     2    1
 # 5 bolsa de dormir                    30    7
 
-# Podemos comprobar la cantidad de puntos de sobrevivencia suma esta configuración
+# Podemos comprobar la cantidad de puntos de sobrevivencia con la suma esta configuración
 
 cat(cromosoma %*% objetos$Puntaje.Sobrevivencia)
 # 42
@@ -63,8 +64,8 @@ cat(cromosoma %*% objetos$Puntaje.Sobrevivencia)
 # exactamente lo que hace la función de evaluación.
 
 # El algoritmo genalg intenta optimizar hacia el valor mínimo. Por lo tanto, el valor se 
-# calcula como anteriormente y se multiplica por -1. Una configuración que lleva a superar 
-# la restricción de peso devuelve un valor de 0 (el valor mós alto se puede también dar).
+# calcula igual que la forma anterior y se multiplica por -1. Una configuración que lleva a superar 
+# la restricción de peso devuelve un valor de 0 (el valor más alto se puede también dar).
 # Se define la función de evaluación de la siguiente manera.
 
 funcEval <- function(x) {
