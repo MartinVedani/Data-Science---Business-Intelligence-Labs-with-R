@@ -1,6 +1,6 @@
 #############################################################################################
 
-# Ejemplos prácticos de Redes Neuronales en R - por Martin Vedani, UTN Business Intelligence
+# Ejemplos prácticos de Redes Neuronales en R - por Martín Vedani, UTN Business Intelligence
 
 ############################################################################################
 
@@ -41,7 +41,7 @@ testeo <- neuralNetData[51:101, ]
 # de una entrada, oculta y nodos de salida). Si bien se elige aquí el número de nodos sin 
 # un método claro, hay sin embargo algunas reglas generales. La opción LifeSign se refiere 
 # al nivel de detalle. El ouput no es lineal y vamos a utilizar un valor umbral del 10%. 
-# El paquete NeuralNet utiliza backpropagation elástico con regresión por pesos como su 
+# El paquete NeuralNet utiliza back-propagation elástico con regresión por pesos como su 
 # algoritmo estándar.
 
 ?neuralnet
@@ -63,7 +63,7 @@ sub.testeo <- subset(testeo, select = c("E1", "E2", "E3", "E4", "E5", "E6",
 head(sub.testeo)
 str(sub.testeo)
 
-# El conjunto de datos sub.testeo es un subconjunto de nuestra base de datos de testeo, 
+# El conjunto de datos sub.testeo es un subconjunto de nuestra base de datos original, 
 # contiene sólo las variables (columnas) de entrada, no hemos incluido la columna de 
 # respuesta "Y". 
 # El conjunto se ve de la siguiente manera:
@@ -72,7 +72,7 @@ str(sub.testeo)
 computos <- compute(nuestra.red, sub.testeo)
 
 # Observemos los resultados de que tan bien aprendió nuestra red neuronal
-# comparando las predicciones vs con la información real Y que tenemos.
+# comparando las predicciones vs con la información Y real original.
 
 resultados <- data.frame(real = testeo$Y, prediccion = computos$net.result)
 head(resultados)
@@ -91,8 +91,8 @@ head(resultados)
 
 # - Pueden ser más rápidos una vez entrenados (aunque ambos algoritmos pueden entrenar 
 #   lentamente dependiendo algoritmo exacto y la cantidad / dimensionalidad de los datos). 
-#   Esto se debe a que un árbol de decisión intrínsecamente "tira a la basura" la variable
-#   la entrada que no encuentra útil, mientras que una red neuronal utilizará todas las 
+#   Esto se debe a que un árbol de decisión intrínsecamente descarta la(s) variable(s)
+#   de entrada que no encuentra útil, mientras que una red neuronal utilizará todas las 
 #   variables a menos que hagas una selección manual de características dentro de una 
 #   etapa de re-procesamiento.
 
@@ -106,9 +106,9 @@ head(resultados)
 
 # - Más lentas (tanto para la formación y clasificación), y menos interpretables.
 
-# - Si los datos llegan por stream, se pueden hacer actualizaciones incrementales 
-#   estocásticos a diferencia de los árboles de decisión que utilizan algoritmos de 
-#   aprendizaje por "batch" (por lote).
+# - Si los datos llegan continuamente vía streaming, se pueden hacer actualizaciones 
+#   incrementales estocásticas a diferencia de los árboles de decisión que utilizan 
+#   algoritmos de aprendizaje por "batch" (por lote).
 
 # - Se pueden modelar funciones más arbitrarias (interacciones no lineales, etc.) y por lo 
 #   tanto podrían ser más precisos, siempre que haya suficientes datos de entrenamiento. 
