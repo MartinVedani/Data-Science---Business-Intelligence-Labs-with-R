@@ -1,4 +1,4 @@
-# Ejercicios de Agrupamiento en R - por Martin Vedani, UTN Business Intelligence
+# Ejercicios de Agrupamiento en R - por Martín Vedani, UTN Business Intelligence
 
 #########################################################################################
 #################################### Ejercicio 2.1.1 ####################################
@@ -36,8 +36,8 @@
 
 # En este ejercicio nos concentraremos en distancia euclídea.
 
-# El método de Manhattan no lo veremos implementado pero en la unidad de Algorítmos 
-# Genéticos, en dilema del viajante se implementa una solucion de ciudades muy interesante.
+# El método de Manhattan no lo veremos implementado pero en la unidad de Algoritmos 
+# Genéticos, en dilema del viajante se implementa una solución de ciudades muy interesante.
 
 getwd() # Por defecto R toma los archivos de esta carpeta
 generoPeliculas <- read.csv("generoPeliculas.csv", header = TRUE)
@@ -48,12 +48,12 @@ generoPeliculas <- read.table(file.choose(), header = TRUE, sep = ",")
 
 generoPeliculas
 
-# Tenemos un data frame con datos numericos, characteres. Necesitamos lograr
-# una matriz de solamente numeros para calcular distancias.
+# Tenemos un data frame con datos numéricos y caracteres. Necesitamos lograr
+# una matriz de solamente números para calcular distancias.
 
 Pelis <- generoPeliculas[,2:4] #toma columnas de 2 a 4
 Pelis
-rownames(Pelis) <- generoPeliculas$Caso #cambiea el nomrbre de las filas al mismo del archivo original
+rownames(Pelis) <- generoPeliculas$Caso #cambia el nombre de las filas al mismo del archivo original
 Pelis 
 
 # Ahora tenemos la matriz Pelis de 5 observaciones con 3 coordenadas cartesianas
@@ -78,7 +78,7 @@ plot(agruparPelis)
 plot(as.dendrogram(agruparPelis))
 par(mfrow = c(1,1))
 
-# El primer grafico nos da bastante información, pero para identificar claramente 
+# El primer gráfico nos da bastante información, pero para identificar claramente 
 # la cantidad de grupos a diferentes distancias, el segundo en más útil. 
 # Veamoslo más grande para entender por qué.
 
@@ -97,8 +97,8 @@ abline(h = 0.5, col="red")
 abline(h = 2.5, col="red")
 
 # 3, porque nuestra línea corta 3 "ramas". Y los grupos similares son A+C y B+D, con E
-# por sí sola quien, claramente, tiene un gusto en películas estadísticamente diferente
-# a de las otra 4 personas.
+# por sí sola quien, claramente, tiene un gusto en películas estadisticamente diferente
+# a de las otras 4 personas.
 
 #########################################################################################
 #################################### Ejercicio 2.1.2 ####################################
@@ -114,7 +114,7 @@ cluster <- read.csv("cluster.txt", header = FALSE)
 # o
 cluster  <- read.table(file.choose(), header = FALSE, sep = ",")
 
-head(cluster) # R asignó autom?ticamente el nombre de las columnas (variables) V1 y V2
+head(cluster) # R asignó automáticamente el nombre de las columnas (variables) V1 y V2
 
 # Cambiamos los nombres de las columnas para que representen exactamente lo que son
 colnames(cluster) <- (c("x","y"))
@@ -122,7 +122,7 @@ head(cluster)
 
 plot(cluster)
 
-# Parecería que hay 5 agrupamientos, busquemos major detalle calculando distancias
+# Parecería que hay 5 agrupamientos, busquemos mayor detalle calculando distancias
 
 distanciaCluster <- dist(cluster, method = "euclidean")
 
@@ -146,7 +146,7 @@ abline (h = 1.4, col = "red")
 #################################### Ejercicio 2.1.3 ####################################
 #########################################################################################
 
-# El dendrograma incluido en la teoría, grafica el proceso de agrupamiento jerárquico de 
+# El dendrograma incluido en la teoría, gráfica el proceso de agrupamiento jerárquico de 
 # provincias de argentina según variables del censo de población 2010. Analizarlo y comentar:
 
 # a) Según este resultado, ¿en cuántos niveles agruparía a las provincias?
@@ -201,7 +201,7 @@ cluster <- read.csv("cluster.txt", header = FALSE)
 
 # Alternativa para buscar archivo manualmente
 cluster <- read.table(file.choose(), header = FALSE)
-head(cluster) # R asign? autom?ticamente el nombre de las columnas (variables) V1 y V2
+head(cluster) # R asignó automáticamente el nombre de las columnas (variables) V1 y V2
 
 # Cambiamos los nombres de las columnas para que representen exactamente lo que son
 colnames(cluster) <- (c("x","y"))
@@ -239,9 +239,8 @@ agrupar5 <- kmeans(cluster, centers = 5)
 agrupar5
 
 # K-means clustering with 5 clusters of sizes 420, 87, 101, 191, 202 
-# (depende tambien del sistema orperativo, set seed es para duplicar los mismo resultados en mismos
-# sistemas. Yo estoy usando mac, es probable que Windows o Linux den resultados diferentes con 
-# set.seed(123) o con versiones differentes de las fórmula kmeans().
+# (Puede depender también del sistema operativo, set seed ddbería ayudar a duplicar
+#  los mismos resultados en diferentes maquinas y sistemas).
 
 # Cluster means:
 #   x          y
@@ -262,7 +261,7 @@ plot(cluster)
 points(agrupar5$centers, col="black", bg="red", pch=23, cex=2)
 
 # Interesante, son 5 centros, pero no son exactamente los 5 que habíamos 
-# "adivinado" y estabamos esperando, ¿verdad?
+# "adivinado" y estábamos esperando, ¿verdad?
 
 # probemos con 6 centros
 set.seed(123)
@@ -291,8 +290,7 @@ agruparMejor5 # total_SS =  96.7 % es una mejora MUY interesante
 
 plot(cluster)
 points(agruparMejor5$centers, col="black", bg="red", pch=23, cex=2)
-#Ahora sí tenemos los 5 centros esperados que "adivinamos por aproximación 
-# visual" al comienzo.
+#Ahora sí tenemos los 5 centros esperados que "adivinamos visualmente" al comienzo.
 
 # Otra forma interesante de graficar los grupos (con o sin centroides) sería la 
 # siguiente
@@ -315,8 +313,7 @@ agruparMejor5de2500
 # beneficio que tal vez no se note hasta la milésima, diezmilésima, etc. 
 # El despilfarro no se notó porque nuestros datos son pocos, no obstante, es una
 # consideración que todo programador debe tener en cuenta al evaluar los costos vs.
-# los beneficios de incrementar significativamente los argumentos (parámetros) en
-# algoritmos de este o cualquier tipo.
+# los beneficios de incrementar significativamente la cantidad de simulaciones.
 
 # Repasemos:
 # 1) K-means clustering requiere que se especifique un número de grupos antes de empezar.
@@ -357,7 +354,7 @@ points(agruparYasc$centers, col="black", bg="red", pch=23, cex=2)
 # ¿Los resultados resultan familiares? ¿El orden de los datos, influencia realmente sus 
 # coordenadas, distancias euclidianas y los agrupamientos de kmeans()?
 
-# Para extraer los componentes de  # "clusters", podemos utilizar sus referencias al pie de:
+# Para extraer los datos estadísticos de cada clusters podemos utilizar sus referencias al pie de:
 
 agruparYasc
 
