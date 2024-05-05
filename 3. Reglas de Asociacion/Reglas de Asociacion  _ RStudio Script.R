@@ -1,15 +1,15 @@
 #########################################################################################
 
-# Ejercicios de Reglas de Asociacion en R - por Martin Vedani, UTN Business Intelligence
+# Ejercicios de Reglas de Asociación en R - por Martín Vedani, UTN Business Intelligence
 
 #########################################################################################
 
-# Se recomiendo enfaticamente realizar estos ejercicios luego de leer el archivo pdf 
-# "arules" y "arulesViz" detenidamente. Estan en inglés por lo cual, de no leerlo, se 
+# Se recomienda realizar estos ejercicios luego de leer los archivos pdf 
+# "arules" y "arulesViz" detenidamente. Están en inglés por lo cual, de no leerlos, se 
 # pueden seguir los pasos debajo sin problema.
 # Fuente: Intelligent Data Analysis Lab, https://lyle.smu.edu/IDA/arules/
 
-# Instalacion y carga del paquete de R a ser utilizado
+# Instalación y carga del paquete de R a ser utilizado
 if(! "arules" %in% installed.packages()) install.packages("arules", depend = TRUE)
 if(! "arulesViz" %in% installed.packages()) install.packages("arulesViz", depend = TRUE)
 if(! "seriation" %in% installed.packages()) install.packages("seriation", depend = TRUE)
@@ -122,7 +122,7 @@ par(mfrow = c(3,1)) #para dividir la sección de gráficos en 3x1 ( 3 filas y 1 
 itemFrequencyPlot(Caso1trans, topN=50, cex.names=.5)
 itemFrequencyPlot(Caso2trans, topN=50, cex.names=.5)
 itemFrequencyPlot(Caso3trans, topN=50, cex.names=.5)
-par(mfrow = c(1,1)) #resetear la sección de gráficos a 1 x 1 (1 fila, 1 columna)
+par(mfrow = c(1,1)) # resetear la sección de gráficos a 1 x 1 (1 fila, 1 columna)
 
 ### Crear e inspeccionar reglas
 
@@ -164,7 +164,7 @@ reglas3diez80 <- apriori(Caso3trans, parameter = list(supp = 0.001, confidence =
 # dependientes a las más independientes.
 #########################################################################################
 
-# Inspeccionar reglas, en orden descendente (de mayor a menor) segun "lift" 
+# Inspeccionar reglas, en orden descendente (de mayor a menor) según "lift" 
 # la cual es una medida popular de la fuerza regla
 
 inspect(head(sort(reglas1diez80, by="lift"), n=10))
