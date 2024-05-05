@@ -1,12 +1,12 @@
-# Arboles 1, 2 y 3. Por Martin Vedani, originalmente como ayudante de la materia
-# en la UTN (educacion a distancia).
+# Arboles 1, 2 y 3. Por Martín Vedani, originalmente como ayudante de la materia
+# en la UTN (educación a distancia).
 
-# Este es un desarrollo para leer l?nea por l?nea e ir ejecutando orden por orden
+# Este es un desarrollo para leer línea por línea e ir ejecutando orden por orden
 # manualmente, de forma interactiva.
 
-# Todo texto a la derecha del s?mbolo "#" son comentarios del autor. Es irrelevante
+# Todo texto a la derecha del símbolo "#" son comentarios del autor. Es irrelevante
 # para R si lo resaltas o no con el mouse antes de hacer clic en "run",
-# ya que R simplemente ejecutara los comandos anteriores a # en cada l?nea e ignorar?
+# ya que R simplemente ejecutara los comandos anteriores a # en cada línea e ignorará
 # lo que se encuentre a la derecha de #.
 
 ######################################################################################
@@ -14,31 +14,31 @@
 
 # Primero que nada, juntemos nuestras herramientas.
 # Debemos instalar el paquete de algoritmos de Arboles de R (desde el mirror de CRAN 
-# m?s cercano) para que la bajada sea lo m?s veloz posible. Cualquier mirror de CRAN 
+# más cercano) para que la bajada sea lo más veloz posible. Cualquier mirror de CRAN 
 # sirve obviamente porque son todos iguales. RSTUDIO tiene su propio espejo de CRAN
-# en alg?n lugar.
+# en algún lugar.
 
 install.packages("rpart") #Solo se hace una vez, luego queda instalado
 
-# Cargar dicho paquete en la sesi?n activa de R.
+# Cargar dicho paquete en la sesión activa de R.
 
-library(rpart) #Hay que cargar el paquete cada vez que se inicia la sesi?n de R.
+library(rpart) #Hay que cargar el paquete cada vez que se inicia la sesión de R.
 
-# Importemos ahora los archivos a la sesi?n de trabajo activa creando variables.
-# Es necesario tener los datos crudos de cada ?rbol separados de antemano en 
+# Importemos ahora los archivos a la sesión de trabajo activa creando variables.
+# Es necesario tener los datos crudos de cada árbol separados de antemano en 
 # 3 archivos diferentes y guardados como *.CSV (desde Excel en nuestro caso).
-# A continuaci?n veamos 2 m?todos de lograr nuestras variables. Hay mucho m?todos y
-# formatos adicionales muy bien explicados en un enorme n?mero de foros y YouTube.
-# Los 2 primeros m?todos abren un ventana de dialogo en Windows
-# donde se puede navegar manualmente hasta la ubicaci?n de los archivos.
-# En el tercer m?todo se necesita saber de antemano la ubicaci?n de(los) archivo(s) lo
-# cual no requiere interrupci?n para interacci?n manual del usuario.
+# A continuación veamos 2 métodos de lograr nuestras variables. Hay mucho métodos y
+# formatos adicionales muy bien explicados en un enorme número de foros y YouTube.
+# Los 2 primeros métodos abren un ventana de dialogo en Windows
+# donde se puede navegar manualmente hasta la ubicación de los archivos.
+# En el tercer método se necesita saber de antemano la ubicación de(los) archivo(s) lo
+# cual no requiere interrupción para interacción manual del usuario.
 
 arbol1 <- read.csv("C:\\Users\\admin\\Documents\\GitHub\\Data-Science---Business-Intelligence-Labs-with-R\\1. Arboles de Predicción\\Arbol1CSV.csv", header = T) 
 arbol2 <- read.csv("C:\\Users\\admin\\Documents\\GitHub\\Data-Science---Business-Intelligence-Labs-with-R\\1. Arboles de Predicción\\Arbol2CSV.csv", header = T)
 arbol3 <- read.csv("C:\\Users\\admin\\Documents\\GitHub\\Data-Science---Business-Intelligence-Labs-with-R\\1. Arboles de Predicción\\Arbol3CSV.csv", header = T)
 
-# Veamos y entendamos la clase y estructura para cada de las variables reci?n creadas
+# Veamos y entendamos la clase y estructura para cada de las variables recién creadas
 
 str(arbol1) #data frame de 10 mil observaciones con 7 variables
 str(arbol2) #data frame de 20 mil observaciones con 7 variables
@@ -49,78 +49,75 @@ str(arbol3) #data frame de 40 mil observaciones con 7 variables
 ##################################### Ejercicio 1 #################################
 ###################################################################################
 
-# Generar un ?rbol de decisi?n para los datos contenidos en la tabla arbol1.
+# Generar un árbol de decisión para los datos contenidos en la tabla arbol1.
 # Utilizaremos las funciones y algoritmos dentro del paquete rpart.
 
-# La funci?n rpart() requiere de argumentos. Veamos su documentaci?n para entender 
+# La función rpart() requiere de argumentos. Veamos su documentación para entender 
 # mejor.
 
 ?rpart
 
-# Ok, la documentaci?n nos dice que vamos a necesitar de al menos 3 argumentos.
-# formula: La variable de inter?s o dependiente (y), en nuestro caso "Resultado", 
-# en funci?n de ("~") todas las variables independientes o predictivas (x), 
-# en nuestro caso atributos 1:6 (atributos del 1 al 6). Matem?ticamente se escribe 
+# Ok, la documentación nos dice que vamos a necesitar de al menos 3 argumentos.
+# formula: La variable de interés o dependiente (y), en nuestro caso "Resultado", 
+# en función de ("~") todas las variables independientes o predictivas (x), 
+# en nuestro caso atributos 1:6 (atributos del 1 al 6). Matemáticamente se escribe 
 # y = f(x1, x2, x3, x4, x5, x6)
-# data: el set de datos que se desea utilizar para la construcci?n del ?rbol de decisi?n o predictivo
-# method: tipo de predicci?n que se desea lograr.
+# data: el set de datos que se desea utilizar para la construcción del árbol de decisión o predictivo
+# method: tipo de predicción que se desea lograr.
 
 # Bien, ahora que entendemos los argumentos, creemos una nueva variable con nuestro
-# primer ?rbol.
+# primer árbol.
 
 
 fit.arbol1 <- rpart(formula = Resultado ~ Atributo.1 + Atributo.2 + Atributo.3
-              + Atributo.4 + Atributo.5 + Atributo.6, data = arbol1, method = "class")
+                    + Atributo.4 + Atributo.5 + Atributo.6, data = arbol1, method = "class")
 
-# Veamos los resultados para saber que hay en nuestro primer ?rbol
+# Veamos los resultados para saber que hay en nuestro primer árbol
 
 printcp(fit.arbol1)
 summary(fit.arbol1)
 rsq.rpart(fit.arbol1)
 
-# Que cantidad de informaci?n. Veamos si graficando se entiende mejor.
+# Que cantidad de información. Veamos si graficando se entiende mejor.
 
 plot(fit.arbol1)
 text(fit.arbol1)
 
-# Demasiado b?sico, o s?per avanzado, como para entender bien.
-# Tratemos de graficar algo m?s ?til para nuestro modesto nivel de estudiantes.
+# Tratemos de graficar algo más útil.
 
-par(mfrow = c(1,2)) #para dividir la secci?n de gr?ficos en 1x2 ( 1 fila y 2 columnas)
+par(mfrow = c(1,2)) #para dividir la sección de gráficos en 1x2 ( 1 fila y 2 columnas)
 plotcp(fit.arbol1)
 plot(fit.arbol1, uniform = TRUE, main = "arbol1")
 text(fit.arbol1, use.n = T, all = T, cex = .7) #Agrega texto al grafico anterior, el grafico #2 en este caso
-par(mfrow = c(1,1)) #resetear la secci?n de gr?ficos a 1 x 1 (1 fila, 1 columna)
+par(mfrow = c(1,1)) #resetear la sección de gráficos a 1 x 1 (1 fila, 1 columna)
 
-# Estos gr?ficos me siguen dando un poco de dolor de cabeza. Y adem?s sali? un
-# mensaje de error que no se sabe bien que significa.
+# Salió un mensaje de error que no se sabe bien que significa.
 
-# Por suerte existen paquetes adicionales en R que nos facilitan lograr gr?ficos 
-# a?n mucho m?s interesantes
+# Por suerte existen paquetes adicionales en R que nos facilitan lograr gráficos 
+# más interesantes
 
 install.packages(c("rattle", "rpart.plot", "RColorBrewer")) #Instalar 1 sola vez
-library(rattle) #cargar en cada sesion de R
-library(rpart.plot) #cargar en cada sesion de R
-library(RColorBrewer) #cargar en cada sesion de R
+library(rattle) # cargar en cada sesión de R
+library(rpart.plot) # cargar en cada sesión de R
+library(RColorBrewer) # cargar en cada sesión de R
 
-# Estudiemos la documentaci?n de la nueva funci?n de gr?ficos que utilizaremos.
-# (Entender la documentaci?n es cuesti?n de pr?ctica y experiencia)
+# Estudiemos la documentación de la nueva función de gráficos que utilizaremos.
+# (Entender la documentación es cuestión de práctica y experiencia)
 
 ?fancyRpartPlot
 
-# OK, m?s all? de t?tulo y subtitulo, ambos opcionales, solo le tenemos que se?alar la 
-# variable que contiene a nuestro ?rbol (nuestro modelo predictivo). 
-# La documentaci?n nos indica que debe ser un objeto de rpart - SIN PROBLEMA!!
+# OK, mas allá de titulo y subtitulo, ambos opcionales, solo le tenemos que señalar la 
+# variable que contiene a nuestro árbol (nuestro modelo predictivo). 
+# La documentación nos indica que debe ser un objeto de rpart - SIN PROBLEMA!!
 
-par(mfrow = c(1,2)) #dividir secci?n de gr?ficos para comparar lado a lado
-plot(fit.arbol1, uniform = TRUE, main = "arbol1") #Feo gr?fico 1,
-text(fit.arbol1, use.n = T, all = T, cex = .7) # Agrega texto al feo gr?fico 1
-fancyRpartPlot(fit.arbol1) #Gr?fico 2
-par(mfrow = c(1,1)) #resetear la secci?n de gr?ficos
+par(mfrow = c(1,2)) #dividir sección de gráficos para comparar lado a lado
+plot(fit.arbol1, uniform = TRUE, main = "arbol1") #Feo grafico 1,
+text(fit.arbol1, use.n = T, all = T, cex = .7) # Agrega texto al feo grafico 1
+fancyRpartPlot(fit.arbol1) #Grafico 2
+par(mfrow = c(1,1)) #resetear la sección de gráficos
 
-# Grafico 2 es mucho m?s claro y ?til. 
-# Y Gratis => ?Gracias a la Comunidad R por desarrollar paquetes tan ?tiles!
-# Especialmente gracias a:
+# Grafico 2 es mucho mas claro y útil. 
+# Gracias a:
 
 ?citation
 citation("rpart")
@@ -138,25 +135,20 @@ fancyRpartPlot(fit.arbol1)
 # Se lee: 
 # Atributo.1 < 0.5 "yes" (o sea tendiente a "0" o "FALSE"), 
 # Atributo.1 <0.5 "no" (o sea tendiente a "1" o "TRUE"),
-# y as? sucesivamente con los atributos 6, 2, y 5.
+# y así sucesivamente con los atributos 6, 2, y 5.
 
-# Los dem?s atributos (3 y 4) no nos ayudar?an a predecir, ser?an potencialmente
+# Los demás atributos (3 y 4) no nos ayudarían a predecir, serian
 # irrelevantes.
-
-# Momento, ?no ten?amos 7 variables dentro de nuestros datos crudos?.
-# S?, pero la variable 7 es el Resultado y ~ x1:6. O es dependiente (y) o es
-# independiente (x). Ambas, no!
-
 
 ###################################################################################
 ##################################### Ejercicio 2 #################################
 ###################################################################################
 
-# Seleccionar un conjunto de datos al azar de la tabla arbol2 y construir un ?rbol de 
-# decisi?n para ese conjunto.
+# Seleccionar un conjunto de datos al azar de la tabla arbol2 y construir un árbol de 
+# decisión para ese conjunto.
 # Hacer lo mismo sobre los datos no utilizados y comparar.
 
-# Dividir arbol2 a la mitad. Una mitad ser? nuestra variable de entrenamiento y la 
+# Dividir arbol2 a la mitad. Una mitad sera nuestra variable de entrenamiento y la 
 # otra mitad la variable de testeo
 
 arbol2.train <- arbol2[1:10000,]
@@ -167,25 +159,21 @@ arbol2.test <- arbol2[10001:20000,]
 str(arbol2.train) #data frame de 10 mil observaciones con 7 variables
 str(arbol2.test) #data frame de 10 mil observaciones con 7 variables
 
-# Generar un ?rbol de decisi?n para los datos contenidos en la tabla arbol2.train
+# Generar un árbol de decisión para los datos contenidos en la tabla arbol2.train
 
 fit.arbol2.train <- rpart(formula = Resultado ~ Atributo.1 + Atributo.2 + Atributo.3
-                    + Atributo.4 + Atributo.5 + Atributo.6, 
-                    data = arbol2.train, method = "class")
+                          + Atributo.4 + Atributo.5 + Atributo.6, 
+                          data = arbol2.train, method = "class")
 
-# Generar un ?rbol de decisi?n para los datos contenidos en la tabla arbol2.test
+# Generar un árbol de decisión para los datos contenidos en la tabla arbol2.test
 
 fit.arbol2.test <- rpart(formula = Resultado ~ Atributo.1 + Atributo.2 + Atributo.3
-                          + Atributo.4 + Atributo.5 + Atributo.6, 
-                          data = arbol2.test, method = "class")
+                         + Atributo.4 + Atributo.5 + Atributo.6, 
+                         data = arbol2.test, method = "class")
 
-# ?Ser? cierto que "Todas las madres quieren a sus hijos por igual"?
-# Supongamos que s?, que rpart() es completamente objetiva.
-
-# Comparemos ambos aprendizajes y pongamos a prueba nuestra confianza.
-# ?Un resultado TRUE = id?nticos demostrar?a que tenemos raz?n, y un
-# resultado FALSE = No id?nticos demostrar?a que nuestra confianza no tiene
-# raz?n de ser?
+# Comparemos ambos aprendizajes.
+# Un resultado TRUE = idénticos 
+# resultado FALSE = No idénticos
 # Queremos poder testear (sobre arbol2.test) lo que 
 # aprendimos (con el arbol2.train) sobre dos bases diferentes y evaluar si
 # las predicciones funcionan o no.
@@ -193,38 +181,37 @@ fit.arbol2.test <- rpart(formula = Resultado ~ Atributo.1 + Atributo.2 + Atribut
 identical(fit.arbol2.train, fit.arbol2.test)
 
 # FALSO, lo que significa que nuestros modelos aprendieron cosas diferentes, 
-# pero ... ?en base a datos iguales o diferentes?
+# pero ... ¿en base a datos iguales o diferentes?
 
 identical(arbol2.train, arbol2.test)
 # FALSE
 
-# Ok, hasta ahora sabemos que rpart() nos ense?? cosas diferentes sobre dos mitades
-# (bases de datos crudos) diferentes. ?rpart() tiene un hijo favorito entonces?
+# Ok, hasta ahora sabemos que rpart() “aprendió” cosas diferentes sobre dos mitades
+# (o subconjuntos) diferentes de una misma bases de datos.
 
-# Veamos, visualmente, si todos los caminos nos llevaran a Roma y recobramos
-# nuestra confianza
+# Veamos visualmente el resultado
 
 par(mfrow = c(1,2))
 fancyRpartPlot(fit.arbol2.train)
 fancyRpartPlot(fit.arbol2.test)
-par(mfrow = c(1,1)) #resetear la seccion de graficos a 1x1
+par(mfrow = c(1,1)) #resetear la sección de gráficos a 1x1
 
 # Vemos que la importancia de los atributos predictivos son iguales.
-# La funci?n rpart() obviamente es objetiva y sabe c?mo ajustarse
-# a sus diferentes datos de la misma familia.
+# La función rpart() obviamente es objetiva y sabe como ajustarse
+# a sus diferentes datos (subgrupos) de una misma familia (base de datos).
 
 ###################################################################################
 ##################################### Ejercicio 3 #################################
 ###################################################################################
 
 # Seleccionar tres conjuntos de datos al azar (a,b,c) a partir de la tabla arbol3.
-# Construir una ?rbol de decisi?n a partir del subconjunto a.
+# Construir una árbol de decisión a partir del subconjunto a.
 # Realizar una poda usando el subconjunto b.
 # Verificar que poder predictivo tiene cada nodo usando el subconjunto c.
 
-arbol3.train <- arbol3[1:15000,] #base para el ?rbol de decisi?n
+arbol3.train <- arbol3[1:15000,] #base para el árbol de decisión
 arbol3.prune <- arbol3[15001:30000,] # base para la poda
-arbol3.test <- arbol3[30001:40000,] #base para verificar el poder predictivo del ?rbol
+arbol3.test <- arbol3[30001:40000,] #base para verificar el poder predictivo del árbol
 
 str(arbol3.train) #data frame de 15 mil observaciones con 7 variables
 str(arbol3.prune) #data frame de 15 mil observaciones con 7 variables
@@ -235,39 +222,34 @@ identical(arbol3.prune, arbol3.test) #Buscamos FALSE
 identical(arbol3.train, arbol3.test) #Buscamos FALSE
 
 # Bien, los 3 subconjuntos de la misma bases de datos son diferentes. 
-# Del ejercicio Ya sabemos que con rpart(), diferentes ?rboles o modelos de predicci?n
+# Del ejercicio Ya sabemos que con rpart(), diferentes arboles o modelos de predicción
 # aprenden diferentes cosas (los modelos dependen del subconjunto
 # utilizado para fabricarlos) pero logran las mismas predicciones (un mismo modelo 
 # puede predecir correctamente sobre los demas subconjuntos y, por ende, sobre toda la bases de datos).
 
 # Sabiendo esto, no necesitamos 3 modelos predictivos. Fabricar fit.arbol3.prune y 
-# fit.arbol3.test no es necesarios as? que no lo haremos. El le?ador entusiasta
-# es m?s que bienvenido a hacerlo por su cuenta, la pr?ctica de copy/paste/edit
-# hace al analista y es un requisito clave de todo aspirante a programador
+# fit.arbol3.test no es necesarios así que no lo haremos.
 
-# Hagamos crecer entonces (fabriquemos, aprendamos) nuestro ?rbol predictivo.
+# Generemos entonces nuestro árbol predictivo.
 
 fit.arbol3.train <- rpart(formula = Resultado ~ Atributo.1 + Atributo.2 + Atributo.3
                           + Atributo.4 + Atributo.5 + Atributo.6, 
                           data = arbol3.train, method = "class")
 
-# Y ahora que lo tenemos, usemoslo para predecir algo ?no?
+# Y ahora que lo tenemos, usemoslo para predecir algo
 
-#Estudiemos la nueva funci?n que vamos a necesitar
+#Estudiemos la documentación de la nueva función que vamos a necesitar
 
 ?predict
-
-# OK... con el tiempo ya iremos entendiendo m?s de estos documentos a medida que
-# acumulemos experiencia
 
 prediccion.arbol3.test <- predict(fit.arbol3.train, arbol3.test, type = "class")
 
 # Eso parece haber hecho algo interesante a una gran velocidad
-# ?Que tiene esta nueva variable "prediccion.arbol3.test" que nos sea ?til?
-# Al llamar fit.arbol3.train, utilizamos nuestro ?rbol de predicci?n que fabricamos
-# (aprendimos) utilizando la base de datos de entrenamiento arbol3.train - (Bien!)
+# ¿Que tiene esta nueva variable "prediccion.arbol3.test" que nos sea útil?
+# Al llamar fit.arbol3.train, utilizamos nuestro árbol de prediccion que fabricamos
+# (aprendimos) utilizando la base de datos de entrenamiento arbol3.train
 
-# Recordemos la f?rmula de nuestro modelo
+# Recordemos la formula de nuestro modelo
 
 printcp(fit.arbol3.train)
 
@@ -275,11 +257,11 @@ printcp(fit.arbol3.train)
 # + Atributo.6, data = arbol3.train, method = "class")
 
 # Al definir arbol3.test para llegar a nuestra variable "prediccion.arbol3.test", 
-# le pedimos a predict() una predicci?n de la variable "Resultado" para cada una de
-# las 10,000 observaciones (l?neas) dentro de arbol3.test utilizando los atributos 1:6 
-# tambi?n dentro arbol3.test. Y le pedimos a predict() que prediga "Resultado" 
-# de la forma que aprendimos al crecer o fabricar el ?rbol llamado "fit.arbol3.train"
-# utilizando rpart(). Ok, tiene sentido.
+# le pedimos a predict() una prediccion de la variable "Resultado" para cada una de
+# las 10,000 observaciones (lineas) dentro de arbol3.test utilizando los atributos 1:6 
+# también dentro arbol3.test. Y le pedimos a predict() que prediga "Resultado" 
+# de la forma que aprendimos al crecer o fabricar el árbol llamado "fit.arbol3.train"
+# utilizando rpart().
 
 # Veamos que resultados tenemos entonces.
 
@@ -288,67 +270,51 @@ str(prediccion.arbol3.test)
 
 # 9,004 0s (o FALSE) y 996 1s (o TRUE)
 
-# OK. A ver graficamente:
+# OK. A ver gráficamente:
 
 fancyRpartPlot(prediccion.arbol3.test)
 
-# No funciona, nos da error. Esta funcion es poderosa pero no sirve para un vector 
-# de 1 s?lo factor con 2 niveles (1s y 0s / TRUE y FALSE). 
-# A ver con algo mas basico
+# No funciona, nos da error. Esta función es poderosa pero no sirve para un vector 
+# de 1 solo factor con 2 niveles (1s y 0s / TRUE y FALSE). 
+# A ver con algo mas básico
 
 plot(prediccion.arbol3.test)
 
-# La misma informaci?n que obtuvimos con la funci?n summary()
-# Nada nuevo = Frustrante... as? es la vida del analista de datos y del
-# pronosticador.
+# La misma información que obtuvimos con la función summary()
+# Nada nuevo
 
 scatter.smooth(prediccion.arbol3.test)
 
-# Peor. Un gr?fico para decirnos q tenemos 2 niveles en 10 mil observaciones.
-# Menos mal que estudiamos la funci?n str() y ya sabemos que tenemos 0 y 1 nada m?s.
-# ?Estamos con mala racha? Sigamos, la turbulencia ligera no derriba aviones.
-# Me parece que la estamos complicando demasiado, no nos damos cuenta lo que tenemos
-# en nuestras manos.
+# Simplifiquemos.
 
-# Veamos las primeras l?neas de los resultados en crudo
+# Veamos las primeras lineas de los resultados en crudo
 
 head(prediccion.arbol3.test)
 
-# Hmm, ?1s y 0s con cada observaci?n enumerada?
-# Quiero ver un poco m?s, las primeras 50 l?neas
+# Para ver un poco mas, las primeras 50 lineas:
 
 head(prediccion.arbol3.test, 50)
 
-# Ok, parece que s?, hay un orden ascendente de observaciones con resultados 1s y 0s.
-# Cuando ejecutamos la funci?n str(), hab?a 10000 l?neas, entonces,
-# ?a ver c?mo termina nuestra base de predicciones de resultados?
-
-tail(prediccion.arbol3.test, 50)
-
-# Aja!! Armamos la variable Arbol3.test con las ?ltimas observaciones (30,001 a 40,000)
-# de nuestra base original y completa llamada arbol3.
-
-# Definitivamente tenemos 10 mil predicciones de Resultados 0s y 1s en base a 
-# los atributos 1:6 de la base de datos "arbol3.test" (NO en base a los atributos de
-# la base arbol3.train, diferente a "arbol3.test", que usamos para aprender y construir 
-# el ?rbol (modelo predictivo) "fit.arbol3.train").
-
-# Todo esto ya es un traba lenguas de variables ... 
-# Es fundamental seguirle el paso a todas nuestra variables, hemos utilizado
-# nombres largos y no pr?cticos para ilustrar este detalle log?stico, ya que algunas
+# Es fundamental seguirle el paso a todas nuestra variables, ya que algunas
 # variables son:
 # i) datos crudos: arbol1, arbol2, arbol3; 
 # ii) subdivisiones de datos crudos: arbol3.train, arbol3.prune, arbol3.test;
 # iii) modelos predictivos: fit.arbol3.train;
-# y ahora tambi?n 
 # iv) resultados de predicciones: prediccion.arbol3.test
 
-# Genial. Tenemos la cantidad correcta de predicciones, seg?n los atributos
-# correctos, para las observaciones (l?neas) originales correctas (30,001 a 40,000)
-# gracias a un modelo bien aprendido o bien ense?ado por rpart()
+# Para ver como termina nuestra base de predicciones de resultados:
 
-# ?C?mo presentamos estas predicciones?
-# En cantidades y proporciones ser?a una buena idea.
+tail(prediccion.arbol3.test, 50)
+
+# Tenemos 10 mil predicciones de Resultados 0s y 1s en base a 
+# los atributos 1:6 de la base de datos "arbol3.test"
+
+# Genial. Tenemos la cantidad correcta de predicciones, según los atributos
+# correctos, para las observaciones (lineas) originales correctas (30,001 a 40,000)
+# gracias a un modelo bien aprendido utilizando rpart()
+
+# ¿Cómo presentamos estas predicciones?
+# En cantidades y proporciones seria una buena idea.
 
 table(prediccion.arbol3.test)
 prop.table(table(prediccion.arbol3.test))
@@ -358,77 +324,76 @@ prop.table(table(prediccion.arbol3.test))
 # Y ya que sabemos los resultados reales al mirar la variable (columna) "Resultado" de
 # nuestra base original arbol3.test...
 
-# ...?Qu? tan buena es nuestra predicci?n? ?Cu?l es el resultado de este testeo sobre
-# la base de datos arbol.3.test. ?Cu?l es el prop?sito de todo este ejercicio?
-
-# Comparemos manzanas con manzanas
+# ...¿Qué tan buena es nuestra predicción? ¿Cuál es el resultado de este testeo sobre
+# árbol.3.test ?
 
 table(arbol3.test$Resultado)
 prop.table(table(arbol3.test$Resultado))
 
-# Guau, la diferencia parece peque?a, ?de cu?nto es?
+# la diferencia parece poca
 
 9004-8982; ((9004-8982)/8982)*100; 1-abs(((9004-8982)/8982))
 
 # Para 0s o FALSE tenemos 22 unidades en aproximadamente 10 mil o 0.24% de delta. 
-# Esto significa que nuestro modelo predictivo (?rbol) tiene un 99.75% de certeza 
+# Esto significa que nuestro modelo predictivo (árbol) tiene un 99.75% de certeza 
 # para 0s o FALSE a nivel agregado.
 
 996-1018; ((996-1018)/1018)*100; 1-abs(((996-1018)/1018))
 
-# Para 1s o TRUE. Tambi?n tenemos 22 unidades, sobre aproximadamente 1 mil o 2.2% de 
-# delta. Esto significa que nuestro modelo predictivo (?rbol) tiene 
+# Para 1s o TRUE. También tenemos 22 unidades, sobre aproximadamente 1 mil o 2.2% de 
+# delta. Esto significa que nuestro modelo predictivo tiene 
 # un 97.8% de certeza para 1s o TRUE a nivel agregado.
 
-# ?Cu?l ser? la precisi?n at?mica, l?nea por l?nea, observaci?n especifica predicha
-# versus exactamente esa misma observaci?n especifica real? En otras palabras, ?cu?ntas
-# observaciones originalmente FALSAS, predecimos como FALSAS sin equivocarnos?
+# ¿Cual sera la precisión atómica de la predicción linea por linea
+# versus lo que realmente sucedió para cada caso de la realidad? En otras palabras, ¿cuantas
+# observaciones originalmente FALSE/TRUE, predecimos como FALSE/TRUE sin equivocarnos?
 
 sum(arbol3.test$Resultado==prediccion.arbol3.test)/length(prediccion.arbol3.test)
 
 # 98.06%.
 
-# Excelente!!
+# Nada mal. Si estuviésemos prediciendo buenos y malos pagadores de una cartera
+# de préstamos, el riesgo de equivocarnos es menos del 2%.
 
 # Hora de exportar y enviar estas predicciones a los usuarios interesados.
-# Se los enviaremos por email en un archivo que puedan utilizar f?cilmente.
-# Vamos a ser proactivos y agregar una columna llamada "Observaciones" para facilitar
-# el uso de nuestras predicciones a nuestros clientes internos/usuarios.
 
-# Tambi?n vamos a crear una variable nueva para no tocar la predicci?n que hemos
-# hecho y no arruinarla si nos equivocamos en alguna orden.
+# Crearemos una variable nueva con las observaciones (tomadores de préstamo) 
+# en la primera columna, y la predicción de si cada uno de ellos será buen o 
+# mal pagador en la segunda columna.
 
 
 prediccion.arbol3.compartir <- data.frame(Observacion = 30001:40000, 
-                                    Resultado = prediccion.arbol3.test)
+                                          Resultado = prediccion.arbol3.test)
+
+# Crearemos un archivo que nuestros usuarios internos puedan utilizar fácilmente.
 
 write.csv(prediccion.arbol3.compartir, file = "prediccion.arbol3.csv", 
           row.names = FALSE)
 
-# Para saber d?nde R ha grabado nuestro nuevo archivo e ir a buscarlo,
+# Para saber donde R ha grabado nuestro nuevo archivo e ir a buscarlo,
 # debemos saber el directorio de nuestro espacio de trabajo (work directory).
 
 getwd()
 
 # Ahora recordemos el primer ejercicio, 1.4.1, donde los atributos 3 y 4
-# parec?an potencialmente irrelevantes. 
+# parecían potencialmente irrelevantes. 
 
-# ?Puede ser que nuestro modelo predictivo (nuestro ?rbol) entonces tenga ramas
-# que se puedan podar? Veamos si es as? y c?mo impactar?a sobre los resultados de 
-# la predicci?n SIN poda que acabamos de hacer.
+# ¿Puede ser que nuestro modelo predictivo (nuestro árbol) entonces tenga ramas
+# que se puedan podar? Veamos si es así y como impactaría sobre los resultados de 
+# la prediccion SIN poda que acabamos de hacer.
 
-# El objetivo detr?s de podar el ?rbol es evitar sobreajuste los datos. 
-# Por lo general, queremos seleccionar un tama?o de ?rbol que minimice el error
-# de validaci?n cruzada, la columna de xerror impreso por printcp ().
+# El objetivo detrás de podar el árbol es evitar sobre ajuste los datos. 
+# Por lo general, queremos seleccionar un tamaño de árbol que minimice el error
+# de validación cruzada, la columna de xerror impreso por printcp ().
 
 printcp (fit.arbol3.train)
 
-# Examinando los resultados de error con validaci?n cruzada, debemos seleccionar
-# el par?metro de complejidad (cp) asociado con el error m?nimo, 
-# y colocarlo en la funci?n de prune(). En este caso es f?cil de identificar, es el cp
-# n?mero 5.
-# Alternativamente, cuando los datos sean much?simo m?s extensos se puede utilizar el 
-# siguiente fragmento de c?digo para que prune() lo busque autom?ticamente:
+# Examinando los resultados de error con validación cruzada, debemos seleccionar
+# el parámetro de complejidad (cp) asociado con el error mínimo, 
+# y colocarlo en la función de prune(). En este caso es fácil de identificar, es el cp
+# numero 5.
+# Alternativamente, cuando los datos sean muchísimo mas extensos se puede utilizar el 
+# siguiente fragmento de código para que prune() lo busque automáticamente:
 # fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"]
 
 poda.arbol3 <- prune(fit.arbol3.train, cp = 0.01000000)
@@ -436,127 +401,112 @@ poda.arbol3 <- prune(fit.arbol3.train, cp = 0.01000000)
 poda.arbol3.cpAuto <- prune(fit.arbol3.train, cp = fit.arbol3.train$cptable
                             [which.min(fit.arbol3.train$cptable[,"xerror"]),"CP"])
 
-# ?Confiamos en este c?digo "autom?tico" que alguien posteo en alg?n foro de internet?
+# ¿Confiamos en este código "automático"?
 
 identical(poda.arbol3, poda.arbol3.cpAuto)
 
-# TRUE. Bien, son iguales! La fuente es de alta calidad y en el futuro volver? a ella
-# por ayuda. Gracias a HSAUR por la idea (http://www.statmethods.net/about/books.html)
-# Ahora voy a remover una de los 2 variables id?nticas para no hacerme l?o, y mantener
-# mi escritorio lo m?s limpio y ordenado posible.
+# TRUE. Bien, son iguales! Gracias a HSAUR por la idea (http://www.statmethods.net/about/books.html) # Ahora voy a remover una de los 2 variables idénticas para mantener # el escritorio de trabajo lo mas limpio y ordenado posible.  rm(poda.arbol3.cpAuto)  # Vamos a graficar el árbol podado y compararlo con la versión anterior a la poda  par(mfrow = c(1,2)) # ya sabemos para que esto fancyRpartPlot(fit.arbol3.train) # antes de la poda fancyRpartPlot(poda.arbol3) # después de la poda par(mfrow = c(1,1))
 
-rm(poda.arbol3.cpAuto)
-
-# Vamos a graficar el ?rbol podado y compararlo con la versi?n anterior a la poda
-
-par(mfrow = c(1,2)) # ya sabemos para que esto
-fancyRpartPlot(fit.arbol3.train) # antes de la poda
-fancyRpartPlot(poda.arbol3) # despues de la poda
-par(mfrow = c(1,1)) # como habla este pibe, basta de comentarios por favor!
-
-# Visualmente no notamos nada. ?A ver si identical() detecta algo?
+# Visualmente no notamos nada. ¿A ver si identical() detecta algo?
 
 identical(fit.arbol3.train, poda.arbol3)
 
-# No, identical() est? de acuerdo, no hay diferencias. En la realidad, esto ser?a una
-# rara excepci?n que tambi?n podr?a darse. Rpart() es muy h?bil y, sin saberlo,
-# nos percatamos tempranamente que los atributos 3 y 4 hab?an sido ignorados (podados)
-# por rpart().
+# Para identical() no hay diferencias.
+# Rpart() es muy hábil desde el inicio.
+# Los atributos 3 y 4 ya habían sido ignorados (podados) por rpart().
 
-# Ten?amos un subgrupo de datos creados en la variable arbol3.prune
-# Los desaf?o a realizar este ejercicio 1.4.3 completamente desde cero
+# Teníamos un subgrupo de datos creados en la variable arbol3.prune
+# Los desafío a realizar este ejercicio 1.4.3 completamente desde cero
 # utilizando arbol3.prune para "entrenamiento" del modelo predictivo y arbol3.test 
-# como el ?rbol de testeo.
+# como el árbol de testeo.
 
 
 ###################################################################################
 ################################## Random Forest ##################################
 ###################################################################################
 
-# En t?rminos simples, la t?cnica Random Forest (Bosque aleatoria) se enfoca
-# en el problema de sobreajuste (overfitting) de un ?rboles de decisi?n. ?Cu?ndo ocurre
-# este sobreajuste? Sucede cuando un ?rbol de decisi?n (un modelo predictivo)
+# En términos simples, la técnica Random Forest (Bosque Aleatorio) se enfoca
+# en el problema de sobre ajuste (overfitting) de un arboles de decisión. ¿Cuando ocurre
+# este sobre ajuste? Sucede cuando un árbol de decisión. (un modelo predictivo)
 # aprende "demasiado", cuando se ajusta con demasiada exactitud a la base de datos de 
-# entrenamiento, y su capacidad de realizar predicciones ?tiles sobre otras bases de 
-# datos diferentes (i.e. testing) disminuye. Por ejemplo, en el ?ltimo ejercicio
-# vimos como rpart() ignoro algunos atributos (el 3 y 4) al generar el ?rbol predictivo
-# y, por ende, asumimos eso como la raz?n por la cual la poda no fue necesaria.
-# Esto no es completamente correcto. Atributos 3 y 4 pudieron ser irrelevantes sin tener
-# nada que ver con overfitting.
+# entrenamiento, y su capacidad de realizar predicciones útiles sobre otras subgrupo de 
+# datos de la misma base original (i.e. testing) disminuye.
 
-# Random forest es una forma de poda m?s avanzada que rpart() y prune(). 
-# Involucra la creaci?n de m?ltiples ?rboles de diferentes niveles de ajuste a
-# la base de datos de entrenamiento. En el momento de la predicci?n, para
-# cada l?nea u observaci?n, cada ?rbol fabricado (entrenado) generar su 
-# predicci?n y cuenta como su "voto". Por ejemplo, si tenemos 3 ?rboles, de 
-# los cuales 2 predicen 0 o FALSE, y el tercero predice 1 o TRUE,
-# la observaci?n en cuesti?n quedar? predica como 0 o FALSE por "mayor?a de votos".
-# Esta t?cnica de sobre entrenamiento de ?rboles con diferentes ajuste, llega a la
-# decisi?n final de clasificaci?n (valor predicho) de forma democr?tica y evita sobreajuste.
+# Random forest es una forma de poda mas avanzada que rpart() y prune(). 
+# Involucra la creación de múltiples arboles de diferentes niveles de ajuste al
+# subgrupo de datos de entrenamiento. En el momento de la prediccion, para
+# cada linea u observación, cada árbol fabricado (entrenado) generar su 
+# prediccion y cuenta como su "voto". Por ejemplo, si tenemos 5 arboles, de 
+# los cuales tres predicen 0 o FALSE, y dos predicen 1 o TRUE,
+# la observación en cuestión quedara predicha como 0 o FALSE por "mayoría de votos".
+# Esta técnica de sobre entrenamiento de arboles con diferentes ajuste, llega a la
+# decisión. final de clasificación (valor predicho) de forma democrática y evita sobre ajuste.
 
 # Lo primero que debemos asegurarnos es que nuestras bases de datos no tengan valores
-# faltantes o identificar la observaci?n (fila) y variable (columna) a completar.
+# faltantes o identificar la observación (fila) y variable (columna) a completar.
 
-# En nuestras bases de datos, no hay valores faltantes. En la pr?ctica, lo m?s com?n
-# es que s? los haya. y en grandes cantidades. 
-# Las soluciones son variadas. Se puede eliminar la(s) observaci?n(es) con
+# En nuestras bases de datos, no hay valores faltantes. En la practica, lo mas común
+# es que sí los haya, y en grandes cantidades. 
+# Las soluciones para resolver falta de datos son variadas. 
+# Se puede eliminar la(s) observación(es) con
 # datos faltantes, se pueden completar los valores faltantes con valores medios o
-# promedios calculados con los valores de las dem?s observaciones para esa variable 
+# promedios calculados con los valores de las demás observaciones para esa variable 
 # en particular, o,  sorprendentemente, se pueden predecir los valores faltantes con
-# ?rboles!!
+# arboles!!
 
-# Una vez que ya no nos falte ning?n dato, podemos iniciar con el primer 
-# paso requerido para la creaci?n de un ?rbol, que ser?a el de dividir la
+# Una vez que ya no nos falte ningún dato, podemos iniciar con el primer 
+# paso requerido para la creación de un árbol, que seria el de dividir la
 # data.frame en partes, i.e. data.frame.train y data.frame.test
 
 ?randomForest2Rules
 
-# Para ejecutar la funci?n randomForest(), debemos instalar el paquete ramdomForest
+# Para ejecutar la función randomForest(), debemos instalar el paquete ramdomForest
 
-install.packages("randomForest") # s?lo es necesario hacerlo una vez
-library("randomForest") # se debe cargar en cada nueva sesi?n de R
+install.packages("randomForest") # solo es necesario hacerlo una vez
+library("randomForest") # se debe cargar en cada nueva sesión de R
 ?randomForest
 
-# randomForest() es muy similar a rpart(). El primer argumento es la f?rmula, igual
-# formato que en rpart(). Al no haber un argumento de m?todo, hay que convertir
+# randomForest() es muy similar a rpart(). El primer argumento es la formula, igual
+# formato que en rpart(). Al no haber un argumento de método, hay que convertir
 # todas la variable dependiente "Y" en factor dentro del argumento "formula":
 
 # formula = as.factor(Resultado) ~ Atributo.1 + Atributo.2 + Atributo.3
 # +                                         +Atributo.4 + Atributo.5 + Atributo.6
 
-# Una forma de resumir la cantidad de tipeo en R, es usar un sin?nimo para "TODOS LOS
-# ATRIBUTOS". Y ese sin?nimo es el punto ".". Quedar?a entonces m?s corto, de la siguiente forma
+# Una forma de resumir la cantidad de tipeo en R, es usar un sinónimo que signifique 
+# "TODOS LOS ATRIBUTOS". Y ese sinónimo es el punto "."
+# Quedaría entonces mas corto, de la siguiente forma
 
 # formula = as.factor(Resultado) ~ . 
 
-# Se lee: Resultado (en formato "factor") en funci?n de todas las variables (columnas)
+# Se lee: Resultado (en formato "factor") en función de todas las variables (columnas)
 # existente (sin incluir la columna "Resultado" obviamente). El
 # problema con esta forma corta de incluir todo, es que no nos permite alterar el
 # orden de las variables que le alimentamos a la formula. Nunca hemos alterado 
-# el orden de la variables en nuestros ejercicios hasta ahora, pero bien podr?amos 
-# desear hacerlo en la pr?ctica. Por ejemplo, queremos poner las variables "sexo" 
+# el orden de la variables en nuestros ejercicios hasta ahora, pero bien podríamos 
+# desear hacerlo en la practica. Por ejemplo, queremos poner las variables "sexo" 
 # y "edad" primero si es que en nuestra base de datos se encuentran en las 
 # columnas 3 y 8 (por decir cualquier orden).
 
 # El argumento data es igual que en rpart().
 
-# El argumento "importance = TRUE" nos permitir? visualizar la importancia de cada
-# variable en la predicci?n de los arboles (modelos) creados por randomForest().
+# El argumento "importance = TRUE" nos permitirá visualizar la importancia de cada
+# variable en la prediccion de los arboles (modelos) creados por randomForest().
 
-# El argumento ntrees limita el n?mero de ?rboles generados por randomForest.
-# Esto puede ayudarnos con la gesti?n de recursos computacionales cuando estos son
+# El argumento ntrees limita el numero de arboles generados por randomForest.
+# Esto puede ayudarnos con la gestión de recursos computacionales cuando estos son
 # limitados.
 
-# El argumento set.seed(123) asegura que el generador de n?meros aleatorios de R que
-# utiliza randomForest() siempre arranque igual para poder reproducir los mismos 
+# El argumento set.seed(123) asegura que el generador de números aleatorios de R que
+# utiliza randomForest() siempre arranque igual para poder reproducir los mismos
 # resultados muchas veces. De otra forma, siempre arrancara desde un random diferente
-# y nunca ser? posible reproducir exactamente los mismo resultados.
-# Esto es realmente ?til para explicar en detalle una predicci?n de ser necesario, como
-# por ejemplo a los alumnos o jefes que quieren ver exactamente c?mo y de d?nde salieron 
-# los n?meros que se presentaron en power point, o un reporte PDF, etc. etc. etc.
+# y nunca sera posible reproducir exactamente los mismo resultados.
+# Esto es realmente útil para explicar en detalle una prediccion de ser necesario, como
+# por ejemplo al querer demostrar exactamente cómo y de dónde salieron 
+# las predicciones.
 
 # Una vez generado el modelo predictivo de randomForest (con una cantidad de ntrees 
-# dentro de ?l), se podr? utilizar la funci?n predict() como venimos haciendolo.
+# dentro), se podrá utilizar la función predict() como venimos haciéndolo.
 
 # Veamos un ejemplo usaremos las bases de datos ya generadas
 
@@ -567,15 +517,15 @@ str(arbol3.test) # 10 mil observaciones, 7 variables
 # los mismos resultados en el futuro cuantas veces lo necesitemos
 
 set.seed(123); fit.bosque.a3.train <- randomForest(as.factor(Resultado) ~ ., 
-                                          data = arbol3.train, importance = TRUE,
-                                              ntree = 1000)
+                                                   data = arbol3.train, importance = TRUE,
+                                                   ntree = 1000)
 
 # Para entretenernos un poco, veamos si hay diferencia entre los modelos
 # predictivos fit.bosque.a3.train versus fit.arbol3.train
 
 identical(fit.bosque.a3.train, fit.arbol3.train)
 
-# FALSE. Era de esperarse, 1 arbol versus 1000 arboles. Analicemos en mayor detalle.
+# FALSE. Era de esperarse, 1 árbol versus 1000 arboles. Analicemos en mayor detalle.
 
 printcp (fit.arbol3.train)
 printcp (fit.bosque.a3.train)
@@ -586,19 +536,17 @@ printcp (fit.bosque.a3.train)
 
 varImpPlot(fit.bosque.a3.train)
 
-# El grafico de la izquierda nos muestra cuanto decaer?a la precisi?n o calidad
-# de predicci?n del bosque en general al remover cada variable individualmente.
+# El grafico de la izquierda nos muestra cuanto decaería la precisión o calidad
+# de prediccion del bosque en general al remover cada variable individualmente.
 # El grafico de la derecha muestra el coeficiente de Gini que nos dice la importancia 
 # de cada variable dentro del modelo.
 # Dos formas diferentes de decir cosas parecidas, pero no iguales.
-# El grafico de la izquierda habla de la ca?da en performance del modelo en general 
-# seg?n se remueva cada variable. El coeficiente de Gini nos dice el aporte
-#espec?fico de cada variable, independientemente del resto de las variables. 
-# En nuestro caso, el orden descendiente de importancia es el mismo en ambos gr?ficos,
-# pero no siempre se da de esta forma. Dos variables, A y B con orden de importancia 2 y 3
-# respectivamente en el gr?fico de Gini de la derecha, podr?an perfectamente tener un orden
-# opuesto en el gr?fico de la izquierda.
-# En ambos gr?ficos, cuanto mayor es el desplazamiento del valor para cada
+# El grafico de la izquierda habla de la caída en performance del modelo en general 
+# según se remueva cada variable. El coeficiente de Gini nos dice el aporte
+#especifico de cada variable, independientemente del resto de las variables. 
+# En nuestro caso, el orden descendiente de importancia es el mismo en ambos gráficos,
+# pero no siempre se da de esta forma.
+# En ambos gráficos, cuanto mayor es el desplazamiento del valor para cada
 # variable hacia la derecha, mayor la importancia de esa variable.
 # Dentro del modelo predictivo. El orden de importancia es 1 -> 6 -> 2 -> 5 
 # con 3 y 4 aproximadamente en cero.
@@ -609,7 +557,7 @@ fancyRpartPlot(fit.arbol3.train)
 
 # Exactamente lo mismo con rpart(): 1 -> 6 -> 2 -> 5
 
-# Veamos si podemos hacer una comparacion grafica
+# Veamos si podemos hacer una comparación grafica
 
 par(mfrow = c(1,2))
 fancyRpartPlot(fit.arbol3.train)
@@ -617,13 +565,11 @@ fancyRpartPlot(fit.bosque.a3.train) # Ups, error
 plot(fit.bosque.a3.train) # Ahora tenemos algo, pero no nos sirve demasiado.
 par(mfrow = c(1,1))
 
-# Diferentes gr?ficos, comparar rpart() vs randomForest() de esta forma es como
-# comparar peras con manzanas. No nos sirve.
+# El segundo grafico no dice algo muy útil:
 
-# No obstante, el segundo gr?fico no dice algo muy ?til:
-
-# ntrees = 1000 en randomForest() fue un buen argumento ya que la varianza de error
-# se aplana despu?s ?rbol n?mero 550 aproximadamente. Genial!!
+# ntrees = 1000 en randomForest() fue un buen argumento ya que la gran varianza de error
+# se aplana después del árbol numero 550 aproximadamente. Este sería el mínimo de arboles
+# necesarios para minimizar errores de prediccion.
 
 # OK, la habilidad de cada jugador se ve en la cancha - lo que realmente importa son los resultados.
 
@@ -651,11 +597,11 @@ tail(pred.bosque.a3.test, 15)
 table(prediccion.arbol3.test)
 table(pred.bosque.a3.test)
 
-# OK. El ramdomForest() predice m?s 0s o FALSE, y menos 1s o TRUE que rpart()
+# OK. El ramdomForest() predice mas 0s o FALSE, y menos 1s o TRUE que rpart()
 # Tenemos los datos originales ("reales") de la base arbol3.test para comparar
 # predicciones versus realidad. Vemos como queda.
 
-# ?Qui?n se lleva el beneficio de las predicciones, los 0s o FALSE, o los 1s o TRUE?
+# ¿Quien se lleva el beneficio de las predicciones, los 0s o FALSE, o los 1s o TRUE?
 
 table(arbol3.test$Resultado)
 table(prediccion.arbol3.test)
@@ -668,23 +614,21 @@ table(pred.bosque.a3.test)
 # con rpart() y 78 unidades o 0.87% de delta con randomForest(). 
 # Esto significa que rpart() tiene un 99.75% de certeza para 0s o FALSE y 
 # randomForest() tiene 99.13%.
-# Rpart() era m?s acertado para 0s o FALSOS que randomForest()
+# Rpart() es mas acertado para 0s o FALSOS que randomForest()
 
 996-1018; ((996-1018)/1018)*100; 1-abs(((996-1018)/1018))
 940-1018; ((940-1018)/1018)*100; 1-abs(((940-1018)/1018))
 
-# Para 1s o TRUE, rpart() predijo 22 unidades menos, o 2.2% de delta, d?ndonos 
+# Para 1s o TRUE, rpart() predijo 22 unidades menos, o 2.2% de delta, dándonos 
 # un 97.8% de certeza para 1s o TRUE. randomForest() predice 78 unidades menos, 
-# o 7.7% de delta, d?ndonos un 92.3% de certeza para 1s o TRUE.
+# o 7.7% de delta, dándonos un 92.3% de certeza para 1s o TRUE.
 
-# Hmm, en cantidades agregada rpart() supera claramente a randomForest(). ?Es esta
-# Comparaci?n correcta, claro, la matem?tica funciona. 
-# ?Es una comaparaci?n justa, ??Realmente NO!!
+# En cantidades agregadas rpart() supera claramente a randomForest().
 
-# A nivel at?mico, observaci?n por observaci?n, ?qui?n es mejor?
+# A nivel atómico, observación por observación, ¿quien predice mejor?
 
-# Sab?amos que rpart() ten?a una exactitud, comparando observaci?n por observaci?n
-# a nivel at?mico (i.e. l?nea 35667 real vs. 35667 predicha), del 98.06%. 
+# rpart() tenia una exactitud, comparando observación por observación
+# a nivel atómico (i.e. linea 35667 real vs. 35667 predicha), del 98.06%. 
 # Recordemos:
 
 sum(arbol3.test$Resultado==prediccion.arbol3.test)/length(prediccion.arbol3.test)
@@ -695,24 +639,21 @@ sum(arbol3.test$Resultado==pred.bosque.a3.test)/length(pred.bosque.a3.test)
 
 # 98.16%. 
 
-# Guau, randomForest() predijo cada observacion individual mejor que rpart(). 
-# Lo cual significa que randomForest() es el m?s certero a nivel at?mico.
+# randomForest() predijo cada observación individual mejor que rpart(). 
+# Lo cual significa que randomForest() es el mas certero a nivel atómico.
 
 98.16-98.06
 
-# La democracia entre los 1000 ?rboles votantes dentro de randomForest()
+# La democracia entre los 1000 arboles votantes dentro de randomForest()
 # nos ha generado una mejora del 0.10%.
 
-# Peque?a diferencia sin duda, de importancia RELATIVA!! Cada caso de la realidad,
-# con datos reales, dictar? cual ser? la verdadera importancia de tan peque?as mejoras.
+# Solo nos resta ahora creamos una data.frame con 2 columnas para compartir con nuestros
+# clientes internos
 
-# Solo nos resta ahora creamos una data.frame con 2 columnas para compartir
-
-# Creemos una variable nueva para no molestar a la variable que contiene nuestras
-# predicciones
+# Creemos una variable nueva igual que hicimos anteriormente
 
 pred.bosque.a3 <- data.frame(Observacion = 30001:40000, 
-                                  Resultado = pred.bosque.a3.test)
+                             Resultado = pred.bosque.a3.test)
 
 # Exportamos a un archivo compartible
 
@@ -720,7 +661,7 @@ write.csv(pred.bosque.a3, file = "pred.bosque.arbol3.csv", row.names = FALSE)
 
 # Listo!!!
 
-# Ten?amos un subgrupo de datos creados en la variable arbol3.prune
-# Los desaf?o a realizar este ejercicio de randomForest completamente desde cero
+# Teníamos un subgrupo de datos creados en la variable arbol3.prune
+# Los desafío a realizar este ejercicio de randomForest completamente desde cero
 # utilizando arbol3.prune para "entrenamiento" del modelo predictivo y arbol3.test 
-# como el ?rbol de testeo.
+# como el árbol de testeo.
