@@ -3,13 +3,13 @@
 # Ejemplos prácticos de Algoritmos Genéticos en R
 # El Problema del Viajante
 # https://es.wikipedia.org/wiki/Problema_del_viajante
-# - por Martin Vedani, UTN Business Intelligence
+# - por Martín Vedani, UTN Business Intelligence
 
 ############################################################################################
 
 # Instalar y cargar los paquetes que utilizaremos
-if(! "TSP" %in% installed.packages()) install.packages("TSP", depend = TRUE)
-install.packages("doParallel", depend = TRUE)
+if(! "TSP" %in% installed.packages()) install.packages("TSP", depend = T)
+if(! "doParallel" %in% installed.packages()) install.packages("doParallel", depend = T)
 
 # El siguiente ejemplo esta publicados en la siguiente página de la implementación del 
 # paquete TSP (por las siglas en ingles de "Travelling Sales Person")
@@ -49,7 +49,7 @@ USCA50
 
 # Actualmente, los siguiente métodos están disponibles
 
-metodos <- c("nearest_insertion", "cheapest_insertion", "farthest_insertion", 
+metodos <- c("identity", "random", "nearest_insertion", "farthest_insertion", "cheapest_insertion", 
              "arbitrary_insertion", "nn", "repetitive_nn", "two_opt")
 
 # Empezaremos siempre con la misma semilla del randomizador para poder duplicar los mismos
@@ -78,22 +78,22 @@ title("Figura 1 - Viajes")
 viajes[["nn+two_opt+rep_10"]]
 # object of class ‘TOUR’ 
 # result of method ‘nn+two_opt_rep_10’ for 50 cities
-# tour length: 14756
+# tour length: 14749
 
 labels(viajes[["nn+two_opt+rep_10"]])
-# [1] "Belleville, ON"    "Buffalo, NY"       "Burlington, ONT"   "Brantford, ON"    
-# [5] "Canton, OH"        "Akron, OH"         "Ann Arbor, MI"     "Bay City, MI"     
-# [9] "Battle Creek, MI"  "Cedar Rapids, IA"  "Bloomington, IL"   "Bowling Green, KY"
-# [13] "Ashland, KY"       "Asheville, NC"     "Augusta, GA"       "Atlanta, GA"      
-# [17] "Birmingham, AL"    "Biloxi, MS"        "Baton Rouge, LA"   "Beaumont, TX"     
-# [21] "Austin, TX"        "Abilene, TX"       "Amarillo, TX"      "Albuquerque, NM"  
-# [25] "Bakersfield, CA"   "Berkeley, CA"      "Carson City, NV"   "Boise, ID"        
-# [29] "Butte, MT"         "Billings, MT"      "Bismarck, ND"      "Brandon, MB"      
-# [33] "Calgary, AB"       "Bellingham, WA"    "Anchorage, AK"     "Alert, NT"        
-# [37] "Bangor, ME"        "Augusta, ME"       "Cambridge, MA"     "Boston, MA"       
-# [41] "Brockton, MA"      "Brattleboro, VT"   "Albany, NY"        "Bridgeport, CT"   
-# [45] "Central Islip, NY" "Atlantic City, NJ" "Baltimore, MD"     "Allentown, PA"    
-# [49] "Binghamtom, NY"    "Burlington, VT"   
+# [1] "Allentown, PA"     "Binghamtom, NY"    "Belleville, ON"    "Buffalo, NY"      
+# [5] "Burlington, ONT"   "Brantford, ON"     "Canton, OH"        "Akron, OH"        
+# [9] "Ann Arbor, MI"     "Bay City, MI"      "Battle Creek, MI"  "Cedar Rapids, IA" 
+# [13] "Bloomington, IL"   "Bowling Green, KY" "Ashland, KY"       "Asheville, NC"    
+# [17] "Augusta, GA"       "Atlanta, GA"       "Birmingham, AL"    "Biloxi, MS"       
+# [21] "Baton Rouge, LA"   "Beaumont, TX"      "Austin, TX"        "Abilene, TX"      
+# [25] "Amarillo, TX"      "Albuquerque, NM"   "Bakersfield, CA"   "Berkeley, CA"     
+# [29] "Carson City, NV"   "Boise, ID"         "Butte, MT"         "Billings, MT"     
+# [33] "Bismarck, ND"      "Brandon, MB"       "Calgary, AB"       "Bellingham, WA"   
+# [37] "Anchorage, AK"     "Alert, NT"         "Burlington, VT"    "Bangor, ME"       
+# [41] "Augusta, ME"       "Cambridge, MA"     "Boston, MA"        "Brockton, MA"     
+# [45] "Brattleboro, VT"   "Albany, NY"        "Bridgeport, CT"    "Central Islip, NY"
+# [49] "Atlantic City, NJ" "Baltimore, MD"  
 
 
 # El camino de Hamilton
@@ -130,7 +130,7 @@ title("Figura 2 - Gira")
 gira[["nn+two_opt+rep_10"]]
 # object of class ‘TOUR’ 
 # result of method ‘nn+two_opt_rep_10’ for 313 cities
-# tour length: 36908
+# tour length: 37231
 
 # Utilizamos cut_tour() para crear un camino y mostramos las primeras y últimas 6 ciudades 
 # a continuación.
@@ -139,25 +139,26 @@ gira <- gira[["nn+two_opt+rep_10"]]
 camino <- cut_tour(gira, "cut")
 
 head(labels(camino))
-# [1] "Hilo, HI"          "Honolulu, HI"      "Lihue, HI"         "Prince Rupert, BC"
-# [5] "Juneau, AK"        "Whitehorse, YK"   
+# [1] "Lihue, HI" "Honolulu, HI" "Hilo, HI" "Butte, MT" "Helena, MT"     
+# [6] "Great Falls, MT"  
 
 tail(labels(camino))
-# [1] "Saint Petersburg, FL" "Sarasota, FL"         "West Palm Beach, FL"  "Miami, FL"           
-# [5] "Key West, FL"         "San Juan, PR"   
+# [1] "Whitehorse, YK" "Dawson, YT" "Fairbanks, AK" "Anchorage, AK" "Nome, AK"      
+# [6] "Alert, NT"  
 
-# La gira que se encuentra en este ejemplo nos da un camino desde Hilo, Hawaii 
-# a San Juan de Puerto Rico. Un camino de este tipo también se puede visualizar mediante el 
+# La gira que se encuentra en este ejemplo nos da un camino desde Lihue, HI hasta Alert, NT. 
+# Un camino de este tipo también se puede visualizar mediante el 
 # los paquetes sp, mapas y MapTools (Pebesma y Bivand 2005).
 
-install.packages("sp", depend = TRUE)
-install.packages("maps", depend = TRUE)
-install.packages("maptools", depend = TRUE)
-install.packages("rgeos", depend = TRUE)
+if(! "sp" %in% installed.packages()) install.packages("sp", depend = T)
+if(! "maps" %in% installed.packages()) install.packages("maps", depend = T)
+# if(! "maptools" %in% installed.packages()) install.packages("maptools", depend = T)
+# if(! "rgeos" %in% installed.packages()) install.packages("rgeos", depend = T)
 
 library("maps")
 library("sp")
-library("maptools")
+# library("maptools")
+# library("rgeos")
 data("USCA312_GPS")
 
 # Busca todo el path en tu máquina local al archivo USCA312_map.rda provisto.
@@ -167,7 +168,7 @@ data("USCA312_GPS")
 
 load(file = "<path to>/USCA312_map.rda")
 
-# Creamos un grafico especial que utilizaremos varias veces.
+# Creamos un gráfico especial que utilizaremos varias veces.
 plot_path <- function(path){
   plot(as(USCA312_coords, "Spatial"), axes = TRUE)
   plot(USCA312_basemap, add = TRUE, col = "gray")
@@ -204,6 +205,7 @@ tour_inicial$'nn+two_opt+rep_10' <- solve_TSP(atsp, method="nn", two_opt=TRUE, r
 tour_inicial$'arbitrary_insertion+two_opt' <- solve_TSP(atsp)
 
 #Visualizar resultados de las distancias generadas por cada método
+
 dotchart(sort(c(sapply(tour_inicial, tour_length))), xlab = "tour length")
 title("Figura 4 - Tour Inicial NY")
 
@@ -212,26 +214,27 @@ title("Figura 4 - Tour Inicial NY")
 # anteriormente. La ruta se inicia con la primera ciudad en la lista después de la 
 # ciudad ficticia y termina con la ciudad justo antes de ella. 
 
-tour_inicial[["nearest_insertion"]]
+tour_inicial[["nn+two_opt+rep_10"]]
 # object of class ‘TOUR’ 
 # result of method ‘nearest_insertion’ for 313 cities
-# tour length: 39538
+# result of method ‘nn+two_opt_rep_10’ for 312 cities
+# tour length: 38756 
 
 # Utilizamos cut_tour() para crear un camino y mostramos las primeras y últimas 6 ciudades 
 # a continuación.
 
-tour_inicial <- tour_inicial[["nearest_insertion"]]
+tour_inicial <- tour_inicial[["nn+two_opt+rep_10"]]
 
 camino2 <- cut_tour(tour_inicial, cut = "New York, NY", 
                     exclude_cut = FALSE)
 
 head(labels(camino2))
-# [1] "New York, NY"     "Jersey City, NJ"  "Elizabeth, NJ"    "Newark, NJ"      
-# [5] "Paterson, NJ"     "White Plains, NY"
+# [1] "New York, NY" "Jersey City, NJ"  "Elizabeth, NJ" "Newark, NJ" "Paterson, NJ"    
+# [6] "White Plains, NY"
 
 tail(labels(camino2))
-# [1] "Oakland, CA"       "Berkeley, CA"      "San Francisco, CA" "Hilo, HI"         
-# [5] "Honolulu, HI"      "Lihue, HI" 
+# [1] "Fairbanks, AK" "Anchorage, AK" "Nome, AK" "Hilo, HI" "Honolulu, HI" 
+# [6] "Lihue, HI"
 
 plot_path(camino2)
 title("Figura 5 - Tour Inicial NY")
@@ -277,18 +280,17 @@ title("Figura 6 - Tour de NY a LA")
 tour_final[['arbitrary_insertion+two_opt']]
 # object of class 'TOUR' 
 # result of method 'arbitrary_insertion+two_opt' for 311 cities
-# tour length: 40539
+# tour length: 41186
 
 tour_final <- tour_final[['arbitrary_insertion+two_opt']]
 path_labels <- c("New York, NY", labels(cut_tour(tour_final, la_ny)), "Los Angeles, CA")
 path_ids <- match(path_labels, labels(USCA312))
+
 head(path_labels)
-# [1] "New York, NY"     "Jersey City, NJ"  "Elizabeth, NJ"    "Newark, NJ"      
-# [5] "Paterson, NJ"     "White Plains, NY"
+# [1] "New York, NY" ...
 
 tail(path_labels)
-# [1] "Bakersfield, CA"    "Las Vegas, NV"      "San Bernardino, CA" "San Diego, CA"     
-# [5] "Pasadena, CA"       "Los Angeles, CA"   
+# ... "Los Angeles, CA"
 
 plot_path(path_ids)
 title("Figura 7 - Tour de NY a LA")
@@ -329,7 +331,7 @@ unique(iris$Species)
 
 # Como hay 3 especies en el conjunto iris, es una buena razón para empezar con n = 3  
 # clusters. Por más que tenemos una buena razón, estadísticamente hablando, no deja de 
-# ser arbirtaria hasta que se demuestre lo contrario.
+# ser arbitraria hasta que se demuestre lo contrario.
 
 tsp_dummy <- insert_dummy(tsp, n = 3, label = "boundary")
 
@@ -352,7 +354,7 @@ title("Figura 8 - Tour Iris")
 tour_iris[['nn+two_opt+rep_10']]
 # object of class ‘TOUR’ 
 # result of method ‘nn+two_opt_rep_10’ for 153 cities
-# tour length: 47.0642
+# tour length: 47.28361
 
 # A continuación, trazamos la matriz de distancia permutada del TSP utilizando el sombreado 
 # para representar distancias.
@@ -375,7 +377,7 @@ title("Figura 9")
 abline(h = which(labels(tour_iris)=="boundary"), col = "red")
 abline(v = which(labels(tour_iris)=="boundary"), col = "red")
 
-# Tres líneas rojas horizontales y tres verticales separan exactamente la areas más oscuras
+# Tres líneas rojas horizontales y verticales separan exactamente la áreas más oscuras
 # de las más claras.
 # Podemos ver lo bien que la partición obtenida se ajusta a la estructura de los datos 
 # dados por el campo de las especies en el conjunto iris. Dado que usamos a la especie
@@ -389,22 +391,21 @@ out <- rle(labels(tour_iris))
 data.frame(Species = out$values, Lenghts = out$lengths, Pos = cumsum(out$lengths))
 
 #       Species Lenghts Pos
-# 1      setosa      49  49
-# 2    boundary       1  50 <- boundary o "ciudad ficticia" número 1
-# 3   virginica       6  56
-# 4  versicolor       1  57
-# 5   virginica       1  58
-# 6  versicolor       1  59
-# 7   virginica       1  60
-# 8  versicolor      23  83
-# 9   virginica       8  91
-# 10   boundary       1  92 <- boundary o "ciudad ficticia" número 2
-# 11  virginica      33 125
-# 12 versicolor      21 146
-# 13  virginica       1 147
-# 14 versicolor       4 151
-# 15   boundary       1 152  <- boundary o "ciudad ficticia" número 3
-# 16     setosa       1 153
+# 1    boundary       1   1 <--------------- boundary
+# 2      setosa      49  50
+# 3    boundary       1  51 <--------------- boundary
+# 4      setosa       1  52
+# 5    boundary       1  53 <--------------- boundary
+# 6  versicolor       5  58
+# 7   virginica       1  59
+# 8  versicolor      23  82
+# 9   virginica       9  91
+# 10 versicolor       1  92
+# 11  virginica       6  98
+# 12 versicolor       1  99
+# 13  virginica       1 100
+# 14 versicolor      20 120
+# 15  virginica      33 153
 
 # La especie setosa esta perfectamente separada de las otros dos clusters.
 # La razón por la que la agrupación por reordenamiento falla para dividir los datos en tres 
@@ -453,10 +454,10 @@ tour_clusters4$'arbitrary_insertion+two_opt' <- solve_TSP(atsp_dummy)
 dotchart(sort(c(sapply(tour_clusters4, tour_length))), xlab = "tour length")
 title("Figura 11 - Tour de NY a LA con 4 Clusters")
 
-tour_clusters4[['arbitrary_insertion+two_opt']]
+tour_clusters4[['two_opt']]
 # object of class ‘TOUR’ 
 # result of method ‘arbitrary_insertion+two_opt’ for 315 cities
-# tour length: 31581
+# tour length: 32496
 
 # Bastante mejor que la solución óptima de concorde sin clusters que daba un tour length 
 # de 38.489. 
@@ -471,7 +472,7 @@ tour_clusters4[['arbitrary_insertion+two_opt']]
 
 # Matrix de distancia
 
-tour_clusters4 <- tour_clusters4[['arbitrary_insertion+two_opt']]
+tour_clusters4 <- tour_clusters4[['two_opt']]
 
 image(atsp_dummy, tour_clusters4, xlab = "objects", ylab ="objects")
 title("Figura 12")
@@ -505,7 +506,7 @@ title("Figura 13 - Tour de NY a LA con 5 Clusters")
 tour_clusters5[['arbitrary_insertion+two_opt']]
 # object of class ‘TOUR’ 
 # result of method ‘arbitrary_insertion+two_opt’ for 316 cities
-# tour length: 31421
+# tour length: 29745
 
 tour_clusters5 <- tour_clusters5[['arbitrary_insertion+two_opt']]
 
@@ -537,7 +538,7 @@ title("Figura 15 - Tour de NY a LA con 6 Clusters")
 tour_clusters6[['arbitrary_insertion+two_opt']]
 # object of class ‘TOUR’ 
 # result of method ‘arbitrary_insertion+two_opt’ for 317 cities
-# tour length: 30819 
+# tour length: 30170 
 
 tour_clusters6 <- tour_clusters6[['arbitrary_insertion+two_opt']]
 
@@ -566,12 +567,12 @@ tour_clusters7$'arbitrary_insertion+two_opt' <- solve_TSP(atsp_dummy)
 dotchart(sort(c(sapply(tour_clusters7, tour_length))), xlab = "tour length")
 title("Figura 17 - Tour de NY a LA con 7 Clusters")
 
-tour_clusters7[['arbitrary_insertion+two_opt']]
+tour_clusters7[['farthest_insertion']]
 # object of class ‘TOUR’ 
 # result of method ‘arbitrary_insertion+two_opt’ for 318 cities
-# tour length: 29266
+# tour length: 29509
 
-tour_clusters7 <- tour_clusters7[['arbitrary_insertion+two_opt']]
+tour_clusters7 <- tour_clusters7[['farthest_insertion']]
 
 image(atsp_dummy, tour_clusters7, xlab = "objects", ylab ="objects")
 title("Figura 18")
@@ -579,7 +580,7 @@ title("Figura 18")
 abline(h = which(labels(tour_clusters7)=="boundary"), col = "red")
 abline(v = which(labels(tour_clusters7)=="boundary"), col = "red")
 
-# Aun queda 1 curz clara SIN resaltar en rojo, con una mejora de más de 1000 millas entre 
+# Aun queda 1 curz clara SIN resaltar en rojo, con la mejora conseguido entre 
 # 6 y 7 clusters, vale la pena intentar con n = 8.
 
 atsp_dummy <- insert_dummy(atsp, n = 8, label = "boundary")
@@ -598,15 +599,15 @@ tour_clusters8$'arbitrary_insertion+two_opt' <- solve_TSP(atsp_dummy)
 dotchart(sort(c(sapply(tour_clusters8, tour_length))), xlab = "tour length")
 title("Figura 19 - Tour de NY a LA con 8 Clusters")
 
-tour_clusters8[['arbitrary_insertion+two_opt']]
+tour_clusters8[['farthest_insertion']]
 # object of class ‘TOUR’ 
 # result of method ‘arbitrary_insertion+two_opt’ for 319 cities
-# tour length: 27586
+# tour length: 28704
 
-# Otra mejora de más de 1000 millas, veamos la matriz de distancias para ver si podemos
+# Otra mejora interesante, veamos la matriz de distancias para ver si podemos
 # mejorar más.
 
-tour_clusters8 <- tour_clusters8[['arbitrary_insertion+two_opt']]
+tour_clusters8 <- tour_clusters8[['farthest_insertion']]
 
 image(atsp_dummy, tour_clusters8, xlab = "objects", ylab ="objects")
 title("Figura 20")
@@ -614,7 +615,7 @@ title("Figura 20")
 abline(h = which(labels(tour_clusters8)=="boundary"), col = "red")
 abline(v = which(labels(tour_clusters8)=="boundary"), col = "red")
 
-# Sí, hay una clara cruz todavía SIN resaltar, por lo que hay que intentar con 
+# Sí, hay cruz (o cruces) todavía SIN resaltar, por lo que hay que intentar con 
 # n = 9 entonces.
 
 atsp_dummy <- insert_dummy(atsp, n = 9, label = "boundary")
@@ -635,10 +636,9 @@ title("Figura 21 - Tour de NY a LA con 9 Clusters")
 
 tour_clusters9[['arbitrary_insertion+two_opt']]
 # object of class ‘TOUR’ 
-# result of method ‘arbitrary_insertion+two_opt’ for 320 cities
-# tour length: 27040 
+# result of method 27685 
 
-# La mejora ahora es cerca de 500 millas, puede ser que ya tengamos el óptimo número de 
+# La mejora ahora es menor, puede ser que ya tengamos el óptimo número de 
 # cluster, comprobemos con la matriz de distancias representadas en colores.
 
 tour_clusters9 <- tour_clusters9[['arbitrary_insertion+two_opt']]
@@ -668,30 +668,27 @@ tour_clusters10$'arbitrary_insertion+two_opt' <- solve_TSP(atsp_dummy)
 dotchart(sort(c(sapply(tour_clusters10, tour_length))), xlab = "tour length")
 title("Figura 23 - Tour de NY a LA con 10 Boundaries")
 
-tour_clusters10[['arbitrary_insertion+two_opt']]
+tour_clusters10[['farthest_insertion']]
 # object of class ‘TOUR’ 
 # result of method ‘arbitrary_insertion+two_opt’ for 320 cities
-# tour length: 27915 
+# tour length: 27438
 
-# Hemos empeorado tour_length, por lo tanto el numero de clusters óptimo en n = 9.
+# Mejoró muy poco. Supongamos que tour_length hubiese empeorado, el número de clusters 
+# óptimo hubiese sido n = 9. AVancemos con este supuesto.
 
 path_labels <- c("New York, NY", labels(cut_tour(tour_clusters9, la_ny)),
                  "Los Angeles, CA")
 path_ids <- match(path_labels, labels(USCA312))
 head(path_labels)
-# [1] "New York, NY"     "Jersey City, NJ"  "Elizabeth, NJ"    "Newark, NJ"      
-# [5] "Paterson, NJ"     "White Plains, NY"
+# [1] "New York, NY" ...
 
 tail(path_labels)
-# [1] "El Paso, TX"     "Tucson, AZ"      "Phoenix, AZ"     "Yuma, AZ"        "San Diego, CA"  
-# [6] "Los Angeles, CA" 
+# ... "Los Angeles, CA" 
 
 # El recorrido completo es el siguiente:
 
 path_labels
-# [1] "New York, NY"         "Jersey City, NJ"      "Elizabeth, NJ"       
-# [4] "Newark, NJ"           "Paterson, NJ"         "White Plains, NY"    
-# [7] "Stamford, CT"        etc etc etc etc etc
+# [1] "New York, NY" ... "Los Angeles, CA"
 
 # Removemos los boundaries para poder ilustrar la ruta sobre el mapa
 
@@ -708,128 +705,45 @@ title("Figura 24 - Tour de NY a LA con 9 Clusters")
 
 # Busquemos cada "boundary"
 
-# path_labels
-# [1] "New York, NY"         "Jersey City, NJ"      "Elizabeth, NJ"       
-# [4] "Newark, NJ"           "Paterson, NJ"         "White Plains, NY"    
-# [7] "Stamford, CT"         "Central Islip, NY"    "Bridgeport, CT"      
-# [10] "New Haven, CT"        "Meriden, CT"          "New Britain,CT"      
-# [13] "Hartford, CT"         "Springfield, MA"      "Pittsfield, MA"      
-# [16] "Albany, NY"           "Schenectady, NY"      "Troy, NY"            
-# [19] "Brattleboro, VT"      "Worcester, MA"        "Providence, RI"      
-# [22] "Fall River, MA"       "Brockton, MA"         "Boston, MA"          
-# [25] "Cambridge, MA"        "Lowell, MA"           "Lawrence, MA"        
-# [28] "Manchester, NH"       "Concord, NH"          "Portsmouth, NH"      
-# [31] "Portland, ME"         "Augusta, ME"          "Bangor, ME"          
-# [34] "Fredericton, NB"      "Saint John, NB"       "Moncton, NB"         
-# [37] "Halifax, NS"          "Charlottetown, PE"    "Syndey, NS"          
-# [40] "Saint John's, NF"     "boundary"             "Quebec City, QC"     
-# [43] "Trois-Rivieres, QC"   "Sherbrooke, QC"       "Montpelier, VT"      
-# [46] "Burlington, VT"       "Montreal, QC"         "Ottawa, ON"          
-# [49] "Kingston, ON"         "Utica, NY"            "Binghamtom, NY"      
-# [52] "Syracuse, NY"         "Rochester, NY"        "Belleville, ON"      
-# [55] "Peterborough, ON"     "Buffalo, NY"          "Niagara Falls, ON"   
-# [58] "Saint Catherines, ON" "Hamilton, ON"         "Erie, PA"            
-# [61] "London, ON"           "Brantford, ON"        "Kitchener, ON"       
-# [64] "Guelph, ON"           "Burlington, ONT"      "Toronto, ON"         
-# [67] "North Bay, ON"        "Sudbury, ON"          "Timmins, ON"         
-# [70] "Sault Ste Marie, ON"  "Bay City, MI"         "Saginaw, MI"         
-# [73] "Flint, MI"            "Ann Arbor, MI"        "Jackson, MI"         
-# [76] "Lansing, MI"          "Grand Rapids, MI"     "Battle Creek, MI"    
-# [79] "Kalamazoo, MI"        "South Bend, IN"       "Ft Wayne, IN"        
-# [82] "Muncie, IN"           "Indianapolis, IN"     "Terre Haute, IN"     
-# [85] "Lafayette, IN"        "Gary, IN"             "Chicago, IL"         
-# [88] "Kenosha, WI"          "Racine, WI"           "Milwaukee, WI"       
-# [91] "Sheboygan, WI"        "Green Bay, WI"        "Madison, WI"         
-# [94] "Rockford, IL"         "Champaign, IL"        "Urbana, IL"          
-# [97] "Decatur, IL"          "Saint Louis, MO"      "Springfield, IL"     
-# [100] "Bloomington, IL"      "Peoria, IL"           "Dubuque, IA"         
-# [103] "Iowa City, IA"        "Cedar Rapids, IA"     "Waterloo, IA"        
-# [106] "Des Moines, IA"       "Columbia, MO"         "Kansas City, MO"     
-# [109] "Kansas City, KS"      "Topeka, KS"           "Saint Joseph, MO"    
-# [112] "Lincoln, NE"          "Omaha, NE"            "Sioux City, IA"      
-# [115] "Sioux Falls, SD"      "Pierre, SD"           "Rapid City, SD"      
-# [118] "Sheridan, WY"         "Billings, MT"         "Great Falls, MT"     
-# [121] "Helena, MT"           "Butte, MT"            "Boise, ID"           
-# [124] "Pocatello, ID"        "Ogden, UT"            "Salt Lake City, UT"  
-# [127] "Provo, UT"            "Grand Junction, CO"   "Cheyenne, WY"        
-# [130] "Denver, CO"           "Colorado Springs, CO" "Gallup, NM"          
-# [133] "Flagstaff, AZ"        "Las Vegas, NV"        "San Bernardino, CA"  
-# [136] "Pasadena, CA"         "Santa Barbara, CA"    "Bakersfield, CA"     
-# [139] "Fresno, CA"           "Carson City, NV"      "Reno, NV"            
-# [142] "Sacramento, CA"       "Stockton, CA"         "San Jose, CA"        
-# [145] "Santa Cruz, CA"       "San Francisco, CA"    "Oakland, CA"         
-# [148] "Berkeley, CA"         "Eureka, CA"           "Eugene, OR"          
-# [151] "Salem, OR"            "Portland, OR"         "Tacoma, WA"          
-# [154] "Seattle, WA"          "Victoria, BC"         "Vancouver, BC"       
-# [157] "Bellingham, WA"       "Yakima, WA"           "Walla Walla, WA"     
-# [160] "Spokane, WA"          "Calgary, AB"          "Lethbridge, AB"      
-# [163] "Medicine Hat, AB"     "Moose Jaw, SK"        "Regina, SK"          
-# [166] "Saskatoon, SK"        "Edmonton, AB"         "boundary"            
-# [169] "Prince Rupert, BC"    "Juneau, AK"           "Whitehorse, YK"      
-# [172] "Dawson, YT"           "Fairbanks, AK"        "Anchorage, AK"       
-# [175] "Nome, AK"             "boundary"             "Yellowknife, NT"     
-# [178] "boundary"             "Alert, NT"            "boundary"            
-# [181] "Churchill, MB"        "boundary"             "Thunder Bay, ON"     
-# [184] "Duluth, MN"           "Superior, WI"         "Eau Claire, WI"      
-# [187] "Rochester, MN"        "Saint Paul, MN"       "Minneapolis, MN"     
-# [190] "Saint Cloud, MN"      "Fargo, ND"            "Bismarck, ND"        
-# [193] "Minot, ND"            "Brandon, MB"          "Winnipeg, MB"        
-# [196] "boundary"             "Lihue, HI"            "Honolulu, HI"        
-# [199] "Hilo, HI"             "boundary"             "San Juan, PR"        
-# [202] "boundary"             "Norfolk, VA"          "Portsmouth, VA"      
-# [205] "Richmond, VA"         "Washington, DC"       "Baltimore, MD"       
-# [208] "Wilmington, DE"       "Philadelphia, PA"     "Atlantic City, NJ"   
-# [211] "Trenton, NJ"          "Allentown, PA"        "Wilkes-Barre, PA"    
-# [214] "Reading, PA"          "Johnstown, PA"        "Lancaster, PA"       
-# [217] "Harrisburg, PA"       "Pittsburgh, PA"       "Wheeling, WV"        
-# [220] "Steubenville, OH"     "Youngstown, OH"       "Canton, OH"          
-# [223] "Akron, OH"            "Cleveland, OH"        "Windsor, ON"         
-# [226] "Detroit, MI"          "Toledo, OH"           "Lima, OH"            
-# [229] "Columbus, OH"         "Zanesville, OH"       "Charleston, WV"      
-# [232] "Ashland, KY"          "Springfield, OH"      "Dayton, OH"          
-# [235] "Hamilton, OH"         "Cincinnati, OH"       "Louisville, KY"      
-# [238] "Lexington, KY"        "Knoxville, TN"        "Asheville, NC"       
-# [241] "Roanoke, VA"          "Winston-Salem, NC"    "Greensboro, NC"      
-# [244] "Durham, NC"           "Raleigh, NC"          "Wilmington, NC"      
-# [247] "Charlotte, NC"        "Spartanburg, NC"      "Greenville, SC"      
-# [250] "Augusta, GA"          "Columbia, SC"         "Charleston, SC"      
-# [253] "Savannah, GA"         "Jacksonville, FL"     "Daytona Beach, FL"   
-# [256] "Orlando, FL"          "West Palm Beach, FL"  "Miami, FL"           
-# [259] "Key West, FL"         "Sarasota, FL"         "Saint Petersburg, FL"
-# [262] "Tampa, FL"            "Gainesville, FL"      "Tallahassee, FL"     
-# [265] "Pensacola, FL"        "Mobile, AL"           "Biloxi, MS"          
-# [268] "Gulfport, MS"         "New Orleans, LA"      "Baton Rouge, LA"     
-# [271] "Natchez, MS"          "Jackson, MS"          "Birmingham, AL"      
-# [274] "Montgomery, AL"       "Columbus, GA"         "Macon, GA"           
-# [277] "Atlanta, GA"          "Gadsden, AL"          "Huntsville, AL"      
-# [280] "Chattanooga, TN"      "Nashville, TN"        "Bowling Green, KY"   
-# [283] "Evansville, IN"       "Paducah, KY"          "Memphis, TN"         
-# [286] "Little Rock, AR"      "Ft Smith, AR"         "Texarkana, TX"       
-# [289] "Marshall, TX"         "Shreveport, LA"       "Beaumont, TX"        
-# [292] "Port Arthur, TX"      "Galveston, TX"        "Houston, TX"         
-# [295] "Corpus Christi, TX"   "Laredo, TX"           "San Antonio, TX"     
-# [298] "Austin, TX"           "Waco, TX"             "Dallas, TX"          
-# [301] "Ft Worth, TX"         "Abilene, TX"          "Lubbock, TX"         
-# [304] "Amarillo, TX"         "Enid, OK"             "Oklahoma City, OK"   
-# [307] "Tulsa, OK"            "Springfield, MO"      "Joplin, MO"          
-# [310] "Wichita, KS"          "Salina, KS"           "Dodge City, KS"      
-# [313] "Pueblo, CO"           "Santa Fe, NM"         "Albuquerque, NM"     
-# [316] "El Paso, TX"          "Tucson, AZ"           "Phoenix, AZ"         
-# [319] "Yuma, AZ"             "San Diego, CA"        "Los Angeles, CA" 
+path_labels
+# [1] "New York, NY" ... "Los Angeles, CA" 
 
-# Lo boundaries están en las posiciones [41], [168], [176], [178], [180], [182], [196],
-# [200], y [202]. Por ende, 9 boundaries no dan 10 clusters:
+which (path_labels %in% "boundary") 
+# Los boundaries están en las posiciones 31  33  35  37  41  43  47  61 217
+# 9 boundaries nos dan 10 clusters:
 
-cluster1 <- path_labels[1:40]
-cluster2 <- path_labels[42:167]
-cluster3 <- path_labels[169:175]
-cluster4 <- path_labels[177]
-cluster5 <- path_labels[179]
-cluster6 <- path_labels[181]
-cluster7 <- path_labels[183:195]
-cluster8 <- path_labels[197:199]
-cluster9 <- path_labels[201]
-cluster10 <- path_labels[203:321]
+cluster1 <- path_labels[1:30]
+cluster2 <- path_labels[32]
+cluster3 <- path_labels[34]
+cluster4 <- path_labels[36]
+cluster5 <- path_labels[38:40]
+cluster6 <- path_labels[42]
+cluster7 <- path_labels[44:46]
+cluster8 <- path_labels[48:60]
+cluster9 <- path_labels[62:216]
+cluster10 <- path_labels[218:321]
+
+# Chequear en caso de errores
+which (cluster1 %in% "boundary") 
+# integer(0)
+which (cluster2 %in% "boundary") 
+# integer(0)
+which (cluster3 %in% "boundary") 
+# integer(0)
+which (cluster4 %in% "boundary") 
+# integer(0)
+which (cluster5 %in% "boundary") 
+# integer(0)
+which (cluster6 %in% "boundary") 
+# integer(0)
+which (cluster7 %in% "boundary") 
+# integer(0)
+which (cluster8 %in% "boundary") 
+# integer(0)
+which (cluster9 %in% "boundary") 
+# integer(0)
+which (cluster10 %in% "boundary") 
+# integer(0)
 
 # ¿Nos sobra un cluster? Tenemos 9 boundaries, sigamos investigando los resultados de
 # TSP.
