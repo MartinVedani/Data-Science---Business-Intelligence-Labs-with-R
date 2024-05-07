@@ -1,7 +1,7 @@
 #############################################################################################
 
 # Ejemplos prácticos de Series Temporales en R
-# - por Martin Vedani, UTN Business Intelligence
+# - por Martín Vedani, UTN Business Intelligence
 
 ############################################################################################
 
@@ -48,7 +48,7 @@ str(gripes)
 
 # La clase zoo fue diseñada para manejar datos de series de tiempo ordenadas por 
 # índices de tiempo arbitrarios. 
-# Decimos arbitrario porque un úndice de ordenamiento por tiempo puede ser regular, donde el 
+# Decimos arbitrario porque un indice de ordenamiento por tiempo puede ser regular, donde el 
 # espacio entre observaciones es el mismo (observaciones diarias, semanales, etc.), o las 
 # observaciones pueden tener separaciones irregulares (un día entre observaciones 1 y 2,
 # cuatro días entre observaciones 2 y 3, seis días entre la observaciones 3 y 4, etc.).
@@ -108,7 +108,7 @@ str(gripes.z)
 head(gripes.z, 10); head(gripes,10)
 tail(gripes.z, 10); tail(gripes,10)
 
-# Excelente. Veamos el grafico de la cantidad de gripes observadas en función de las fechas
+# Excelente. Veamos el gráfico de la cantidad de gripes observadas en función de las fechas
 # en que estas fueron observadas
 
 plot(gripes.z)
@@ -126,9 +126,9 @@ plot(gripes.z)
 # Esta descomposición (separación) se logra mediante la función stl(). 
 
 # Como stl() necesita entender la frecuencia de nuestros datos, debemos entonces
-# convertir entonces nuestra data.frame original en un serie de tiempo ts con periodicidad 
+# convertir nuestra data.frame original en un serie de tiempo ts con periodicidad 
 # de 365 días por año ya que cada observación corresponde a un día durante aproximadamente
-# unos  8 años (1999-2007). La frecuencia siempre debe ser un entero.
+# unos  9 años (1999-2007). La frecuencia siempre debe ser un entero.
 
 unique(gripes$Year)
 # [1] 1999 2000 2001 2002 2003 2004 2005 2006 2007
@@ -147,7 +147,8 @@ summary(modelo)
 
 ?HoltWinters
 
-# simple exponencial - modela nivel (remainder), sin tendencia ni componente estacional
+# simple exponencial - modela nivel (remainder), sin tendencia (beta) ni 
+# componente estacional (gamma)
 modelo.simple <- HoltWinters(gripes.ts, beta=FALSE, gamma=FALSE)
 
 modelo.simple
@@ -200,7 +201,7 @@ plot(prediccion3)
 autoplot(prediccion3)
 
 # Excelente, nos da intervalos de confianza. Si miramos el resumen del pronóstico3, 
-# podremos ver a qué intervalos se refiere cada color y explicarlo al presentar el grafico.
+# podremos ver a qué intervalos se refiere cada color del gráfico.
 
 summary(prediccion3)
 # Forecasts:
@@ -210,7 +211,7 @@ summary(prediccion3)
 
 # Adicionalmente, en este caso particular donde no puede haber una cantidad de personas 
 # negativas con gripe, claramente no necesitamos las predicciones negativas, así que 
-# podemos modificar un poco el grafico
+# podemos modificar un poco el gráfico
 
 plot(prediccion3, ylim = c(0,1500), fcol = "red", 
               shadecols = c("grey", "lightblue"))
