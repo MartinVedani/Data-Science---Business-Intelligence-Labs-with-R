@@ -237,6 +237,7 @@ autoplot(prediccion.arima)
 # Dada la fuerte tendencia a la baja luego del pico máximo en 2004, estas proyecciones
 # ARIMA parecen tener más sentido que las anteriores.
 
-# Hay MUCHO que se puede hacer con series de tiempo. Voy a subir una análisis técnico sobre
-# acciones de la bolsa de Wall Street para jugar en mucha más profundidad y detalle
-# con una base de datos históricos mucho más amplia.
+# Hay MUCHO que se puede hacer con series de tiempo como veremos en el próxima
+# se Series Temporales II - Simulaciones de Montecarlo utilizando los precios
+# históricos de empresas de eCommerce que cotizan en la bolsa de valores de USA.
+
