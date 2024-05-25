@@ -1,16 +1,32 @@
+#############################################################################################
+#  Este es un laboratorio BONUS en R, donde se aplicarán las simulaciones de Montecarlo y la 
+# teoría de la gestión eficiente de carteras a series de tiempo financieras para determinar 
+# qué cantidad de 5 acciones internacionales de comercio electrónico debemos comprar para 
+# nuestra cartera de inversiones. Las acciones que utilizaremos son:
+#  Mercado Libre (Latam), Amazon and Ebay (USA/Europe), Alibaba & JD.com (Asia/China)
+#
+#
+# - por Martín Vedani, UTN Business Intelligence
+#
+############################################################################################
 
----
-title: eCommerce - Time Series with Montecarlo Simulation (CAPM and Efficient Portfolio)
-author: "Martin Vedani - European Business School London, Msc. Global Banking and Finance"
-date: '`r format(Sys.time(), "%a %B %d, %Y. %H:%M:%S.")` Buenos Aires, Argentina.'
-output:
-  pdf_document: default
-  html_document:
-    df_print: paged
----
+## Instalar los paquetes
+if(! "knitr" %in% installed.packages()) install.packages("knitr", depend = T)
+if(! "kfigr" %in% installed.packages()) install.packages("kfigr", depend = T)
+if(! "data.table" %in% installed.packages()) install.packages("data.table", depend = T)
+if(! "ggvis" %in% installed.packages()) install.packages("ggvis", depend = T)
+if(! "quantmod" %in% installed.packages()) install.packages("quantmod", depend = T)
+if(! "corrplot" %in% installed.packages()) install.packages("corrplot", depend = T)
+if(! "forecast" %in% installed.packages()) install.packages("forecast", depend = T)
+if(! "rugarch" %in% installed.packages()) install.packages("rugarch", depend = T)
+if(! "quadprog" %in% installed.packages()) install.packages("quadprog", depend = T)
+if(! "ggplot2" %in% installed.packages()) install.packages("ggplot2", depend = T)
+if(! "linprog" %in% installed.packages()) install.packages("linprog", depend = T)
+if(! "lpSolve" %in% installed.packages()) install.packages("lpSolve", depend = T)
+if(! "lpSolveAPI" %in% installed.packages()) install.packages("lpSolveAPI", depend = T)
+if(! "yfR" %in% installed.packages()) install.packages("yfR", depend = T)
 
-```{r echo=FALSE, message=FALSE, results='hide', warning=FALSE}
-## Unicializar los paquetes en el siguiente orden
+## Cargar los paquetes en el siguiente orden
 library(knitr)
 library(kfigr)
 library(data.table)
@@ -21,73 +37,72 @@ library(forecast)
 library(rugarch)
 library(quadprog)
 library(ggplot2)
+library(yfR)
 
-## La ~ en la siguiente ruta de origen debe actualizarse con su propia ruta después de descargar estos 
-# scripts de GitHub
+## La ~ en la siguiente ruta de origen debe actualizarse con su propia ruta después de descargar
+# estos scripts de GitHub
+
+# getwd()
+## ~/8. Series Temporales II -  Simulaciones de Montecarlo
+
+## Entrar en la carpeta de scripts (no es necesario)
+# setwd("scripts")
 
 #Source garchAuto para adaptarse a la volatilidad en quantmodity in quantmod
-source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/garchAuto.R')
+source('scripts/garchAuto.R')
 #Source addGuppy para análisis técnico en quantmod
-source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/addGuppy.R')
+source('scripts/addGuppy.R')
 # Source change2nysebizday para cambiar yearmon (Mmm YYY) a NYSE bizday date (YYYY-mm-dd)
-source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/change2nysebizday.R')
+source('scripts/change2nysebizday.R')
 # Source cor.mtest para combinar corrplot con Test de Significancia
-source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/cor.mtest.R')
+source('scripts/cor.mtest.R')
 # Source funciones de efficient portfolio
-source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/my.eff.frontier.R')
-source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/plotEfficientFrontier.R')
+source('scripts/my.eff.frontier.R')
+source('scripts/plotEfficientFrontier.R')
 #Source función funggcast para graficar forecast in ggplot
-source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/funggcast.R')
+source('scripts/funggcast.R')
 # Source función SDAFE2.R del libro :Statistics and Data Analysis for Financial Engineering, 2nd Edition
-source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/SDAFE2_copy.R')
+source('scripts/SDAFE2_copy.R')
 # Source funciones para el análisis de portfolios
-source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/util_fns.R')
-source('/Users/martin/Documents/myLearning/UTN/BI with R/BI Labs with R/8. Series Temporales II -  Simulaciones de Montecarlo/scripts/portfolio_copy.R')
+source('scripts/util_fns.R')
+source('scripts/portfolio_copy.R')
+
+## Cambiar el working directory un nivel hacia arriba en el árbol de navegación
+# setwd("..")
+
 # Set YTD range
 ytd <- paste(as.numeric(format(Sys.Date(), '%Y')),"::", sep = "")
 # --end of start up --
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
-library(BatchGetSymbols)
-# Fuente: https://cran.r-project.org/web/packages/BatchGetSymbols/vignettes/BatchGetSymbols-vignette.html
+# New Package yfR
+# https://ropensci.org/blog/2022/07/26/package-yfr/
 
 # Configurar fechas
-first.date <- as.Date("2015-01-01") # cambiar manualmente
+first.date <- as.Date("2015-06-01") # cambiar manualmente
 
 last.date <- as.Date("2020-06-07") # cambiar manualmente, d+1 for last.date may 15 2020 in this example
 # last.date <- Sys.Date() # use this option to get up to the latest date available
 
 freq.data <- 'daily'
+
 # Tickers de las acciones a ser analizadas: Amazon, Ebay, y Mercado Libre
 tickers <- c("AMZN","EBAY","MELI", "JD", "BABA")
 
-l.out <- BatchGetSymbols(tickers = tickers, first.date = first.date, last.date = last.date, 
-                         freq.data = freq.data, cache.folder = file.path(tempdir(), 
-                                                                         'BGS_Cache') ) # cache in tempdir()
+# New yfR pacakge
+l.out <- yf_get(tickers = tickers, first_date = first.date, last_date = last.date, 
+                         freq_data = freq.data)
 
-# print(l.out$df.control)
+dplyr::glimpse(l.out)
 
 # Ver los gráficos de los tickers
-p <- ggplot(l.out$df.tickers, aes(x = ref.date, y = price.close))
-p <- p + geom_line()
+p <- ggplot(l.out, aes(x = ref_date, y = price_close))
+p <- p + geom_line() + xlab("June 1, 2015   to   June 7, 2020") +  ylab("Closing Prices")
 p <- p + facet_wrap(~ticker, scales = 'free_y') 
 
-detach("package:BatchGetSymbols", unload=TRUE)
-
-```
-
-### This report if from BONUS Lab in R number 8 - Temporal Series II with Montecarlo  Simulations
-
-We will apply Montecarlo Simulations and Efficient Portfolio Management theory to Financial Time Series to determine how much of 5 Global eCommerce  stocks we should buy for our investment portfolio. Namely, we will be looking at:
-
-Mercado Libre (Latam), Amazon and Ebay (USA/Europe), Alibaba & JD.com (Asia/China)
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', results="asis"}
 print(p)
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
+detach("package:yfR", unload=TRUE)
+
 ###### Otro método para conseguir datos históricos completos y manipularlos más fácil######
 
 # Configurar fechas
@@ -99,6 +114,7 @@ last.date <- as.Date("2020-06-07") # cambiar manualmente, d+1 for last.date may 
 getSymbols(c("AMZN","EBAY","MELI", "BABA", "JD"), from = first.date , to = last.date)
 getSymbols(c("^IRX", "^TNX","^IXIC","^GSPC", "^MERV"), from = first.date , to = last.date)
 getSymbols(c("^BVSP","^MXX", "^N225", "000001.ss"), from = first.date , to = last.date)
+
 # Adjust OHLC columns with both splits and dividends
 meli <- adjustOHLC(MELI)
 amzn <- adjustOHLC(AMZN)
@@ -239,105 +255,56 @@ master.corr.matrix  <- cor(merged.master.matrix, use="pairwise.complete.obs")
 
 res1 <- cor.mtest(merged.master.matrix, conf.level = 0.95)
 
-```
+## Correlation Matrix - specialized the insignificant value according to the significant level
+corrplot(master.corr.matrix, sig.level = 0.05, order = "hclust",
+         type = "upper", pch.cex = .8, tl.srt = 60)
 
-***
 
-### Technical charts in more detail
+#****************************************************************************************
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.keep='last'}
+# ********************************************************************************* #
+# Technical charts
+
+# # Set Year-to-Date (YTD) range
+# ytd <- paste(as.numeric(format(Sys.Date(), '%Y')),"::", sep = "")
+
 # MERCADO LIBRE
-chartSeries(meli, theme = "white", subset = ytd, type = "bar",
+chartSeries(meli, theme = "white", type = "bar",
             name = "(NASDAQ:MELI)", TA="addBBands();addRSI();addVo()")
 addTA(RSI(Cl(meli)) > 70, col="lightyellow", border=NA, on= -(1:3)) #over-bought, expect fall in price
 addVolatility(col = "red", lwd = 2, legend = "Volatility")
 addGuppy(col=c(rep("blue",6), rep("black",6)), legend = "GMMA: Blue(short), Black(long)")
 reChart(major.ticks='months')
-```
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.keep='last'}
 
 # AMAZON
-chartSeries(amzn, theme = "white", subset = ytd, type = "bar",
+chartSeries(amzn, theme = "white", type = "bar",
             name = "(NASDAQ:AMZN)", TA="addBBands();addRSI();addVo()")
 addTA(RSI(Cl(amzn)) > 70, col="lightyellow", border=NA, on= -(1:3)) #over-bought, expect fall in price
 addVolatility(col = "red", lwd = 2, legend = "Volatility")
 addGuppy(col=c(rep("blue",6), rep("black",6)), legend = "GMMA: Blue(short), Black(long)")
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.keep='last'}
 # EBAY
-chartSeries(ebay, theme = "white", subset = ytd, type = "bar",
+chartSeries(ebay, theme = "white", type = "bar",
             name = "(NASDAQ:EBAY)", TA="addBBands();addRSI();addVo()")
 addTA(RSI(Cl(ebay)) > 70, col="lightyellow", border=NA, on= -(1:3)) #over-bought, expect fall in price
 addVolatility(col = "red", lwd = 2, legend = paste("Volatility"))
 addGuppy(col=c(rep("blue",6), rep("black",6)), legend = "GMMA: Blue(short), Black(long)")
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.keep='last'}
 # Alibaba
-chartSeries(baba, theme = "white", subset = ytd, type = "bar",
+chartSeries(baba, theme = "white", type = "bar",
             name = "(NYSE:BABA)", TA="addBBands();addRSI();addVo()")
 addTA(RSI(Cl(baba)) > 70, col="lightyellow", border=NA, on= -(1:3)) #over-bought, expect fall in price
 addVolatility(col = "red", lwd = 2, legend = "Volatility")
 addGuppy(col=c(rep("blue",6), rep("black",6)), legend = "GMMA: Blue(short), Black(long)")
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', fig.keep='last'}
 # JD.com
-chartSeries(jd, theme = "white", subset = ytd, type = "bar",
+chartSeries(jd, theme = "white", type = "bar",
             name = "(NASDAQ:JD)", TA="addBBands();addRSI();addVo()")
 addTA(RSI(Cl(baba)) > 70, col="lightyellow", border=NA, on= -(1:3)) #over-bought, expect fall in price
 addVolatility(col = "red", lwd = 2, legend = "Volatility")
 addGuppy(col=c(rep("blue",6), rep("black",6)), legend = "GMMA: Blue(short), Black(long)")
-```
 
-<span style="color:grey;font-size:12px;">
-Source: Yahoo Finance + All things R.
-</span>
 
-   
-***
-
-   
-### Correlation of stock returns, fx rates, market index log returns, and risk free rates.
-
-Individual assets and the market move in correlation and covariance with many additional financial and economical factors, each with its respective volatilities. I run a wide analysis on the mayor indexes and other possible influential players for each of the companies, countries and mayor markets where these companies operate. 
-
-As we can see from the graph below, as expected, the mayor influences on these eCommerce companies performance are: each other, of course, the market indexes of the US, the index for the markets in their countries of origin, and the indexes of the mayor markets they operate in.
-
-All companies under our current coverage are traded in the US stock markets. Beyond this first introductory analysis and going forward, for our purposes of risk management and portfolio management, we will work with three key economic factors:
-
-1) The US short term 13 week T bill;
-2) the US long term 10 year bond; and
-3) The S&P 500 value.
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', results="asis"}
-## Correlation Matrix - specialized the insignificant value according to the significant level
-
-## Correlation Matrix - specialized the insignificant value according to the significant level
-corrplot(master.corr.matrix, p.mat = res1[[1]], sig.level = 0.05, order = "hclust",
-         type = "upper", pch.cex = .8, tl.srt = 60)
-```
-
-<span style="color:grey;font-size:12px;">
-Notes:  "X" marks denote a pairwise correlation rejected at a 0.05 sig.level.  
-</span>
-<span style="color:grey;font-size:12px;">
-Sources of variables: Yahoo Finance.
-</span>
-
-***
-
-### Capital Asset Pricing Model per company
-
-Lets begin by looking at how our individual stock prices and performance are tied to the US market. We will use historical returns starting on January of 2015 for MELI, AMZN, EBAY, BABA and  JD.
-
-Looking at daily arithmetic returns for each stock and the S&P500 minus the daily closing interest rate of the 10 year US treasury Bond, which we use as the risky free return, we compute each stock's and the S&P500's excess return. We then compare each of their excess returns versus the excess return of the market, represented by the S&P 500 index.
-
-With alphas very close to zero, all stocks are fairly priced.
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide', }
 #****************************************************************************************
 ###### CAPITAL ASSET PRICING MODEL
 #****************************************************************************************
@@ -360,9 +327,9 @@ CAPM.table
 # https://www.researchgate.net/post/Why_did_the_Fama_French_factors_calculated_using_simple_returns_instead_of_log_returns
 
 # Calculate simple returns for meli and merge all in one matrix
-meli.returns <- dailyReturn(meli,  peridod="daily", type="arithmetic")
+meli.returns <- dailyReturn(meli, peridod="daily", type="arithmetic")
 colnames(meli.returns) <- c("meli.returns")
-sp500Ret.meli <- dailyReturn(sp500,  peridod="daily", type="arithmetic")
+sp500Ret.meli <- dailyReturn(sp500, peridod="daily", type="arithmetic")
 colnames(sp500Ret.meli) <- c("sp500.returns")
 
 # US treasuries are in percentage and annual terms, so must be divided by 252
@@ -382,9 +349,9 @@ us10yrLT.meli <- meli.sp500.10yrLT[,3]
 
 #Calculate excess returns
 for(n in 1:dim(meli.sp500)[1]){
-  for(m in 1:dim(meli.sp500)[2]){
-    meli.sp500[n,m] <- meli.sp500[n,m] - us10yrLT.meli[n,1]
-  }
+        for(m in 1:dim(meli.sp500)[2]){
+                meli.sp500[n,m] <- meli.sp500[n,m] - us10yrLT.meli[n,1]
+        }
 }
 
 # Do linear regression
@@ -406,8 +373,8 @@ marketRisk.meli <- paste(round((list.meli$r.squared)*100,2),"%",sep = "")
 
 # Calculate expected excess returns above/below expected average return of sp500
 ExpExcRet.meli <- paste(round(
-                 mean(us10yrLT.meli) + (beta.meli * mean(meli.sp500[,"sp500.returns"]))
-                                                   ,4)*100,"%",sep = "")
+        mean(us10yrLT.meli) + (beta.meli * mean(meli.sp500[,"sp500.returns"]))
+        ,4)*100,"%",sep = "")
 
 
 # Fill table of CAPM results
@@ -416,11 +383,11 @@ CAPM.table["Alpha","MELI"] <- alpha.meli
 CAPM.table["Market Risk Exposure","MELI"] <- marketRisk.meli
 CAPM.table["Expected Excess Returns","MELI"] <- ExpExcRet.meli
 if(alpha.meli > 0.001){
-  CAPM.table["Over/Under Priced","MELI"] <- c("Under-priced")}
+        CAPM.table["Over/Under Priced","MELI"] <- c("Under-priced")}
 if(alpha.meli < 0.00001) {
-  CAPM.table["Over/Under Priced","MELI"] <- c("Over-priced")}
+        CAPM.table["Over/Under Priced","MELI"] <- c("Over-priced")}
 if(alpha.meli > 0.00001 & alpha.meli < 0.001){
-  CAPM.table["Over/Under Priced","MELI"] <- c("Neutral")}
+        CAPM.table["Over/Under Priced","MELI"] <- c("Neutral")}
 
 #### ***************
 #### AMZN
@@ -447,9 +414,9 @@ us10yrLT.amzn <- amzn.sp500.10yrLT[,3]
 
 #Calculate excess returns
 for(n in 1:dim(amzn.sp500)[1]){
-  for(m in 1:dim(amzn.sp500)[2]){
-    amzn.sp500[n,m] <- amzn.sp500[n,m] - us10yrLT.amzn[n,1]
-  }
+        for(m in 1:dim(amzn.sp500)[2]){
+                amzn.sp500[n,m] <- amzn.sp500[n,m] - us10yrLT.amzn[n,1]
+        }
 }
 
 # Do linear regression
@@ -471,7 +438,7 @@ marketRisk.amzn <- paste(round((list.amzn$r.squared)*100,2),"%",sep = "")
 
 # Calculate expected excess returns above/below expected average return of sp500
 ExpExcRet.amzn <- paste(round(mean(us10yrLT.amzn) + 
-                                (beta.amzn * mean(amzn.sp500[,"sp500.returns"]))
+                                      (beta.amzn * mean(amzn.sp500[,"sp500.returns"]))
                               ,4)*100,"%",sep = "")
 
 
@@ -481,11 +448,11 @@ CAPM.table["Alpha","AMZN"] <- alpha.amzn
 CAPM.table["Market Risk Exposure","AMZN"] <- marketRisk.amzn
 CAPM.table["Expected Excess Returns","AMZN"] <- ExpExcRet.amzn
 if(alpha.amzn > 0.001){
-  CAPM.table["Over/Under Priced","AMZN"] <- c("Under-priced")}
+        CAPM.table["Over/Under Priced","AMZN"] <- c("Under-priced")}
 if(alpha.amzn < 0.00001) {
-  CAPM.table["Over/Under Priced","AMZN"] <- c("Over-priced")}
+        CAPM.table["Over/Under Priced","AMZN"] <- c("Over-priced")}
 if(alpha.amzn > 0.00001 & alpha.amzn < 0.001){
-  CAPM.table["Over/Under Priced","AMZN"] <- c("Neutral")}
+        CAPM.table["Over/Under Priced","AMZN"] <- c("Neutral")}
 
 #### ***************
 #### EBAY
@@ -512,9 +479,9 @@ us10yrLT.ebay <- ebay.sp500.10yrLT[,3]
 
 #Calculate excess returns
 for(n in 1:dim(ebay.sp500)[1]){
-  for(m in 1:dim(ebay.sp500)[2]){
-    ebay.sp500[n,m] <- ebay.sp500[n,m] - us10yrLT.ebay[n,1]
-  }
+        for(m in 1:dim(ebay.sp500)[2]){
+                ebay.sp500[n,m] <- ebay.sp500[n,m] - us10yrLT.ebay[n,1]
+        }
 }
 
 # Do linear regression
@@ -536,7 +503,7 @@ marketRisk.ebay <- paste(round((list.ebay$r.squared)*100,2),"%",sep = "")
 
 # Calculate expected excess returns above/below expected average return of sp500
 ExpExcRet.ebay <- paste(round(mean(us10yrLT.ebay) + 
-                                (beta.ebay * mean(ebay.sp500[,"sp500.returns"]))
+                                      (beta.ebay * mean(ebay.sp500[,"sp500.returns"]))
                               ,4)*100,"%",sep = "")
 
 
@@ -546,11 +513,11 @@ CAPM.table["Alpha","EBAY"] <- alpha.ebay
 CAPM.table["Market Risk Exposure","EBAY"] <- marketRisk.ebay
 CAPM.table["Expected Excess Returns","EBAY"] <- ExpExcRet.ebay
 if(alpha.ebay > 0.001){
-  CAPM.table["Over/Under Priced","EBAY"] <- c("Under-priced")}
+        CAPM.table["Over/Under Priced","EBAY"] <- c("Under-priced")}
 if(alpha.ebay < 0.00001) {
-  CAPM.table["Over/Under Priced","EBAY"] <- c("Over-priced")}
+        CAPM.table["Over/Under Priced","EBAY"] <- c("Over-priced")}
 if(alpha.ebay > 0.00001 & alpha.ebay < 0.001){
-  CAPM.table["Over/Under Priced","EBAY"] <- c("Neutral")}
+        CAPM.table["Over/Under Priced","EBAY"] <- c("Neutral")}
 
 #### ***************
 #### BABA
@@ -577,9 +544,9 @@ us10yrLT.baba <- baba.sp500.10yrLT[,3]
 
 #Calculate excess returns
 for(n in 1:dim(baba.sp500)[1]){
-  for(m in 1:dim(baba.sp500)[2]){
-    baba.sp500[n,m] <- baba.sp500[n,m] - us10yrLT.baba[n,1]
-  }
+        for(m in 1:dim(baba.sp500)[2]){
+                baba.sp500[n,m] <- baba.sp500[n,m] - us10yrLT.baba[n,1]
+        }
 }
 
 # Do linear regression
@@ -601,7 +568,7 @@ marketRisk.baba <- paste(round((list.baba$r.squared)*100,2),"%",sep = "")
 
 # Calculate expected excess returns above/below expected average return of sp500
 ExpExcRet.baba <- paste(round(mean(us10yrLT.baba) + 
-                                (beta.baba * mean(baba.sp500[,"sp500.returns"]))
+                                      (beta.baba * mean(baba.sp500[,"sp500.returns"]))
                               ,4)*100,"%",sep = "")
 
 
@@ -611,11 +578,11 @@ CAPM.table["Alpha","BABA"] <- alpha.baba
 CAPM.table["Market Risk Exposure","BABA"] <- marketRisk.baba
 CAPM.table["Expected Excess Returns","BABA"] <- ExpExcRet.baba
 if(alpha.baba > 0.001){
-  CAPM.table["Over/Under Priced","BABA"] <- c("Under-priced")}
+        CAPM.table["Over/Under Priced","BABA"] <- c("Under-priced")}
 if(alpha.baba < 0.00001) {
-  CAPM.table["Over/Under Priced","BABA"] <- c("Over-priced")}
+        CAPM.table["Over/Under Priced","BABA"] <- c("Over-priced")}
 if(alpha.baba > 0.00001 & alpha.baba < 0.001){
-  CAPM.table["Over/Under Priced","BABA"] <- c("Neutral")}
+        CAPM.table["Over/Under Priced","BABA"] <- c("Neutral")}
 
 #### ***************
 #### JD
@@ -642,9 +609,9 @@ us10yrLT.jd <- jd.sp500.10yrLT[,3]
 
 #Calculate excess returns
 for(n in 1:dim(jd.sp500)[1]){
-  for(m in 1:dim(jd.sp500)[2]){
-    jd.sp500[n,m] <- jd.sp500[n,m] - us10yrLT.jd[n,1]
-  }
+        for(m in 1:dim(jd.sp500)[2]){
+                jd.sp500[n,m] <- jd.sp500[n,m] - us10yrLT.jd[n,1]
+        }
 }
 
 # Do linear regression
@@ -666,7 +633,7 @@ marketRisk.jd <- paste(round((list.jd$r.squared)*100,2),"%",sep = "")
 
 # Calculate expected excess returns above/below expected average return of sp500
 ExpExcRet.jd <- paste(round(mean(us10yrLT.jd) + 
-                                (beta.jd * mean(jd.sp500[,"sp500.returns"]))
+                                    (beta.jd * mean(jd.sp500[,"sp500.returns"]))
                             ,4)*100,"%",sep = "")
 
 # Fill table of CAPM results
@@ -675,53 +642,43 @@ CAPM.table["Alpha","JD"] <- alpha.jd
 CAPM.table["Market Risk Exposure","JD"] <- marketRisk.jd
 CAPM.table["Expected Excess Returns","JD"] <- ExpExcRet.jd
 if(alpha.jd > 0.001){
-  CAPM.table["Over/Under Priced","JD"] <- c("Under-priced")}
+        CAPM.table["Over/Under Priced","JD"] <- c("Under-priced")}
 if(alpha.jd < 0.00001) {
-  CAPM.table["Over/Under Priced","JD"] <- c("Over-priced")}
+        CAPM.table["Over/Under Priced","JD"] <- c("Over-priced")}
 if(alpha.jd > 0.00001 & alpha.jd < 0.001){
-  CAPM.table["Over/Under Priced","JD"] <- c("Neutral")}
+        CAPM.table["Over/Under Priced","JD"] <- c("Neutral")}
 
-```
+CAPM.table
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', results="asis"}
-kable(CAPM.table)
-```
+#****************************************************************************************
+###### meli.model (DECOMPOSED)
 
+#### ***** VOLATILITY *******
+# # Rolling realized volatility over a 20 day window
+# # http://www.spiderfinancial.com/support/documentation/numxl/tips-and-tricks/volatility-101
+# # http://stackoverflow.com/questions/12823445/faster-way-of-calculating-rolling-realized-volatility-in-r
 
-   
-***
-  
-### Decomposing MELI: Trend and Seasonality 
-
-Decompose trend and seasonal factros with Seasonal Decomposition of Time Series by Loess
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
-realized.vol.meli.20days <- runSD(meliLogRet, n=20) * sqrt(252)
-```
-
-```{r echo=FALSE, message=FALSE, fig.keep='last', fig.align='center'}
 autoplot(meliLogRet, main = "MELI's daily log returns")
-```
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
+?runSD
+
+realized.vol.meli.20days <- runSD(meliLogRet, n=20) * sqrt(252)
 plot.xts(realized.vol.meli.20days, major.ticks = "months",
          main = "Volatility over 20-day-rolling-window")
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
-# head(meli[,6])
+# Decompose trend and seasonal factros with Seasonal Decomposition of Time Series by Loess
+
+?stl
+
+head(meli[,6])
 # checked MELI.Adjusted closing price
 
-meli.ts <- ts(meli[,6], start = c(2015,1), frequency = 252)
+meli.ts <- ts(meli[,6], start = c(2015, 252/2), frequency = 252)
 
 stl.meli <- stl(meli.ts[,"MELI.Adjusted"], s.window = "periodic", robust = T)
-```
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 summary(stl.meli)
-```
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 plot(stl.meli, main = "MELI Factors Decomposition")
 
 abline(v=c(2015,2016,2017,2018,2019,2020), col="blue", lty=2)
@@ -731,173 +688,197 @@ abline(v=c(2015.25, 2015.5, 2015.75,
            2018.25, 2018.5, 2018.75,
            2019.25, 2019.5, 2019.75,
            2020.25, 2020.5), col="salmon", lty=2)
-```
 
-### Projections for MELI
+# MELI is seasonal, with a trend, and remainder data - as expected with financial data.
 
-Note: I will set seed 123 at the very begining so that everyone's randomizer can be set equally to reproduce the same or as close to the same results at any time the same data is used.
+# # Forecast using STL (Seasonal Decomposition of Time Series by Loess)
 
-### Forecast using STL (Seasonal Decomposition of Time Series by Loess)
+# 1 year is approximately 252 business/trading days, so we will forecast 252 periods
+# ahead
 
-1 year is approximately 252 business/trading days, so we will forecast 252 periods ahead.
+# There are 3 similar methods, we will use stl.
+?stl
+?stlm
+?stlf
 
-There are 3 similar methods (stl, stlm, and stlf), we will use stl.
+#####################################################################################
+set.seed(123) # to be able to reproduce de same results for the rest of this report
+#####################################################################################
 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide'}
-set.seed(123) # to be able to reproduce de same resutls
 stl.forecast.meli <- forecast(stl.meli, h=252)
 
-# summary(stl.forecast.meli)
-```
+summary(stl.forecast.meli)
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 autoplot(stl.forecast.meli)
-```
 
-### Forecast using ETS (Exponential smoothing state space model)
+# # Forecast using ets (Exponential smoothing state space model)
 
-```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide'}
+?ets
+
+head(meli[,6])
+# checked MELI.Adjusted closing price
+
 ets.meli <- ets(meli[,6], allow.multiplicative.trend = T)
 
 #set.seed(123) # to be able to reproduce de same resutls
 ets.forecast.meli <- forecast.ets(ets.meli, h=252)
-```
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
+summary(ets.forecast.meli)
 
 autoplot(ets.forecast.meli)
-```
 
-### COMPARE ACCURACY with Diebold-Mariano test for predictive accuracy
+## COMPARE ACCURACY with Diebold-Mariano test for predictive accuracy
 
-#### Usage
+str(stl.forecast.meli) # stl.forecast.meli$residuals
+str(ets.forecast.meli) # ets.forecast.meli$residuals
 
-dm.test(e1, e2, alternative=c("two.sided","less","greater"), h=1, power=1)
+?dm.test
 
-####  Arguments
+# # Usage
+# 
+# # dm.test(e1, e2, alternative=c("two.sided","less","greater"),
+# #         h=1, power=1)
+# 
+# # Arguments
+# 
+# # e1 Forecast errors from method 1.
+# 
+# # e2 Forecast errors from method 2.
+# 
+# # alternative a character string specifying the alternative hypothesis, must be one of
+# # "two.sided" (default), "greater" or "less". You can specify just the initial letter.
+# 
+# # h The forecast horizon used in calculating e1 and e2.
+# 
+# # power The power used in the loss function. Usually 1 or 2.  The choice of power is entirely due 
+# # to the loss function. If we lose x dollars if the forecast error is x - then our loss function is 
+# # linear and we should use the option power = 1. If we lose x^2 dollars when the forecast error is x,
+# # then we should use power = 2.
+# 
+# # Details
+# 
+# # The null hypothesis is that the two methods have the same forecast accuracy. 
+# #
+# # For alternative="two.sided", the alternative hypothesis is that method 1 and method 2 have 
+# # different levels of accuracy
+# #
+# # For alternative="less", the alternative hypothesis is that method 2 is less accurate than
+# # method 1. 
+# #
+# # For alternative="greater", the alternative hypothesis is that method 2 is more accurate 
+# # than method 1. 
+# 
+# # A smaller p-value means that there is stronger evidence in favor of the alternative hypothesis
 
-e1 Forecast errors from method 1 - for our purposes here, STL will be method 1.
+# # STLM vs. ETS
 
-e2 Forecast errors from method 2 - here, ETS will be method 2.
-
-The alternative input is a character string specifying the alternative hypothesis, must be one of "two.sided" (default), "greater" or "less". You can specify just the initial letter.
-
-The forecast horizon used in calculating e1 and e2 is determined with h.
-
-P is the power used in the loss function. Usually 1 or 2.  The choice of power is entirely due to the loss function. If we lose x dollars if the forecast error is x - then our loss function is linear and we should use the option power = 1. If we lose x^2 dollars when the forecast error is x, then we should use power = 2.
-
-#### Details
-
-The null hypothesis is that the two methods have the same forecast accuracy. 
-
-For alternative = "two.sided", the alternative hypothesis is that method 1 and method 2 have different levels of accuracy
-
-For alternative = "less", the alternative hypothesis is that method 2 is less accurate than method 1. 
- 
-For alternative = "greater", the alternative hypothesis is that method 2 is more accurate than method 1. 
-
-A smaller p-value means that there is stronger evidence in favor of the alternative hypothesis
-
-#### STLM vs. ETS
-
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 dm.test(stl.forecast.meli$residuals, ets.forecast.meli$residuals, power = 1,
         alternative = "two.sided", h = 252)
-```
 
-p-value is very low, H0 rejected, STL and ETS have different levels of accuracy.
+# p-value is very low, H0 rejected, stl and ets have different levels of accuracy.
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 dm.test(stl.forecast.meli$residuals, ets.forecast.meli$residuals, power = 1,
         alternative = "greater", h = 252)
-```
 
-p-value is very low, H0 rejected: ETS is MORE accurate than STL.
+# p-value is very low, H0 rejected: ets IS MORE accurate than stl.
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
 dm.test(stl.forecast.meli$residuals, ets.forecast.meli$residuals, power = 1,
         alternative = "less", h = 252)
-```
 
-p-value = 1, H0 accepted: ETS is NOT less accurate than STL.
+# p-value is close to 1, H0 accepted: ets IS NOT LESS accurate than stl.
 
-#### So ETS is more accurate than STL in this case.
+## So ETS is more accurate than STL in this case.
 
-### Montecarlo Simulations for Price Projections
+##########
 
-Lets use MONTECARLO simulations now to run 20,000 simulations for each of 252 trading days into the future.
 
-Alternatively to auto.arima which can take very long and be very heavy on computational resources, there is the option to use auto ARFIMA out of the rugarch library.
+# # ********************************************************************************* #
 
-The Rugarch package is one of the more robust R libraries for time series data analysis and forecasting. 
+# Lets use MONTECARLO simulations now and run 20,000 simulations 252 trading days into the future.
 
-Most importantly, in addition to target values, it allows to forecast and simulate deviations or volatility, the base for VaR (Value at Risk) estimates in portfolio management. 
+# Alternatively to auto.arima which can take very long and be very heavy on computational resources,
+# there is the option to use auto ARFIMA out of the rugarcch library.
 
-Rugarch can also accept streaming data and build it into the models, but we will not cover that here - it is just nice to know.
+# The Rugarch package is one of the more robust R libraries for financial data analysis and forecating. 
 
-Sources: http://www.unstarched.net/r-examples/rugarch/a-short-introduction-to-the-rugarch-package/
-         https://palomar.home.ece.ust.hk/MAFS6010R_lectures/Rsession_time_series_modeling.html
+# It allows to forecast more than just prices, specifically volatility which is very importat
+# for VaR estimations at the time to decide what porfoloio allocations are on the efficient 
+# fontier and which allocations will give us less than optimal returns for a given level of
+# risk. 
 
-```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide'}
+# Even more so, it can accept streaming data and build it into the models, but we will not cover that
+# here - it is just nice to know.
+
+# # Sources: http://www.unstarched.net/r-examples/rugarch/a-short-introduction-to-the-rugarch-package/
+# #          https://palomar.home.ece.ust.hk/MAFS6010R_lectures/Rsession_time_series_modeling.html
+
 library(rugarch)
-```
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
-auto.arfima.meli <- autoarfima(meliLogRet, ar.max = 2, ma.max = 2,  distribution.model = "sged",
-                               criterion = "AIC", method = "partial")
+auto.arfima.meli <- autoarfima(meliLogRet, ar.max = 2, ma.max = 2, 
+                               criterion = "AIC", method = "partial",
+                               solver = "hybrid", 
+                               distribution.model = "sged")
 
 show(head(auto.arfima.meli$rank.matrix))
-```
+#   AR MA Mean ARFIMA       AIC converged
+# 1  0  0    1      0 -4.485027         1
 
-So ARMA(0,0) model WITH a mean
+# So ARMA(0,0) model WITH a mean. This could change depending on different computers.
 
-Parameters for ARIMA(p,d,q)
+# Parameters for ARIMA(p,d,q)
 
-If convergence problems arise:
+# If convergence problems arise
 
-In choosing ARMA(p,q) the theory of difference equations suggests that we should choose ARMA(p+1,p), which gives rise to a solution of the difference equation with p+1 terms. You can of course have some zero orders
+# In choosing ARMA(p,q) the theory of difference equations suggests that
+# we should choose ARMA(p+1,p), which gives rise to a solution of the difference
+# equation with p+1 terms. You can of course have some zero orders
+# This is explained in my book H. D. Vinod,
+# "Hands-On Intermediate Econometrics Using R: Templates for Extending Dozens of Practical Examples." (2008) World Scientific Publishers: Hackensack, NJ.
+# (http://www.worldscibooks.com/economics/6895.html)
 
-This is explained in my book H. D. Vinod, "Hands-On Intermediate Econometrics Using R: Templates for Extending Dozens of Practical Examples." (2008) World Scientific Publishers: Hackensack, NJ.
-(http://www.worldscibooks.com/economics/6895.html)
-
-```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide'}
 meli.p <- auto.arfima.meli$rank.matrix[1,"AR"]
 meli.q <- auto.arfima.meli$rank.matrix[1,"MA"]
 meli.mean <- auto.arfima.meli$rank.matrix[1,"Mean"]
-```
+meli.p
+meli.q
+meli.mean
 
-There are no convergence problems here so we will use p and q with/without mean as estimated for each of the stocks we are looking into.
+?ugarchspec
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
+# No convergence problems so we will use p and q with/without mean as estimated:
+
 arma.garch.meli.spec.std <- ugarchspec(
-                  variance.model = list(model = "sGARCH", garchOrder=c(1,1)), distribution.model = "sged",
-                        mean.model = list(armaOrder=c(meli.p, meli.q), include.mean = meli.mean))
+        variance.model = list(model = "sGARCH", garchOrder=c(1,1)), distribution.model = "sged",
+        mean.model = list(armaOrder=c(meli.p, meli.q), include.mean = meli.mean))
 
 arma.garch.meli.fit.std <- ugarchfit(spec=arma.garch.meli.spec.std, data=meliLogRet)
-```
 
-After running the 20,000 simulations for each of 252 trading days into the future, we get the following results:
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
+coef(arma.garch.meli.fit.std)
+# see all coeficients
+
+?ugarchsim
+
+# Run 20,000 simulations, 252 trading days into the future. Set seed 123 to be able to reproduce same
+# results.
+
 T = 20000
 
 arma.garch.meli.sim <- ugarchsim(fit = arma.garch.meli.fit.std, startMethod = "sample",
-                                 n.sim = 252, m.sim = T)#, rseed = 123)
-```
+                                 n.sim = 252, m.sim = T) #, rseed = 123)
 
+# Series Plot
+plot(arma.garch.meli.sim, which = 2)
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.keep='last', fig.align='center', fig.height=8, fig.width=8}
-# Plot fit
-par(mfrow=c(4,1))
-plot(arma.garch.meli.sim, which = 2) 
+# Sigma Plot
 plot(arma.garch.meli.sim, which = 1)
-plot(arma.garch.meli.sim, which = 4)
-plot(arma.garch.meli.sim, which = 3)
-par(mfrow=c(1,1))
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide'}
+# Kernel Density Plot
+plot(arma.garch.meli.sim, which = 4)
+
+# Conditional Sigma - Kernel Density
+plot(arma.garch.meli.sim, which = 3)
+
 # Extract fitted forecasted log returns from simulation variable
 fitted.meli <- fitted(arma.garch.meli.sim)
 
@@ -911,35 +892,79 @@ meli.fitted.mean <- apply(fitted.meli, 1, mean)
 last.meli.price <- as.numeric(last(Ad(meli)))
 meli.projected.ret.as.price <- last.meli.price * c(1, exp(cumsum(meli.fitted.mean)))
 meli.target.price.252d <- as.numeric(last(meli.projected.ret.as.price))
-```
 
-> The 1 year (252 trading days approx.) target price for MERCADO LIBRE is USD `r round(meli.target.price.252d,2)`, (a `r paste(round(((meli.target.price.252d - last.meli.price) / last.meli.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.meli.price,2)`)
+meli.target.price.252d 
+# 1344.3
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
-chart.meli <- autoplot(ets.forecast.meli)
-chart.meli + geom_hline(yintercept = meli.target.price.252d, color = "red")
-```
-Makes sense!
+# Compare to reality
+getSymbols("MELI")
+meli.one.year.later <- last.date + 365
+meli.actual.price.252d <- as.numeric(MELI$MELI.Adjusted[meli.one.year.later])
 
-***
-### Projections for AMAZON
-```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide'}
+legend_projected_meli <- print(paste("u$s", round(meli.target.price.252d, digits = 2),
+                                     "Projected by Montecarlo  (", last.date,")"))
+legend_actual_meli <- print(paste("u$s", round(meli.actual.price.252d, digits = 2),
+                                  "Actual 1 year later (", meli.one.year.later,")"))
+
+meli_prices <- rep(c(legend_projected_meli,legend_actual_meli))
+
+chart.meli <- autoplot(ets.forecast.meli) + 
+  xlab("MELI projected price 1 year w/ Montecarlo") + 
+  ylab("MELI") + 
+  geom_hline( aes(yintercept = meli.target.price.252d, linetype = "Projected"),
+              color = "red") +
+  geom_hline( aes(yintercept = meli.actual.price.252d, linetype = "Actual"),
+              color = "green")
+
+chart.meli
+
+  if(meli.target.price.252d > meli.actual.price.252d){
+    chart.meli +
+    annotate("text", x = 700, y = meli.target.price.252d +100, label =meli_prices[1]) +
+      annotate("text", x = 700, y = meli.actual.price.252d -100, label =meli_prices[2])
+  } else {
+    chart.meli +
+    annotate("text", x = 700, y = meli.target.price.252d -100, label =meli_prices[1]) +
+      annotate("text", x = 700, y = meli.actual.price.252d +100, label =meli_prices[2])
+  }
+
+# Pretty good!!!
+
+#*************************************************************
+## Investments and Portfolio Management
+#*************************************************************
+## First, we need to run the same simulations for everyone else
+
+######  Amazon ###### 
+head(amzn[,6])
+# checked AMZN.Adjusted closing price
+
 ets.amzn <- ets(amzn[,6], allow.multiplicative.trend = T)
 
 #set.seed(123) # to be able to reproduce de same resutls
 ets.forecast.amzn <- forecast.ets(ets.amzn, h=252)
 
-# summary(ets.forecast.amzn)
+summary(ets.forecast.amzn)
 
-# autoplot(ets.forecast.amzn)
+autoplot(ets.forecast.amzn)
 
-auto.arfima.amzn <- autoarfima(amznLogRet, ar.max = 2, ma.max = 2,  distribution.model = "sged",
+auto.arfima.amzn <- autoarfima(amznLogRet, ar.max = 2, ma.max = 2, 
                                criterion = "AIC", method = "partial",
-                               solver = "hybrid")
+                               solver = "hybrid", 
+                               distribution.model = "sged")
+
+show(head(auto.arfima.amzn$rank.matrix))
+#   AR MA Mean ARFIMA       AIC converged
+# 1  0  0    1      0 -5.349739         1
 
 amzn.p <- auto.arfima.amzn$rank.matrix[1,"AR"]
 amzn.q <- auto.arfima.amzn$rank.matrix[1,"MA"]
 amzn.mean <- auto.arfima.amzn$rank.matrix[1,"Mean"]
+amzn.p
+amzn.q
+amzn.mean
+
+# No convergence problems so we will use p and q with/without mean as estimated:
 
 arma.garch.amzn.spec.std <- ugarchspec(
         variance.model = list(model = "sGARCH", garchOrder=c(1,1)), distribution.model = "sged",
@@ -947,56 +972,90 @@ arma.garch.amzn.spec.std <- ugarchspec(
 
 arma.garch.amzn.fit.std <- ugarchfit(spec=arma.garch.amzn.spec.std, data=amznLogRet)
 
-# coef(arma.garch.amzn.fit.std)
+coef(arma.garch.amzn.fit.std)
 
 # 20,000 simulations, 252 trading days into the future. Set seed 123
 
 arma.garch.amzn.sim <- ugarchsim(fit = arma.garch.amzn.fit.std, startMethod = "sample",
                                  n.sim = 252, m.sim = T)#, rseed = 123)
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.keep='last', fig.align='center', fig.height=8, fig.width=8}
-# Plot fit
-par(mfrow=c(4,1))
 plot(arma.garch.amzn.sim, which = 2)
 plot(arma.garch.amzn.sim, which = 1)
 plot(arma.garch.amzn.sim, which = 4)
 plot(arma.garch.amzn.sim, which = 3)
-par(mfrow=c(1,1))
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide'}
 # Extract fitted forecasted log returns from simulation variable
 fitted.amzn <- fitted(arma.garch.amzn.sim)
 amzn.fitted.mean <- apply(fitted.amzn, 1, mean)
 last.amzn.price <- as.numeric(last(Ad(amzn)))
 amzn.projected.ret.as.price <- last.amzn.price * c(1, exp(cumsum(amzn.fitted.mean)))
 amzn.target.price.252d <- as.numeric(last(amzn.projected.ret.as.price))
-```
 
-> The 1 year (252 trading days approx.) target price for AMAZON is USD `r round(amzn.target.price.252d,2)`, (a `r paste(round(((amzn.target.price.252d - last.amzn.price) / last.amzn.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.amzn.price,2)`)
+amzn.target.price.252d 
+# [1] 194.7365
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
-chart.amzn <- autoplot(ets.forecast.amzn) 
-chart.amzn + geom_hline(yintercept = amzn.target.price.252d, color = "red")
-```
-Seems a little TOO bullish, but we have enough simulations on variation for the VaR that we will do further down.
+# Compare to reality
+getSymbols("AMZN")
+amzn.one.year.later <- last.date + 365
+amzn.actual.price.252d <- as.numeric(AMZN$AMZN.Adjusted[amzn.one.year.later])
 
-***
-### Projections for EBAY
+legend_projected_amzn <- print(paste("u$s", round(amzn.target.price.252d, digits = 2),
+                                     "Projected by Montecarlo  (", last.date,")"))
+legend_actual_amzn <- print(paste("u$s", round(amzn.actual.price.252d, digits = 2),
+                                  "Actual 1 year later (", amzn.one.year.later,")"))
 
-```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide'}
+amzn_prices <- rep(c(legend_projected_amzn,legend_actual_amzn))
+
+chart.amzn <- autoplot(ets.forecast.amzn) + 
+  xlab("AMZN projected price 1 year w/ Montecarlo") + 
+  ylab("AMZN") + 
+  geom_hline( aes(yintercept = amzn.target.price.252d, linetype = "Projected"),
+              color = "red") +
+  geom_hline( aes(yintercept = amzn.actual.price.252d, linetype = "Actual"),
+              color = "green")
+
+chart.amzn
+
+if(amzn.target.price.252d > amzn.actual.price.252d){
+  chart.amzn +
+    annotate("text", x = 700, y = amzn.target.price.252d +30, label =amzn_prices[1]) +
+    annotate("text", x = 700, y = amzn.actual.price.252d -30, label =amzn_prices[2])
+} else {
+  chart.amzn +
+    annotate("text", x = 700, y = amzn.target.price.252d -30, label =amzn_prices[1]) +
+    annotate("text", x = 700, y = amzn.actual.price.252d +30, label =amzn_prices[2])
+}
+
+###### EBAY ###### 
+head(ebay[,6])
+# checked EBAY.Adjusted closing price
+
 ets.ebay <- ets(ebay[,6], allow.multiplicative.trend = T)
 
 #set.seed(123) # to be able to reproduce de same resutls
 ets.forecast.ebay <- forecast.ets(ets.ebay, h=252)
 
-auto.arfima.ebay <- autoarfima(ebayLogRet, ar.max = 2, ma.max = 2,  distribution.model = "sged",
-                               criterion = "AIC", method = "partial", solver = "hybrid")
+summary(ets.forecast.ebay)
+
+autoplot(ets.forecast.ebay)
+
+auto.arfima.ebay <- autoarfima(ebayLogRet, ar.max = 2, ma.max = 2, 
+                               criterion = "AIC", method = "partial",
+                               solver = "hybrid", 
+                               distribution.model = "sged")
+
+show(head(auto.arfima.ebay$rank.matrix))
+#   AR MA Mean ARFIMA       AIC converged
+# 1  2  2    1      0 -5.442996         1
 
 ebay.p <- auto.arfima.ebay$rank.matrix[1,"AR"]
 ebay.q <- auto.arfima.ebay$rank.matrix[1,"MA"]
 ebay.mean <- auto.arfima.ebay$rank.matrix[1,"Mean"]
+ebay.p
+ebay.q
+ebay.mean
+
+# No convergence problems so we will use p and q with/without mean as estimated:
 
 arma.garch.ebay.spec.std <- ugarchspec(
         variance.model = list(model = "sGARCH", garchOrder=c(1,1)), distribution.model = "sged",
@@ -1004,173 +1063,253 @@ arma.garch.ebay.spec.std <- ugarchspec(
 
 arma.garch.ebay.fit.std <- ugarchfit(spec=arma.garch.ebay.spec.std, data=ebayLogRet)
 
-# coef(arma.garch.ebay.fit.std)
+coef(arma.garch.ebay.fit.std)
 
 # 20,000 simulations, 252 trading days into the future. Set seed 123
 
 arma.garch.ebay.sim <- ugarchsim(fit = arma.garch.ebay.fit.std, startMethod = "sample",
                                  n.sim = 252, m.sim = T)#, rseed = 123)
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.keep='last', fig.align='center', fig.height=8, fig.width=8}
-# Plot fit
-par(mfrow=c(4,1))
 plot(arma.garch.ebay.sim, which = 2)
 plot(arma.garch.ebay.sim, which = 1)
 plot(arma.garch.ebay.sim, which = 4)
 plot(arma.garch.ebay.sim, which = 3)
-par(mfrow=c(1,1))
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide'}
 # Extract fitted forecasted log returns from simulation variable
 fitted.ebay <- fitted(arma.garch.ebay.sim)
 ebay.fitted.mean <- apply(fitted.ebay, 1, mean)
 last.ebay.price <- as.numeric(last(Ad(ebay)))
 ebay.projected.ret.as.price <- last.ebay.price * c(1, exp(cumsum(ebay.fitted.mean)))
 ebay.target.price.252d <- as.numeric(last(ebay.projected.ret.as.price))
-```
 
-> The 1 year (252 trading days approx.) target price for EBAY is USD `r round(ebay.target.price.252d,2)`, (a `r paste(round(((ebay.target.price.252d - last.ebay.price) / last.ebay.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.ebay.price,2)`)
+ebay.target.price.252d 
+# [1] 61.59616
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
-chart.ebay <- autoplot(ets.forecast.ebay) 
-chart.ebay + geom_hline(yintercept = ebay.target.price.252d, color = "red")
-```
-Makes sense, also a little too bullish and with a conditional sigma which looks a little too flat - we can double check that with the VaR exercise.
+# Compare to reality
+getSymbols("EBAY")
+ebay.one.year.later <- last.date + 365
+ebay.actual.price.252d <- as.numeric(EBAY$EBAY.Adjusted[ebay.one.year.later])
 
-***
-### Projections for ALIBABA
+legend_projected_ebay <- print(paste("u$s", round(ebay.target.price.252d, digits = 2),
+                                     "Projected by Montecarlo  (", last.date,")"))
+legend_actual_ebay <- print(paste("u$s", round(ebay.actual.price.252d, digits = 2),
+                                  "Actual 1 year later (", ebay.one.year.later,")"))
 
-```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide'}
+ebay_prices <- rep(c(legend_projected_ebay,legend_actual_ebay))
+
+chart.ebay <- autoplot(ets.forecast.ebay) + 
+  xlab("EBAY projected price 1 year w/ Montecarlo") + 
+  ylab("EBAY") + 
+  geom_hline( aes(yintercept = ebay.target.price.252d, linetype = "Projected"),
+              color = "red") +
+  geom_hline( aes(yintercept = ebay.actual.price.252d, linetype = "Actual"),
+              color = "green")
+
+chart.ebay
+
+if(ebay.target.price.252d > ebay.actual.price.252d){
+  chart.ebay +
+    annotate("text", x = 700, y = ebay.target.price.252d +5, label =ebay_prices[1]) +
+    annotate("text", x = 700, y = ebay.actual.price.252d -5, label =ebay_prices[2])
+} else {
+  chart.ebay +
+    annotate("text", x = 700, y = ebay.target.price.252d -5, label =ebay_prices[1]) +
+    annotate("text", x = 700, y = ebay.actual.price.252d +5, label =ebay_prices[2])
+}
+
+###### ALIBABA ###### 
+head(baba[,6])
+# checked BABA.Adjusted closing price
+
 ets.baba <- ets(baba[,6], allow.multiplicative.trend = T)
 
 #set.seed(123) # to be able to reproduce de same resutls
 ets.forecast.baba <- forecast.ets(ets.baba, h=252)
 
-auto.arfima.baba <- autoarfima(babaLogRet, ar.max = 2, ma.max = 2,  distribution.model = "sged",
-                               criterion = "AIC", method = "partial", solver = "hybrid")
+summary(ets.forecast.baba)
+
+autoplot(ets.forecast.baba)
+
+auto.arfima.baba <- autoarfima(babaLogRet, ar.max = 2, ma.max = 2, 
+                               criterion = "AIC", method = "partial",
+                               solver = "hybrid", 
+                               distribution.model = "sged")
+
+show(head(auto.arfima.baba$rank.matrix))
+#   AR MA Mean ARFIMA       AIC converged
+# 1  2  2    0      0 -4.997153         1
 
 baba.p <- auto.arfima.baba$rank.matrix[1,"AR"]
 baba.q <- auto.arfima.baba$rank.matrix[1,"MA"]
 baba.mean <- auto.arfima.baba$rank.matrix[1,"Mean"]
+baba.p
+baba.q
+baba.mean
 
 # No convergence problems so we will use p and q with/without mean as estimated:
 
 arma.garch.baba.spec.std <- ugarchspec(
-        variance.model = list(model = "sGARCH", garchOrder=c(1,1)),  distribution.model = "sged",
+        variance.model = list(model = "sGARCH", garchOrder=c(1,1)), distribution.model = "sged",
         mean.model = list(armaOrder=c(baba.p, baba.q), include.mean = baba.mean))
 
 arma.garch.baba.fit.std <- ugarchfit(spec=arma.garch.baba.spec.std, data=babaLogRet)
 
-# coef(arma.garch.baba.fit.std)
+coef(arma.garch.baba.fit.std)
 
 # 20,000 simulations, 252 trading days into the future. Set seed 123
 
 arma.garch.baba.sim <- ugarchsim(fit = arma.garch.baba.fit.std, startMethod = "sample",
                                  n.sim = 252, m.sim = T)#, rseed = 123)
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.keep='last', fig.align='center', fig.height=8, fig.width=8}
-# Plot fit
-par(mfrow=c(4,1))
 plot(arma.garch.baba.sim, which = 2)
 plot(arma.garch.baba.sim, which = 1)
 plot(arma.garch.baba.sim, which = 4)
 plot(arma.garch.baba.sim, which = 3)
-par(mfrow=c(1,1))
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide'}
 # Extract fitted forecasted log returns from simulation variable
 fitted.baba <- fitted(arma.garch.baba.sim)
 baba.fitted.mean <- apply(fitted.baba, 1, mean)
 last.baba.price <- as.numeric(last(Ad(baba)))
 baba.projected.ret.as.price <- last.baba.price * c(1, exp(cumsum(baba.fitted.mean)))
 baba.target.price.252d <- as.numeric(last(baba.projected.ret.as.price))
-```
 
-> The 1 year (252 trading days approx.) target price for ALIBABA is USD `r round(baba.target.price.252d,2)`, (a `r paste(round(((baba.target.price.252d - last.baba.price) / last.baba.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.baba.price,2)`)
+baba.target.price.252d 
+# [1] 216.5752
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
-chart.baba <- autoplot(ets.forecast.baba) 
-chart.baba + geom_hline(yintercept = baba.target.price.252d, color = "red")
-```
-Makes sense, seems to have been trading sideways for quite a long time.
+# Compare to reality
+getSymbols("BABA")
+baba.one.year.later <- last.date + 365
+baba.actual.price.252d <- as.numeric(BABA$BABA.Adjusted[baba.one.year.later])
 
-***
-### Projections for JD.com
+legend_projected_baba <- print(paste("u$s", round(baba.target.price.252d, digits = 2),
+                                     "Projected by Montecarlo  (", last.date,")"))
+legend_actual_baba <- print(paste("u$s", round(baba.actual.price.252d, digits = 2),
+                                  "Actual 1 year later (", baba.one.year.later,")"))
 
-```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide'}
+baba_prices <- rep(c(legend_projected_baba,legend_actual_baba))
+
+chart.baba <- autoplot(ets.forecast.baba) + 
+  xlab("BABA projected price 1 year w/ Montecarlo") + 
+  ylab("BABA") + 
+  geom_hline( aes(yintercept = baba.target.price.252d, linetype = "Projected"),
+              color = "red") +
+  geom_hline( aes(yintercept = baba.actual.price.252d, linetype = "Actual"),
+              color = "green")
+
+chart.baba
+
+if(baba.target.price.252d > baba.actual.price.252d){
+  chart.baba +
+    annotate("text", x = 700, y = baba.target.price.252d +10, label =baba_prices[1]) +
+    annotate("text", x = 700, y = baba.actual.price.252d -10, label =baba_prices[2])
+} else {
+  chart.baba +
+    annotate("text", x = 700, y = baba.target.price.252d -10, label =baba_prices[1]) +
+    annotate("text", x = 700, y = baba.actual.price.252d +10, label =baba_prices[2])
+}
+
+###### JD.com ###### 
+head(jd[,6])
+# checked JS.Adjusted closing price
+
 ets.jd <- ets(jd[,6], allow.multiplicative.trend = T)
 
 #set.seed(123) # to be able to reproduce de same resutls
 ets.forecast.jd <- forecast.ets(ets.jd, h=252)
 
-# summary(ets.forecast.jd)
+summary(ets.forecast.jd)
 
-# autoplot(ets.forecast.jd)
+autoplot(ets.forecast.jd)
 
-auto.arfima.jd <- autoarfima(jdLogRet, ar.max = 2, ma.max = 2,  distribution.model = "sged",
-                               criterion = "AIC", method = "partial", solver = "hybrid")
+auto.arfima.jd <- autoarfima(jdLogRet, ar.max = 2, ma.max = 2, 
+                             criterion = "AIC", method = "partial",
+                             solver = "hybrid", 
+                             distribution.model = "sged")
+
+show(head(auto.arfima.jd$rank.matrix))
+#   AR MA Mean ARFIMA       AIC converged
+# 1  2  2    0      0 -4.523000         1
 
 jd.p <- auto.arfima.jd$rank.matrix[1,"AR"]
 jd.q <- auto.arfima.jd$rank.matrix[1,"MA"]
 jd.mean <- auto.arfima.jd$rank.matrix[1,"Mean"]
+jd.p
+jd.q
+jd.mean
 
 # No convergence problems so we will use p and q with/without mean as estimated:
 
 arma.garch.jd.spec.std <- ugarchspec(
-        variance.model = list(model = "sGARCH", garchOrder=c(1,1)),
+        variance.model = list(model = "sGARCH", garchOrder=c(1,1)), distribution.model = "sged",
         mean.model = list(armaOrder=c(jd.p, jd.q), include.mean = jd.mean))
 
 arma.garch.jd.fit.std <- ugarchfit(spec=arma.garch.jd.spec.std, data=jdLogRet)
 
+coef(arma.garch.jd.fit.std)
+
 # 20,000 simulations, 252 trading days into the future. Set seed 123
 
 arma.garch.jd.sim <- ugarchsim(fit = arma.garch.jd.fit.std, startMethod = "sample",
-                                 n.sim = 252, m.sim = T)#, rseed = 123)
-```
+                               n.sim = 252, m.sim = T)#, rseed = 123)
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.keep='last', fig.align='center', fig.height=8, fig.width=8}
-# Plot fit
-par(mfrow=c(4,1))
 plot(arma.garch.jd.sim, which = 2)
 plot(arma.garch.jd.sim, which = 1)
 plot(arma.garch.jd.sim, which = 4)
 plot(arma.garch.jd.sim, which = 3)
-par(mfrow=c(1,1))
-```
 
-```{r echo=FALSE, message=FALSE, warning=FALSE,results='hide'}
 # Extract fitted forecasted log returns from simulation variable
 fitted.jd <- fitted(arma.garch.jd.sim)
 jd.fitted.mean <- apply(fitted.jd, 1, mean)
 last.jd.price <- as.numeric(last(Ad(jd)))
 jd.projected.ret.as.price <- last.jd.price * c(1, exp(cumsum(jd.fitted.mean)))
 jd.target.price.252d <- as.numeric(last(jd.projected.ret.as.price))
-```
 
-> The 1 year (252 trading days approx.) target price for JD.com is USD `r round(jd.target.price.252d,2)`, (a `r paste(round(((jd.target.price.252d - last.jd.price) / last.jd.price)*100, 2),"%",sep="")` change compared to the last closing price of USD `r round(last.jd.price,2)`)
+jd.target.price.252d 
+# [1] 54.4359
 
-```{r echo=FALSE, message=FALSE, fig.keep='last',fig.align='center'}
-chart.jd <- autoplot(ets.forecast.jd) 
-chart.jd + geom_hline(yintercept = jd.target.price.252d, color = "red")
-```
-Makes sense, similar to the case of Alibaba!
+# Compare to reality
+getSymbols("JD")
+jd.one.year.later <- last.date + 365
+jd.actual.price.252d <- as.numeric(JD$JD.Adjusted[jd.one.year.later])
 
-***
+legend_projected_jd <- print(paste("u$s", round(jd.target.price.252d, digits = 2),
+                                     "Projected by Montecarlo  (", last.date,")"))
+legend_actual_jd <- print(paste("u$s", round(jd.actual.price.252d, digits = 2),
+                                  "Actual 1 year later (", jd.one.year.later,")"))
+
+jd_prices <- rep(c(legend_projected_jd,legend_actual_jd))
+
+chart.jd <- autoplot(ets.forecast.jd) + 
+  xlab("JD projected price 1 year w/ Montecarlo") + 
+  ylab("JD") + 
+  geom_hline( aes(yintercept = jd.target.price.252d, linetype = "Projected"),
+              color = "red") +
+  geom_hline( aes(yintercept = jd.actual.price.252d, linetype = "Actual"),
+              color = "green")
+
+chart.jd
+
+if(jd.target.price.252d > jd.actual.price.252d){
+  chart.jd +
+    annotate("text", x = 700, y = jd.target.price.252d +5, label =jd_prices[1]) +
+    annotate("text", x = 700, y = jd.actual.price.252d -5, label =jd_prices[2])
+} else {
+  chart.jd +
+    annotate("text", x = 700, y = jd.target.price.252d -5, label =jd_prices[1]) +
+    annotate("text", x = 700, y = jd.actual.price.252d +5, label =jd_prices[2])
+}
+
+
+#****************************************************************************************
 ### eCommerce porfolio allocation with and without short selling
 
-The optimal or efficient portfolios that follow were formulated using:  
-. Projected daily prices based on the simulations for all companies that we discussed earlier.  
-. Computing arithmetic daily returns of said projected prices.  
-. Limitation on the maximum portfolio participation of any single stock to not go above a ceiling of 50% when short sales are allowed, and a more conservative maximum allocation of 35% when short sales are not allowed. I chose these constraints for arbitrary reasons.    
-. Sharpe ratio calculated using stocks daily simple returns in excess of risk free rate. 
-. 10 year Long Term US Treasury Bond as the risk free return.
+# The optimal or efficient portfolio mixes that follow were formulated using:  
+# . Projected daily prices based on the simulations for all companies that we discussed earlier.  
+# . Computing arithmetic daily returns of said projected prices.  
+# . Limitation on the maximum portfolio participation of any single stock to not go above a ceiling of 40% long, and not below 20% short. I chose these constraints for arbitrary reasons: a rule of thumb of twice the amount of an equal weights portfolio (100% divided by 5) for long and no more than once the balanced portfolio for short positions.    
+# . Sharpe ratio calculated using stocks daily simple returns in excess of risk free rate. 
+# . 13 week US Treasury Bill Risk Free rate
 
-
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide', }
 meli.projected <- as.data.frame(meli.projected.ret.as.price)
 amzn.projected <- as.data.frame(amzn.projected.ret.as.price)
 ebay.projected <- as.data.frame(ebay.projected.ret.as.price)
@@ -1229,7 +1368,7 @@ jd.weight.no.short <- round(eff.optimal.point_noShort["JD"],2)
 
 weights.short <- cbind(meli.weight.short, amzn.weight.short, ebay.weight.short,
                        baba.weight.short, jd.weight.short)
-rownames(weights.short) <- "Weights - Shorts Allowed, Max 50% allocation"
+rownames(weights.short) <- "Weights - Shorts Allowed, , Max 50% allocation"
 
 weights.no.short <- cbind(meli.weight.no.short, amzn.weight.no.short, ebay.weight.no.short,
                           baba.weight.no.short, jd.weight.no.short)
@@ -1237,39 +1376,35 @@ rownames(weights.no.short) <- "Weights - No Shorts, Max 35% allocation"
 
 weights.short.no.short <- rbind(weights.short, weights.no.short)
 
-```
-  
-  
-```{r echo=FALSE, message=FALSE, warning=FALSE, results="asis", fig.align='center'}
-kable(weights.short.no.short)
-```
-   
+weights.short.no.short
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.keep='last', fig.align='center', fig.height=4, fig.width=8}
 # Find the optimal portfolio again, using "eff.optimal.point" as variable name so that it 
 # works with plotEfficientFrontier()
 eff.optimal.point <- eff_Short[eff_Short$sharpe==max(eff_Short$sharpe),]
 plotEfficientFrontier(eff_Short, header = "Optimal Portfolio - Shorts Allowed, Max 50% allocation")
-```
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide', fig.keep='last', fig.align='center', fig.height=4, fig.width=8}
+
 # Find the optimal portfolio again, using "eff.optimal.point" as variable name so that it 
 # works with plotEfficientFrontier()
 eff.optimal.point <- eff_noShort[eff_noShort$sharpe==max(eff_noShort$sharpe),]
 plotEfficientFrontier(eff_noShort, header = "Optimal Portfolio - No Shorts, Max 35% allocation")
-```
 
-***
-### Portfolio and Components' Value-at-Risk ([VaR](http://www.investopedia.com/terms/v/var.asp)) 
+#### Portfolio and Components' Value-at-Risk ([VaR](http://www.investopedia.com/terms/v/var.asp)) and 
+# Expected Shortfall ([ES](https://en.wikipedia.org/wiki/Expected_shortfall))  
 
-Key points to keep in mind:   
-. VaR is an approximation measure to the worst that could happen (max losses) on one single day out of twenty (5%).   
-. With positive correlation, asset prices tend to move together and this increases the volatility.  
-. Without short sales, it is impossible to go above the expected return of the stock with the highest expected return.   
-. When short sales are allowed, there is no upper bound on the expected return nor on the risk.
-. Although not done here, a short sale strategy (and all others for that manner) should be combined with [stop-loss limit orders](http://www.investopedia.com/terms/s/stop-limitorder.asp) which carries an additional cost.
+#### Portfolio and Components' Value-at-Risk ([VaR](http://www.investopedia.com/terms/v/var.asp)) and Expected Shortfall ([ES](https://en.wikipedia.org/wiki/Expected_shortfall))  
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, results='hide', }
-#and Expected Shortfall ([ES](https://en.wikipedia.org/wiki/Expected_shortfall)) 
+# Key points to keep in mind:   
+#         . VaR and ES are approximation measures to the worst that could happen (max losses) on one 
+# single day out of twenty (5%).   
+# . ES looks at the entire first five percent quantile of the low end of the return distribution tail so 
+# its larger than VaR.   
+# . With positive correlation, asset prices tend to move together and this increases the volatility.  
+# . Without short sales, it is impossible to go above the expected return of the stock with the highest 
+# expected return.   
+# . When short sales are allowed, there is no upper bound on the expected return nor on the risk. And 
+# the projected fall for Alibaba, a company with a market cap above 100B, should not be for the long 
+# run. A short sale strategy should be combined with a [stop-loss 
+#                 limit order](http://www.investopedia.com/terms/s/stop-limitorder.asp).
 
 library(PerformanceAnalytics)
 
@@ -1343,49 +1478,46 @@ colnames(VaR_noShort) <- c("Total", "MELI", "AMZN", "EBAY", "BABA", "JD")
 VarEs.table <- rbind(VaR_Short, VaR_noShort) #,ES_Short, ES_noShort)
 rownames(VarEs.table) <- c("VaR(5%) - Short Sales Allowed",
                            "VaR(5%) - Short Sales Prohibited") #,
-                           # "ES(5%) - Short Sales Allowed",
-                           # "ES(5%) - Short Sales Prohibited")
-```
+# "ES(5%) - Short Sales Allowed",
+# "ES(5%) - Short Sales Prohibited")
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, fig.align='center', results="asis"}
-kable(VarEs.table)
-```
+VarEs.table
 
+#****************************************************************************************
 
-<span style="color:grey;font-size:12px;">
-References:
-R Core Team (2015). R: A language and environment for statistical computing. R
-  Foundation for Statistical Computing, Vienna, Austria. <URL https://www.R-project.org/>.
-All Things R. Pull Yahoo Finance Key-Statistics Instantaneously Using XML and XPath in R. <URL: http://allthingsr.blogspot.com.ar/2012/10/pull-yahoo-finance-key-statistics.html>.
-Raymond McTaggart and Gergely Daroczi (2015). Quandl: API Wrapper for Quandl.com. R
-  package version 2.6.0. <URL: http://CRAN.R-project.org/package=Quandl>.
-Taiyun Wei (2013). corrplot: Visualization of a correlation matrix. R package version
-  0.73. <URL: http://CRAN.R-project.org/package=corrplot>.
-Jeffrey A. Ryan (2015). quantmod: Quantitative Financial Modelling Framework. R
-  package version 0.4-5. <URL: http://CRAN.R-project.org/package=quantmod>.
-Hyndman RJ (2015). _forecast: Forecasting functions for time series and linear models_.
-R package version 6.1, <URL: http://github.com/robjhyndman/forecast>.
-Hyndman RJ and Khandakar Y (2008). "Automatic time series forecasting: the forecast
-package for R." _Journal of Statistical Software_, *26*(3), pp. 1-22. <URL:
-http://ideas.repec.org/a/jss/jstsof/27i03.html>.
-Alexios Ghalanos (2015). rugarch: Univariate GARCH models. R package version 1.3-6.
-Andrew Matuszak. the Economist at Large. Efficient Frontier and plotEfficientFrontier. <URL:   http://economistatlarge.com/>.
-David Ruppert. Statistics and Data Analysis for Financial Engineering (Springer Science+Business Media, LLC, 233 Spring Street, New York, NY 10013, USA).
-John L. Weatherwax, PhD. A Solution Manual for: Statistics and Data Analysis for Financial Engineering by David Rupert. <URL: http://www.waxworksmath.com>.
-S original by Berwin A. Turlach R port by Andreas Weingessel
-  <Andreas.Weingessel@ci.tuwien.ac.at> (2013). quadprog: Functions to solve Quadratic
-  Programming Problems.. R package version 1.5-5.
-  <URL: http://CRAN.R-project.org/package=quadprog>.
- Brian G. Peterson and Peter Carl (2014). PerformanceAnalytics: Econometric tools for
-  performance and risk analysis. R package version 1.4.3541.
-  <URL: http://CRAN.R-project.org/package=PerformanceAnalytics>.
-Yihui Xie (2015). knitr: A General-Purpose Package for Dynamic Report Generation in R.
-  R package version 1.11.
-Yihui Xie (2015) Dynamic Documents with R and knitr. 2nd edition. Chapman and
-  Hall/CRC. ISBN 978-1498716963.
-Yihui Xie (2014) knitr: A Comprehensive Tool for Reproducible Research in R. In
-  Victoria Stodden, Friedrich Leisch and Roger D. Peng, editors, Implementing
-  Reproducible Computational Research. Chapman and Hall/CRC. ISBN 978-1466561595.
-JJ Allaire, Jeffrey Horner, Vicent Marti and Natacha Porte (2015). markdown:
-  'Markdown' Rendering for R. R package version 0.7.7. <http://CRAN.R-project.org/package=markdown>.
-</span>
+# References:
+#         R Core Team (2015). R: A language and environment for statistical computing. R
+# Foundation for Statistical Computing, Vienna, Austria. <URL https://www.R-project.org/>.
+# All Things R. Pull Yahoo Finance Key-Statistics Instantaneously Using XML and XPath in R. <URL: http://allthingsr.blogspot.com.ar/2012/10/pull-yahoo-finance-key-statistics.html>.
+# Raymond McTaggart and Gergely Daroczi (2015). Quandl: API Wrapper for Quandl.com. R
+# package version 2.6.0. <URL: http://CRAN.R-project.org/package=Quandl>.
+# Taiyun Wei (2013). corrplot: Visualization of a correlation matrix. R package version
+# 0.73. <URL: http://CRAN.R-project.org/package=corrplot>.
+# Jeffrey A. Ryan (2015). quantmod: Quantitative Financial Modelling Framework. R
+# package version 0.4-5. <URL: http://CRAN.R-project.org/package=quantmod>.
+# Hyndman RJ (2015). _forecast: Forecasting functions for time series and linear models_.
+# R package version 6.1, <URL: http://github.com/robjhyndman/forecast>.
+# Hyndman RJ and Khandakar Y (2008). "Automatic time series forecasting: the forecast
+# package for R." _Journal of Statistical Software_, *26*(3), pp. 1-22. <URL:
+#         http://ideas.repec.org/a/jss/jstsof/27i03.html>.
+# Alexios Ghalanos (2015). rugarch: Univariate GARCH models. R package version 1.3-6.
+# Andrew Matuszak. the Economist at Large. Efficient Frontier and plotEfficientFrontier. <URL:   http://economistatlarge.com/>.
+# David Ruppert. Statistics and Data Analysis for Financial Engineering (Springer Science+Business Media, LLC, 233 Spring Street, New York, NY 10013, USA).
+# John L. Weatherwax, PhD. A Solution Manual for: Statistics and Data Analysis for Financial Engineering by David Rupert. <URL: http://www.waxworksmath.com>.
+# S original by Berwin A. Turlach R port by Andreas Weingessel
+# <Andreas.Weingessel@ci.tuwien.ac.at> (2013). quadprog: Functions to solve Quadratic
+# Programming Problems.. R package version 1.5-5.
+# <URL: http://CRAN.R-project.org/package=quadprog>.
+# Brian G. Peterson and Peter Carl (2014). PerformanceAnalytics: Econometric tools for
+# performance and risk analysis. R package version 1.4.3541.
+# <URL: http://CRAN.R-project.org/package=PerformanceAnalytics>.
+# Yihui Xie (2015). knitr: A General-Purpose Package for Dynamic Report Generation in R.
+# R package version 1.11.
+# Yihui Xie (2015) Dynamic Documents with R and knitr. 2nd edition. Chapman and
+# Hall/CRC. ISBN 978-1498716963.
+# Yihui Xie (2014) knitr: A Comprehensive Tool for Reproducible Research in R. In
+# Victoria Stodden, Friedrich Leisch and Roger D. Peng, editors, Implementing
+# Reproducible Computational Research. Chapman and Hall/CRC. ISBN 978-1466561595.
+# JJ Allaire, Jeffrey Horner, Vicent Marti and Natacha Porte (2015). markdown:rg/package=markdown>.
+#**************************************************************************************
+#         'Markdown' Rendering for R. R package version 0.7.7. <http://CRAN.R-project.o**
