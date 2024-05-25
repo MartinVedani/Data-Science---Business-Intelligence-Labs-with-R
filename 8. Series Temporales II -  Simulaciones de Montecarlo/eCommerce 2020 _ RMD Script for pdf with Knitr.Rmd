@@ -89,7 +89,7 @@ p <- ggplot(l.out, aes(x = ref_date, y = price_close))
 p <- p + geom_line() + xlab("June 1, 2015   to   June 7, 2020") +  ylab("Closing Prices")
 p <- p + facet_wrap(~ticker, scales = 'free_y') 
 
-print(p)
+# print(p)
 
 detach("package:yfR", unload=TRUE)
 
