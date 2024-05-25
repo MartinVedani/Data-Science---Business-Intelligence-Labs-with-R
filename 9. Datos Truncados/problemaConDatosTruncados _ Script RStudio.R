@@ -5,17 +5,9 @@ library(truncSP)
 # REAL DATA
 realData <- read.csv('realData.csv', header=TRUE, sep=",")
 
-# o
-
-realData <- read.csv(file.choose(), header = TRUE, sep = ",")
-
 ### TRUNCATED DATA
 
 truncatedData <- read.csv('truncatedData.csv', header=TRUE, sep=",")
-
-# o
-
-truncatedData <- read.csv(file.choose(), header = TRUE, sep = ",")
 
 realY <- realData[,1]
 truncatedY <- truncatedData[,1]
