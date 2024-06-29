@@ -37,7 +37,7 @@ https://cran.r-project.org/web/packages/ctv/index.html
 Lo más interesante son los listado por vistas publicados en: https://cran.r-project.org/web/views/
 
 ``>`` <code> install.packages("ctv") </code><br>
-``>`` <code> ctv::update.views(c("DifferentialEquations", "Robust", "Optimization", "OfficialStatistics", "NumericalMathematics","Finance","Econometrics", "TimeSeries","OfficialStatistics", "MissingData","GraphicalModels","ExtremeValue","Finance"), coreOnly=TRUE) </code>
+``>`` <code> ctv::update.views(c("DifferentialEquations", "Robust", "Optimization", "OfficialStatistics", "NumericalMathematics","Finance","Econometrics", "TimeSeries","OfficialStatistics", "MissingData","GraphicalModels","ExtremeValue"), coreOnly=TRUE) </code>
    
 # Instruccion de instalación con TERMINAL en MacOs:
 
